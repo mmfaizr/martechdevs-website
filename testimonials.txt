@@ -1,0 +1,47 @@
+
+I have organized them by file name and formatted them for readability, highlighting the speakers and the specific tools/services mentioned.
+
+### **File: testimonial 2.mp4**
+**Speaker:** Elie, CMO of Submagic
+
+"Hey everyone, I'm Elie, the CMO of Submagic. We have worked with Faizur and his agency for the past six months to set up all the growth stack that we needed. All the marketing analytics tools like **Mixpanel**, **Google Analytics**, data tracking tool, customer analysis tool like **Customer.io**, and like every kind of tool that we needed for the growth stack.
+
+So, we are super happy to work with Faizur. He's always ready to help, super reactive. So yeah, I highly recommend to work with him."
+
+---
+
+### **File: testimonial 3.mp4**
+**Speaker:** Arman Assadi, Founder and CEO of Steno.ai
+
+"Hey, I'm Arman Assadi, Founder and CEO of **Steno.ai**. We worked with Faizur when we wanted to set up **Mixpanel**. It was outside of our experience and skill set, and I'm really glad I found him and his team.
+
+What I loved was how **detail-oriented** he was, and also that he wasn't just there to accomplish that one task. He was able to advise us. He suggested setting up **Segment** and he thought about everything at a macro level, all the way down to the micro, and it just gave me the confidence to be able to outsource this.
+
+And overall, I was just very impressed and hope to continue working with him. So, big shout out. Thanks."
+
+---
+
+### **File: testimonial 4.mp4**
+**Speaker:** Gabriel, Operations at MKTV
+
+"Hi, my name is Gabriel and I run operations at MKTV. We recently had the pleasure of working with Faiz on our recent integration of **Segment**, a customer data platform. Not only did he help us seamlessly set up the integration, but he also went above and beyond to help us establish dashboards in **Mixpanel** as well.
+
+I think what was super valuable in this project was having somebody who understood both the **business/marketing requirements** but also had the **technical expertise** to execute them. And as a startup, this was something that previously we were lacking, but with Faiz's help, we were able to finally break through that barrier.
+
+What sets him apart is his willingness to provide valuable advice and guidance beyond the scope of the project. He was always available to share his deep knowledge in helping us optimize our marketing strategies, but also drive us towards always making those data-driven decisions.
+
+I highly, highly recommend Faiz for any project requiring a blend of technical skills as well as strategic insights. Thank you very much, Faiz."
+
+---
+
+### **File: testimonial 1.mp4**
+**Subject:** Google Ads & Analytics Tracking
+
+"Hi guys. So I'm making this video to thank Faizur for all the work he's been doing with us now since two months. So basically, uh, Faizur helped us transfer **Google Analytics** conversion events to **Google Ads**.
+
+So if you use Google Analytics, you know that it's really painful to use. And even more when you want to transfer data from Google Analytics to other platforms. And what Faizur helped us to do is to track the traffic from Google Ads, identify the events, and send these events to **Segment**, and then from Segment, send this event to Google Ads.
+
+So we have a clear vision of our conversion in Google Ads and we could optimize our campaign like this. Because if your tracking is not on point, you can't really improve your Google Ads performances, and your ads account is kind of a black box. So, you really applied through that efficiently and quickly. So we set that up within two or three weeks.
+
+And after that, he helped us set up **Enhanced Conversion** as well on Google Ads, which help track conversion even more precisely. So if you want to work with Faizur, do not hesitate. I will definitely recommend. Thank you. See ya."
+
