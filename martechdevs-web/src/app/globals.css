@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  color: #111827;
+  line-height: 1.2;
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-33.333%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 60s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 60s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+/* Gradient Masks for Marquee */
+.marquee-mask {
+  position: relative;
+}
+
+.marquee-mask::before,
+.marquee-mask::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.marquee-mask::before {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%);
+}
+
+.marquee-mask::after {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Testimonial Carousel */
+@keyframes testimonial-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+.testimonial-marquee {
+  animation: testimonial-scroll 25s linear infinite;
+}
+
+.testimonial-marquee:hover {
+  animation-play-state: paused;
+}
+
+.animate-marquee-slow {
+  animation: testimonial-scroll 50s linear infinite;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Button hover effect */
+.btn-primary {
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Service card colors */
+.service-purple { background: linear-gradient(135deg, #EDE9FE 0%, #F3E8FF 100%); }
+.service-blue { background: linear-gradient(135deg, #DBEAFE 0%, #E0F2FE 100%); }
+.service-green { background: linear-gradient(135deg, #D1FAE5 0%, #DCFCE7 100%); }
+.service-cyan { background: linear-gradient(135deg, #CFFAFE 0%, #E0F7FA 100%); }
+.service-orange { background: linear-gradient(135deg, #FFEDD5 0%, #FEF3C7 100%); }
+.service-indigo { background: linear-gradient(135deg, #E0E7FF 0%, #EEF2FF 100%); }
+.service-rose { background: linear-gradient(135deg, #FFE4E6 0%, #FCE7F3 100%); }
+.service-teal { background: linear-gradient(135deg, #CCFBF1 0%, #D1FAE5 100%); }
+
+/* Video card styling - removed hover effect */
+
+/* Hide YouCanBook.me branding */
+iframe[src*="youcanbook"] + div,
+a[href*="youcanbook.me/pb-pp"],
+a[data-testid="paidLink"],
+._link_ppnbm_9,
+._paid_ppnbm_27,
+a._base_1sq60_1[href*="youcanbook"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
