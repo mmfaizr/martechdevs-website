@@ -1,0 +1,30 @@
+display_information:
+  name: Martechdevs Support AI
+  description: AI-first customer support with human handoff
+  background_color: "#1a1a2e"
+
+features:
+  bot_user:
+    display_name: Support Bot
+    always_online: true
+
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - channels:read
+      - users:read
+
+settings:
+  event_subscriptions:
+    request_url: https://your-server.com/slack/events
+    bot_events:
+      - message.channels
+  interactivity:
+    is_enabled: true
+    request_url: https://your-server.com/slack/interactions
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+
