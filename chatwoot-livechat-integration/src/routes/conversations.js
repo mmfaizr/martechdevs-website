@@ -126,7 +126,11 @@ router.post('/quote/next', async (req, res) => {
   try {
     const { conversation_id, previous_answer, collected_data } = req.body;
 
+    console.log('[Quote Flow] Generating step:', { conversation_id, previous_answer: previous_answer?.substring(0, 50), collected_keys: Object.keys(collected_data || {}) });
+    
     const result = await geminiService.generateQuoteStep(previous_answer || '', collected_data || {});
+    
+    console.log('[Quote Flow] Result:', { question: result.question?.substring(0, 50), options_count: result.options?.length, is_complete: result.is_complete });
 
     if (conversation_id) {
       try {

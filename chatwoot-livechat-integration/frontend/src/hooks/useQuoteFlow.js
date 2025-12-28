@@ -14,17 +14,23 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     setIsLoadingQuestion(true);
 
     try {
+      console.log('[QuoteFlow] Fetching next question:', { conversationId, previousAnswer: previousAnswer?.substring(0, 30) });
+      
       const response = await fetch(`${apiUrl}/quote/next`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          conversation_id: conversationId,
+          conversation_id: conversationId || null,
           previous_answer: previousAnswer,
           collected_data: currentData
         })
       });
 
-      if (!response.ok) throw new Error('Failed to get next question');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[QuoteFlow] API error:', response.status, errorText);
+        throw new Error('Failed to get next question');
+      }
 
       const data = await response.json();
       
@@ -57,18 +63,34 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
         return { completed: true };
       }
 
-      setCurrentStep({
+      const step = {
         question: data.question,
         options: data.options || [],
         multiSelect: data.multi_select || false,
         inputType: data.input_type || null
-      });
+      };
+      console.log('[QuoteFlow] Setting step:', { question: step.question?.substring(0, 50), options: step.options?.length });
+      setCurrentStep(step);
       setQuestionCount(prev => prev + 1);
       setIsLoadingQuestion(false);
       
       return { completed: false };
     } catch (error) {
-      console.error('Error fetching question:', error);
+      console.error('[QuoteFlow] Error fetching question:', error);
+      
+      setCurrentStep({
+        question: "Let's get you a quote! What type of company are you?",
+        options: [
+          { value: 'b2b_saas', label: 'B2B SaaS' },
+          { value: 'b2c_saas', label: 'B2C SaaS' },
+          { value: 'e_commerce', label: 'E-commerce' },
+          { value: 'fintech', label: 'Fintech' },
+          { value: 'other', label: 'Other' }
+        ],
+        multiSelect: false,
+        inputType: null
+      });
+      setQuestionCount(1);
       setIsLoadingQuestion(false);
       return { completed: false, error: true };
     }

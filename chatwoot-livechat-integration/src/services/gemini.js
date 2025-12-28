@@ -189,7 +189,20 @@ Generate your response:`;
       });
 
       const responseText = result.response.text();
-      const parsed = JSON.parse(responseText);
+      console.log('[Gemini Quote] Raw response:', responseText.substring(0, 500));
+      
+      let parsed;
+      try {
+        parsed = JSON.parse(responseText);
+      } catch (parseErr) {
+        console.error('[Gemini Quote] JSON parse error:', parseErr.message);
+        throw new Error('Invalid JSON from Gemini');
+      }
+
+      if (!parsed.question) {
+        console.error('[Gemini Quote] No question in response:', parsed);
+        throw new Error('No question in Gemini response');
+      }
 
       const newCollected = { ...collectedData };
       if (parsed.collected) {
@@ -208,16 +221,28 @@ Generate your response:`;
         is_complete: isComplete
       };
     } catch (error) {
-      console.error('Gemini Quote Step error:', error);
+      console.error('Gemini Quote Step error:', error.message);
       
       const missingRequired = REQUIRED_FIELDS.filter(f => !collectedData[f]);
-      const nextField = missingRequired[0] || 'email';
+      const nextField = missingRequired[0] || 'company_type';
+      const fieldConfig = QUOTE_SCHEMA[nextField];
+      
+      const fallbackOptions = fieldConfig?.options 
+        ? fieldConfig.options.map(o => ({ 
+            value: o.toLowerCase().replace(/[^a-z0-9]+/g, '_'), 
+            label: o 
+          }))
+        : [];
+      
+      const isFirst = Object.keys(collectedData).length === 0;
       
       return {
-        question: `Could you tell me about your ${QUOTE_SCHEMA[nextField].toLowerCase()}?`,
-        options: [],
-        multi_select: false,
-        input_type: nextField === 'email' ? 'email' : null,
+        question: isFirst 
+          ? `Hey! Let's get you a quick quote. First, what type of company are you?`
+          : `Thanks! Now, ${fieldConfig?.description?.toLowerCase() || 'tell me more'}?`,
+        options: fallbackOptions,
+        multi_select: fieldConfig?.multiSelect || false,
+        input_type: fieldConfig?.inputType || null,
         collected_data: collectedData,
         is_complete: false
       };
