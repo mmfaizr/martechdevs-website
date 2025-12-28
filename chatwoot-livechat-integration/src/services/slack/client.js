@@ -98,6 +98,50 @@ class SlackService {
     });
   }
 
+  async postQuoteSummary(conversation, email, quoteSummary) {
+    await this.client.chat.postMessage({
+      channel: conversation.slack_channel_id,
+      thread_ts: conversation.slack_thread_ts,
+      text: '📋 Quote Generated',
+      blocks: [
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: '📋 Quote Generated',
+            emoji: true
+          }
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*Customer Email:* ${email || 'Not provided'}\n\n${quoteSummary.replace(/\*\*/g, '*')}`
+          }
+        },
+        {
+          type: 'actions',
+          block_id: 'quote_actions',
+          elements: [
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: '📧 Send Proposal', emoji: true },
+              style: 'primary',
+              action_id: 'send_proposal',
+              value: JSON.stringify({ conversationId: conversation.id, email })
+            },
+            {
+              type: 'button',
+              text: { type: 'plain_text', text: '📞 Schedule Call', emoji: true },
+              action_id: 'schedule_call',
+              value: conversation.id
+            }
+          ]
+        }
+      ]
+    });
+  }
+
   async getUserInfo(userId) {
     try {
       const result = await this.client.users.info({ user: userId });

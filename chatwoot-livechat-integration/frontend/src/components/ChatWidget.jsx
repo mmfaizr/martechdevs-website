@@ -11,6 +11,7 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
   const inputRef = useRef(null);
   
   const {
+    conversationId,
     messages,
     status,
     agentName,
@@ -26,7 +27,7 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     ]);
   };
 
-  const quoteFlow = useQuoteFlow(apiUrl, handleQuoteComplete);
+  const quoteFlow = useQuoteFlow(apiUrl, conversationId, handleQuoteComplete);
 
   useEffect(() => {
     if (autoOpen && !isOpen && !hasAutoOpened) {

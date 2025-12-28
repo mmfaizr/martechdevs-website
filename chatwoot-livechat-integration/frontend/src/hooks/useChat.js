@@ -129,6 +129,7 @@ export function useChat(apiUrl, customerInfo) {
   }, [conversationId, apiUrl]);
 
   return {
+    conversationId,
     messages,
     status,
     agentName,
