@@ -1,7 +1,7 @@
 export const QUOTE_TOPICS = [
   {
     id: 'company_type',
-    topic: 'company type and industry',
+    topic: 'type of company',
     options: [
       { value: 'b2b_saas', label: 'B2B SaaS' },
       { value: 'b2c_saas', label: 'B2C SaaS' },
@@ -13,7 +13,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'company_stage',
-    topic: 'company stage and size',
+    topic: 'company stage',
     options: [
       { value: 'early_stage', label: 'Early stage' },
       { value: 'growth_stage', label: 'Growth stage' },
@@ -22,7 +22,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'platforms',
-    topic: 'platforms they need integration for',
+    topic: 'platforms needing integration',
     multiSelect: true,
     options: [
       { value: 'website', label: 'Website' },
@@ -33,7 +33,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'traffic',
-    topic: 'monthly website and app traffic',
+    topic: 'monthly traffic volume',
     options: [
       { value: 'under_5k', label: '< 5,000' },
       { value: '5k_50k', label: '5k - 50k' },
@@ -44,7 +44,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'dev_model',
-    topic: 'how they want to work together - full implementation or as a copilot',
+    topic: 'preferred working model',
     options: [
       { value: 'full_implementation', label: 'Full implementation by us' },
       { value: 'copilot', label: 'Copilot for your dev team' }
@@ -52,7 +52,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'urgency',
-    topic: 'timeline and urgency',
+    topic: 'project timeline',
     options: [
       { value: 'asap', label: 'ASAP / Yesterday' },
       { value: 'two_weeks', label: 'In two weeks' },
@@ -62,7 +62,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'customer_location',
-    topic: 'where their customers are located',
+    topic: 'customer locations',
     multiSelect: true,
     options: [
       { value: 'worldwide', label: 'Worldwide' },
@@ -75,7 +75,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'compliance',
-    topic: 'compliance requirements like GDPR or CCPA',
+    topic: 'compliance requirements',
     multiSelect: true,
     options: [
       { value: 'gdpr', label: 'GDPR' },
@@ -86,7 +86,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'goals',
-    topic: 'main goals and what they want to achieve',
+    topic: 'main goals',
     multiSelect: true,
     options: [
       { value: 'reverse_etl', label: 'Activate Datawarehouse data (Reverse ETL)' },
@@ -99,7 +99,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'tools',
-    topic: 'martech tools they use or plan to use',
+    topic: 'martech tools in use or planned',
     multiSelect: true,
     options: [
       { value: 'mixpanel', label: 'Mixpanel' },
@@ -121,7 +121,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'documentation',
-    topic: 'documentation and training materials needed',
+    topic: 'documentation needs',
     multiSelect: true,
     options: [
       { value: 'docs', label: 'Comprehensive docs' },
@@ -131,7 +131,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'training_hours',
-    topic: 'training hours needed for their team',
+    topic: 'training hours needed',
     options: [
       { value: 'none', label: 'None' },
       { value: '5_hours', label: '5 hours' },
@@ -151,7 +151,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'support_hours',
-    topic: 'monthly support hours needed',
+    topic: 'monthly support hours',
     options: [
       { value: '5_hours', label: '5 hours/month' },
       { value: '20_hours', label: '20 hours/month' },
@@ -161,7 +161,7 @@ export const QUOTE_TOPICS = [
   },
   {
     id: 'email',
-    topic: 'work email to send the quote',
+    topic: 'work email',
     inputType: 'email',
     options: []
   }
