@@ -26,7 +26,7 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     ]);
   };
 
-  const quoteFlow = useQuoteFlow(handleQuoteComplete);
+  const quoteFlow = useQuoteFlow(apiUrl, handleQuoteComplete);
 
   useEffect(() => {
     if (autoOpen && !isOpen && !hasAutoOpened) {
@@ -51,24 +51,23 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     }
   }, [isOpen, quoteFlow.isActive]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     if (quoteFlow.isActive && quoteFlow.currentStep?.inputType) {
-      const result = quoteFlow.submitTextInput(input);
-      if (result) {
+      const inputValue = input;
+      setInput('');
+      setQuoteMessages(prev => [
+        ...prev,
+        { id: `user_${Date.now()}`, type: 'user_input', content: inputValue, created_at: new Date().toISOString() }
+      ]);
+      const result = await quoteFlow.submitTextInput(inputValue);
+      if (result?.completed) {
         setQuoteMessages(prev => [
           ...prev,
-          { id: `user_${Date.now()}`, type: 'user_input', content: input, created_at: new Date().toISOString() }
+          { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
         ]);
-        if (result.completed) {
-          setQuoteMessages(prev => [
-            ...prev,
-            { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
-          ]);
-        }
       }
-      setInput('');
       return;
     }
 
@@ -98,9 +97,8 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     quoteFlow.selectOption(value);
   };
 
-  const handleConfirmSelection = () => {
-    const step = quoteFlow.currentStep;
-    const result = quoteFlow.confirmSelection();
+  const handleConfirmSelection = async () => {
+    const result = await quoteFlow.confirmSelection();
     if (result) {
       setQuoteMessages(prev => [
         ...prev,
@@ -172,7 +170,14 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
                   <QuoteMessage key={msg.id} message={msg} />
                 ))}
 
-                {quoteFlow.currentStep && (
+                {quoteFlow.isLoadingQuestion ? (
+                  <div className="message ai">
+                    <div className="message-header">AI Assistant</div>
+                    <div className="message-content">
+                      <TypingIndicator />
+                    </div>
+                  </div>
+                ) : quoteFlow.currentStep && (
                   <QuoteStep
                     step={quoteFlow.currentStep}
                     selectedOptions={quoteFlow.selectedOptions}

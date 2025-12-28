@@ -1,182 +1,189 @@
-export const QUOTE_FLOW_STEPS = [
+export const QUOTE_TOPICS = [
   {
     id: 'company_type',
-    question: "What type of company are you? This helps us tailor our approach to your needs.",
-    multiSelect: false,
+    topic: 'company type and industry',
     options: [
-      { value: 'b2b_saas', label: 'B2B SaaS', icon: '🏢' },
-      { value: 'b2c_saas', label: 'B2C SaaS', icon: '🏬' },
-      { value: 'ed_tech', label: 'Ed tech', icon: '🎓' },
-      { value: 'fintech', label: 'Fintech', icon: '🏦' },
-      { value: 'marketplace', label: 'Marketplace', icon: '🛒' },
-      { value: 'other', label: 'Others', icon: '💼' }
+      { value: 'b2b_saas', label: 'B2B SaaS' },
+      { value: 'b2c_saas', label: 'B2C SaaS' },
+      { value: 'ed_tech', label: 'Ed tech' },
+      { value: 'fintech', label: 'Fintech' },
+      { value: 'marketplace', label: 'Marketplace' },
+      { value: 'other', label: 'Other' }
     ]
   },
   {
     id: 'company_stage',
-    question: "What stage is your company at?",
-    multiSelect: false,
+    topic: 'company stage and size',
     options: [
-      { value: 'early_stage', label: 'Early stage', icon: '🌱' },
-      { value: 'growth_stage', label: 'Growth stage', icon: '📈' },
-      { value: 'enterprise', label: 'Enterprise', icon: '🏛️' }
+      { value: 'early_stage', label: 'Early stage' },
+      { value: 'growth_stage', label: 'Growth stage' },
+      { value: 'enterprise', label: 'Enterprise' }
     ]
   },
   {
     id: 'platforms',
-    question: "Which platforms do you need integration for? Select all that apply.",
+    topic: 'platforms they need integration for',
     multiSelect: true,
     options: [
-      { value: 'website', label: 'Website', icon: '🖥️' },
-      { value: 'web_app', label: 'Web app', icon: '📱' },
-      { value: 'ios', label: 'iOS', icon: '🍎' },
-      { value: 'android', label: 'Android', icon: '🤖' }
+      { value: 'website', label: 'Website' },
+      { value: 'web_app', label: 'Web app' },
+      { value: 'ios', label: 'iOS' },
+      { value: 'android', label: 'Android' }
     ]
   },
   {
     id: 'traffic',
-    question: "What's your approximate monthly website (+app) traffic?",
-    multiSelect: false,
+    topic: 'monthly website and app traffic',
     options: [
-      { value: 'under_5k', label: '< 5,000', icon: '📊' },
-      { value: '5k_50k', label: '5k - 50k', icon: '📊' },
-      { value: '50k_100k', label: '50k - 100k', icon: '📊' },
-      { value: '100k_1m', label: '100k - 1M', icon: '📊' },
-      { value: 'over_1m', label: '1M+', icon: '📊' }
+      { value: 'under_5k', label: '< 5,000' },
+      { value: '5k_50k', label: '5k - 50k' },
+      { value: '50k_100k', label: '50k - 100k' },
+      { value: '100k_1m', label: '100k - 1M' },
+      { value: 'over_1m', label: '1M+' }
     ]
   },
   {
     id: 'dev_model',
-    question: "How would you like us to work with you?",
-    multiSelect: false,
+    topic: 'how they want to work together - full implementation or as a copilot',
     options: [
-      { value: 'full_implementation', label: 'We implement fully', icon: '🔧' },
-      { value: 'copilot', label: 'We become copilot of your dev team', icon: '⚡' }
+      { value: 'full_implementation', label: 'Full implementation by us' },
+      { value: 'copilot', label: 'Copilot for your dev team' }
     ]
   },
   {
     id: 'urgency',
-    question: "When do you need this implemented?",
-    multiSelect: false,
+    topic: 'timeline and urgency',
     options: [
-      { value: 'asap', label: 'Yesterday', icon: '🔥' },
-      { value: 'two_weeks', label: 'In two weeks', icon: '⏰' },
-      { value: 'month', label: 'In a month', icon: '📅' },
-      { value: 'quarter', label: 'In this quarter', icon: '📆' }
+      { value: 'asap', label: 'ASAP / Yesterday' },
+      { value: 'two_weeks', label: 'In two weeks' },
+      { value: 'month', label: 'In a month' },
+      { value: 'quarter', label: 'This quarter' }
     ]
   },
   {
     id: 'customer_location',
-    question: "Where are your customers located? Select all that apply.",
+    topic: 'where their customers are located',
     multiSelect: true,
     options: [
-      { value: 'worldwide', label: 'Worldwide', icon: '🌍' },
-      { value: 'eu', label: 'European Union', icon: '🇪🇺' },
-      { value: 'middle_east', label: 'Middle East', icon: '🌙' },
-      { value: 'australia', label: 'Australia', icon: '🇦🇺' },
-      { value: 'north_america', label: 'North America', icon: '🇺🇸' },
-      { value: 'asia', label: 'Asia', icon: '🌏' }
+      { value: 'worldwide', label: 'Worldwide' },
+      { value: 'eu', label: 'European Union' },
+      { value: 'middle_east', label: 'Middle East' },
+      { value: 'australia', label: 'Australia' },
+      { value: 'north_america', label: 'North America' },
+      { value: 'asia', label: 'Asia' }
     ]
   },
   {
     id: 'compliance',
-    question: "Any specific compliance requirements?",
+    topic: 'compliance requirements like GDPR or CCPA',
     multiSelect: true,
     options: [
-      { value: 'gdpr', label: 'GDPR', icon: '🔒' },
-      { value: 'ccpa', label: 'CCPA', icon: '🔐' },
-      { value: 'other', label: 'Others', icon: '📋' },
-      { value: 'none', label: 'Not sure / None', icon: '❓' }
+      { value: 'gdpr', label: 'GDPR' },
+      { value: 'ccpa', label: 'CCPA' },
+      { value: 'other', label: 'Other' },
+      { value: 'none', label: 'None / Not sure' }
     ]
   },
   {
     id: 'goals',
-    question: "What are your main goals? Select all that apply.",
+    topic: 'main goals and what they want to achieve',
     multiSelect: true,
     options: [
-      { value: 'reverse_etl', label: 'Activate Datawarehouse data (Reverse ETL)', icon: '🔄' },
-      { value: 'server_tracking', label: 'Server-side tracking and conversion tracking setup', icon: '📡' },
-      { value: 'messaging', label: 'Event based personalised email, in-app, push notifications journey', icon: '✉️' },
-      { value: 'crm_helpdesk', label: 'CRM, Customer Support and Helpdesk Setup', icon: '🎧' },
-      { value: 'analytics', label: 'Marketing performance, product usage and revenue analytics', icon: '📊' },
-      { value: 'data_centralization', label: 'Data Centralisation and Automation', icon: '🗄️' }
+      { value: 'reverse_etl', label: 'Activate Datawarehouse data (Reverse ETL)' },
+      { value: 'server_tracking', label: 'Server-side tracking & conversion tracking' },
+      { value: 'messaging', label: 'Personalised email, in-app, push notifications' },
+      { value: 'crm_helpdesk', label: 'CRM & Helpdesk Setup' },
+      { value: 'analytics', label: 'Marketing & revenue analytics' },
+      { value: 'data_centralization', label: 'Data Centralisation & Automation' }
     ]
   },
   {
     id: 'tools',
-    question: "Which tools are you using or planning to use? Select all that apply.",
+    topic: 'martech tools they use or plan to use',
     multiSelect: true,
     options: [
-      { value: 'mixpanel', label: 'Mixpanel', icon: '📈' },
-      { value: 'segment', label: 'Segment', icon: '🔗' },
-      { value: 'hubspot', label: 'HubSpot', icon: '🧲' },
-      { value: 'census', label: 'Census', icon: '📊' },
-      { value: 'airbyte', label: 'Airbyte', icon: '🔄' },
-      { value: 'fivetran', label: 'Fivetran', icon: '📥' },
-      { value: 'snowflake', label: 'Snowflake', icon: '❄️' },
-      { value: 'bigquery', label: 'BigQuery', icon: '🔍' },
-      { value: 'adjust', label: 'Adjust', icon: '📱' },
-      { value: 'appsflyer', label: 'AppsFlyer', icon: '🚀' },
-      { value: 'braze', label: 'Braze', icon: '🔥' },
-      { value: 'intercom', label: 'Intercom', icon: '💬' },
-      { value: 'gtm', label: 'Google Tag Manager', icon: '🏷️' },
-      { value: 'clevertap', label: 'CleverTap', icon: '🎯' },
-      { value: 'ga4', label: 'Google Analytics', icon: '📉' },
-      { value: 'customerio', label: 'Customer.io', icon: '📧' },
-      { value: 'not_sure', label: 'Not sure', icon: '❓' }
+      { value: 'mixpanel', label: 'Mixpanel' },
+      { value: 'segment', label: 'Segment' },
+      { value: 'hubspot', label: 'HubSpot' },
+      { value: 'census', label: 'Census' },
+      { value: 'airbyte', label: 'Airbyte' },
+      { value: 'fivetran', label: 'Fivetran' },
+      { value: 'snowflake', label: 'Snowflake' },
+      { value: 'bigquery', label: 'BigQuery' },
+      { value: 'braze', label: 'Braze' },
+      { value: 'intercom', label: 'Intercom' },
+      { value: 'gtm', label: 'Google Tag Manager' },
+      { value: 'clevertap', label: 'CleverTap' },
+      { value: 'ga4', label: 'Google Analytics' },
+      { value: 'customerio', label: 'Customer.io' },
+      { value: 'not_sure', label: 'Not sure yet' }
     ]
   },
   {
     id: 'documentation',
-    question: "What type of documentation would you like?",
+    topic: 'documentation and training materials needed',
     multiSelect: true,
     options: [
-      { value: 'docs', label: 'Comprehensive docs', icon: '📄' },
-      { value: 'videos', label: 'Video tutorials', icon: '🎬' },
-      { value: 'none', label: 'None needed', icon: '❌' }
+      { value: 'docs', label: 'Comprehensive docs' },
+      { value: 'videos', label: 'Video tutorials' },
+      { value: 'none', label: 'None needed' }
     ]
   },
   {
     id: 'training_hours',
-    question: "How many hours of training would your team need?",
-    multiSelect: false,
+    topic: 'training hours needed for their team',
     options: [
-      { value: 'none', label: 'None', icon: '0️⃣' },
-      { value: '5_hours', label: '5 hours', icon: '⏱️' },
-      { value: '20_hours', label: '20 hours', icon: '⏰' },
-      { value: '50_hours', label: '50 hours', icon: '🕐' }
+      { value: 'none', label: 'None' },
+      { value: '5_hours', label: '5 hours' },
+      { value: '20_hours', label: '20 hours' },
+      { value: '50_hours', label: '50 hours' }
     ]
   },
   {
     id: 'support_duration',
-    question: "How long would you need ongoing support?",
-    multiSelect: false,
+    topic: 'ongoing support duration',
     options: [
-      { value: 'none', label: 'None', icon: '❌' },
-      { value: '3_months', label: '3 months', icon: '📅' },
-      { value: '6_months', label: '6 months', icon: '📆' },
-      { value: '12_months', label: '12 months', icon: '🗓️' }
+      { value: 'none', label: 'None' },
+      { value: '3_months', label: '3 months' },
+      { value: '6_months', label: '6 months' },
+      { value: '12_months', label: '12 months' }
     ]
   },
   {
     id: 'support_hours',
-    question: "How many support hours per month would you need?",
-    multiSelect: false,
+    topic: 'monthly support hours needed',
     options: [
-      { value: '5_hours', label: '5 hours', icon: '⏱️' },
-      { value: '20_hours', label: '20 hours', icon: '⏰' },
-      { value: '50_hours', label: '50 hours', icon: '🕐' },
-      { value: '100_hours', label: '100 hours', icon: '⚡' }
+      { value: '5_hours', label: '5 hours/month' },
+      { value: '20_hours', label: '20 hours/month' },
+      { value: '50_hours', label: '50 hours/month' },
+      { value: '100_hours', label: '100 hours/month' }
     ]
   },
   {
     id: 'email',
-    question: "Great! Last step — what's your work email so we can send you the detailed quote?",
-    multiSelect: false,
+    topic: 'work email to send the quote',
     inputType: 'email',
     options: []
   }
 ];
+
+export const QUOTE_SYSTEM_PROMPT = `You are a friendly sales assistant for MartechDevs, helping gather requirements to generate a quote for martech integration services.
+
+Your job is to ask ONE question at a time in a natural, conversational way. Vary your phrasing - don't be robotic.
+
+RULES:
+1. Ask only ONE question per response
+2. Be conversational and friendly, not formal
+3. Vary your question phrasing each time
+4. Keep responses under 50 words
+5. Acknowledge their previous answer briefly before asking the next question
+6. For the first question, give a brief friendly intro
+
+CURRENT TOPIC TO ASK ABOUT: {topic}
+TOPICS ALREADY COVERED: {covered_topics}
+PREVIOUS ANSWER: {previous_answer}
+
+Respond with ONLY the question, no options list.`;
 
 export const QUOTE_PRICING = {
   base: {
@@ -306,8 +313,7 @@ export function calculateQuote(answers) {
 
 export function formatQuoteMessage(answers, quote) {
   const lines = [
-    `📋 **Your Instant Quote**\n`,
-    `Based on your requirements, here's your estimated investment:\n`
+    `Here's your personalized quote based on what we discussed:\n`
   ];
 
   lines.push(`**One-time Implementation:** $${quote.oneTime.toLocaleString()}`);
@@ -316,25 +322,23 @@ export function formatQuoteMessage(answers, quote) {
     lines.push(`**Monthly Support:** $${quote.monthly.toLocaleString()}/month`);
   }
 
-  lines.push(`\n**Breakdown:**`);
+  lines.push(`\n**What's included:**`);
   quote.breakdown.forEach(item => {
     const suffix = item.recurring ? '/mo' : '';
     lines.push(`• ${item.item}: $${item.amount.toLocaleString()}${suffix}`);
   });
 
-  if (quote.devMultiplier !== 1) {
-    const label = quote.devMultiplier < 1 ? 'Copilot discount' : 'Full implementation';
-    lines.push(`• ${label}: ${Math.round((1 - quote.devMultiplier) * 100)}% adjustment`);
+  if (quote.devMultiplier !== 1 && quote.devMultiplier < 1) {
+    lines.push(`• Copilot model discount applied`);
   }
 
-  if (quote.urgencyMultiplier !== 1) {
-    const label = quote.urgencyMultiplier > 1 ? 'Rush delivery' : 'Flexible timeline discount';
-    lines.push(`• ${label}: ${Math.round((quote.urgencyMultiplier - 1) * 100)}% adjustment`);
+  if (quote.urgencyMultiplier > 1) {
+    lines.push(`• Rush delivery premium included`);
+  } else if (quote.urgencyMultiplier < 1) {
+    lines.push(`• Flexible timeline discount applied`);
   }
 
-  lines.push(`\n✉️ We'll send a detailed proposal to **${answers.email?.[0] || 'your email'}** shortly.`);
-  lines.push(`\nA team member will reach out within 24 hours to discuss your project in detail.`);
+  lines.push(`\nI'll send a detailed proposal to **${answers.email?.[0] || 'your email'}** shortly. Our team will reach out within 24 hours to discuss next steps!`);
 
   return lines.join('\n');
 }
-

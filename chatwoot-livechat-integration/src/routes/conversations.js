@@ -3,8 +3,11 @@ import db from '../db/queries.js';
 import slackService from '../services/slack/client.js';
 import orchestrator from '../services/orchestrator.js';
 import realtimeService from '../services/realtime.js';
+import geminiService from '../services/gemini.js';
 
 const router = express.Router();
+
+const quoteSessionStore = new Map();
 
 router.post('/conversations', async (req, res) => {
   try {
@@ -117,6 +120,198 @@ router.post('/conversations/:id/messages', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.post('/quote/question', async (req, res) => {
+  try {
+    const { topic, covered_topics, previous_answer, is_first } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: 'Topic is required' });
+    }
+
+    const question = await geminiService.generateQuoteQuestion({
+      topic,
+      coveredTopics: covered_topics || '',
+      previousAnswer: previous_answer || '',
+      isFirst: is_first || false
+    });
+
+    res.json({ question });
+  } catch (error) {
+    console.error('Error generating quote question:', error);
+    res.status(500).json({ error: 'Failed to generate question' });
+  }
+});
+
+router.post('/quote/start', async (req, res) => {
+  try {
+    const sessionId = `quote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    quoteSessionStore.set(sessionId, {
+      history: [],
+      collectedData: {},
+      startedAt: new Date().toISOString()
+    });
+
+    const { text, quoteData } = await geminiService.generateQuoteResponse([], 'I want to get a quote for martech integration services');
+
+    const session = quoteSessionStore.get(sessionId);
+    session.history.push(
+      { role: 'user', content: 'I want to get a quote' },
+      { role: 'assistant', content: text }
+    );
+    if (quoteData?.collected) {
+      session.collectedData = { ...session.collectedData, ...quoteData.collected };
+    }
+
+    res.json({
+      sessionId,
+      message: text,
+      collectedData: session.collectedData,
+      isComplete: false
+    });
+  } catch (error) {
+    console.error('Error starting quote flow:', error);
+    res.status(500).json({ error: 'Failed to start quote flow' });
+  }
+});
+
+router.post('/quote/:sessionId/message', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { content } = req.body;
+
+    if (!content?.trim()) {
+      return res.status(400).json({ error: 'Message content is required' });
+    }
+
+    const session = quoteSessionStore.get(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Quote session not found or expired' });
+    }
+
+    const historyForAI = session.history.map(h => ({
+      sender_type: h.role === 'user' ? 'customer' : 'ai',
+      content: h.content
+    }));
+
+    const { text, quoteData, isComplete } = await geminiService.generateQuoteResponse(
+      historyForAI,
+      content.trim()
+    );
+
+    session.history.push(
+      { role: 'user', content: content.trim() },
+      { role: 'assistant', content: text }
+    );
+    
+    if (quoteData?.collected) {
+      session.collectedData = { ...session.collectedData, ...quoteData.collected };
+    }
+
+    let quote = null;
+    if (isComplete) {
+      quote = calculateQuote(session.collectedData);
+      quoteSessionStore.delete(sessionId);
+    }
+
+    res.json({
+      message: text,
+      collectedData: session.collectedData,
+      isComplete,
+      quote
+    });
+  } catch (error) {
+    console.error('Error in quote flow:', error);
+    res.status(500).json({ error: 'Failed to process quote message' });
+  }
+});
+
+router.delete('/quote/:sessionId', async (req, res) => {
+  const { sessionId } = req.params;
+  quoteSessionStore.delete(sessionId);
+  res.json({ success: true });
+});
+
+function calculateQuote(data) {
+  const pricing = {
+    base: { early_stage: 3000, growth_stage: 6000, enterprise: 12000 },
+    platforms: { website: 500, web_app: 1000, ios: 2000, android: 2000 },
+    traffic: { under_5k: 0, '5k_50k': 500, '50k_100k': 1000, '100k_1m': 2000, over_1m: 4000 },
+    devModel: { full: 1, copilot: 0.7 },
+    urgency: { asap: 1.5, two_weeks: 1.25, month: 1, quarter: 0.9 },
+    goalsPerItem: 1500,
+    toolsPerItem: 300,
+    documentation: { docs: 800, videos: 1500, none: 0 },
+    trainingHours: { none: 0, '5': 750, '20': 2500, '50': 5000 },
+    supportMonthly: { '5': 500, '20': 1800, '50': 4000, '100': 7500 }
+  };
+
+  let total = 0;
+  const breakdown = [];
+
+  const stageKey = (data.company_stage || 'growth_stage').toLowerCase().replace(/\s+/g, '_');
+  const basePrice = pricing.base[stageKey] || pricing.base.growth_stage;
+  total += basePrice;
+  breakdown.push({ item: 'Base implementation', amount: basePrice });
+
+  if (data.platforms?.length) {
+    const platformCost = data.platforms.reduce((sum, p) => {
+      const key = p.toLowerCase().replace(/\s+/g, '_');
+      return sum + (pricing.platforms[key] || 500);
+    }, 0);
+    total += platformCost;
+    breakdown.push({ item: `Platforms (${data.platforms.length})`, amount: platformCost });
+  }
+
+  if (data.goals?.length) {
+    const goalsCost = data.goals.length * pricing.goalsPerItem;
+    total += goalsCost;
+    breakdown.push({ item: `Goals (${data.goals.length})`, amount: goalsCost });
+  }
+
+  if (data.tools?.length) {
+    const toolsCost = data.tools.length * pricing.toolsPerItem;
+    total += toolsCost;
+    breakdown.push({ item: `Tool integrations (${data.tools.length})`, amount: toolsCost });
+  }
+
+  if (data.documentation?.length) {
+    const docCost = data.documentation.reduce((sum, d) => {
+      const key = d.toLowerCase();
+      return sum + (pricing.documentation[key] || 0);
+    }, 0);
+    if (docCost > 0) {
+      total += docCost;
+      breakdown.push({ item: 'Documentation', amount: docCost });
+    }
+  }
+
+  const trainingKey = (data.training_hours || 'none').replace(/\s*hours?/i, '');
+  const trainingCost = pricing.trainingHours[trainingKey] || 0;
+  if (trainingCost > 0) {
+    total += trainingCost;
+    breakdown.push({ item: 'Training', amount: trainingCost });
+  }
+
+  const devMultiplier = pricing.devModel[data.dev_model] || 1;
+  total = total * devMultiplier;
+
+  const urgencyKey = (data.urgency || 'month').toLowerCase().replace(/\s+/g, '_');
+  const urgencyMultiplier = pricing.urgency[urgencyKey] || 1;
+  total = total * urgencyMultiplier;
+
+  let monthlySupport = 0;
+  const supportKey = (data.support_hours || '5').replace(/\s*hours?/i, '');
+  monthlySupport = pricing.supportMonthly[supportKey] || 500;
+
+  return {
+    oneTime: Math.round(total),
+    monthly: monthlySupport,
+    breakdown,
+    email: data.email
+  };
+}
 
 router.get('/conversations/:id/stream', async (req, res) => {
   try {
