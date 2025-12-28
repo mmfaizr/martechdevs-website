@@ -1,20 +1,25 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { calculateQuote } from '../config/quoteFlowConfig';
 
 export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(null);
-  const [collectedData, setCollectedData] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
   const [isGeneratingQuote, setIsGeneratingQuote] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
+  
+  const collectedDataRef = useRef({});
 
-  const fetchNextQuestion = useCallback(async (previousAnswer = '', currentData = {}) => {
+  const fetchNextQuestion = useCallback(async (previousAnswer = '') => {
     setIsLoadingQuestion(true);
 
     try {
-      console.log('[QuoteFlow] Fetching next question:', { conversationId, previousAnswer: previousAnswer?.substring(0, 30) });
+      console.log('[QuoteFlow] Fetching next question:', { 
+        conversationId, 
+        previousAnswer: previousAnswer?.substring(0, 30),
+        collectedKeys: Object.keys(collectedDataRef.current)
+      });
       
       const response = await fetch(`${apiUrl}/quote/next`, {
         method: 'POST',
@@ -22,7 +27,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
         body: JSON.stringify({
           conversation_id: conversationId || null,
           previous_answer: previousAnswer,
-          collected_data: currentData
+          collected_data: collectedDataRef.current
         })
       });
 
@@ -34,7 +39,8 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
 
       const data = await response.json();
       
-      setCollectedData(data.collected_data || currentData);
+      collectedDataRef.current = data.collected_data || collectedDataRef.current;
+      console.log('[QuoteFlow] Updated collected data:', collectedDataRef.current);
       
       if (data.is_complete) {
         setIsGeneratingQuote(true);
@@ -99,11 +105,11 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   const startFlow = useCallback(async () => {
     setIsActive(true);
     setCurrentStep(null);
-    setCollectedData({});
+    collectedDataRef.current = {};
     setSelectedOptions([]);
     setQuestionCount(0);
     setIsGeneratingQuote(false);
-    await fetchNextQuestion('', {});
+    await fetchNextQuestion('');
   }, [fetchNextQuestion]);
 
   const selectOption = useCallback((value) => {
@@ -125,10 +131,10 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     if (!currentStep) return null;
     
     setSelectedOptions([]);
-    const result = await fetchNextQuestion(option.label, collectedData);
+    const result = await fetchNextQuestion(option.label);
     
     return { ...result, selectedLabels: option.label };
-  }, [currentStep, collectedData, fetchNextQuestion]);
+  }, [currentStep, fetchNextQuestion]);
 
   const confirmSelection = useCallback(async () => {
     if (!currentStep || selectedOptions.length === 0) return null;
@@ -139,24 +145,24 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
       .join(', ');
 
     setSelectedOptions([]);
-    const result = await fetchNextQuestion(selectedLabels, collectedData);
+    const result = await fetchNextQuestion(selectedLabels);
     
     return { ...result, selectedLabels };
-  }, [selectedOptions, currentStep, collectedData, fetchNextQuestion]);
+  }, [selectedOptions, currentStep, fetchNextQuestion]);
 
   const submitTextInput = useCallback(async (value) => {
     if (!currentStep || !value.trim()) return null;
 
     setSelectedOptions([]);
-    const result = await fetchNextQuestion(value.trim(), collectedData);
+    const result = await fetchNextQuestion(value.trim());
     
     return { ...result, submittedValue: value };
-  }, [currentStep, collectedData, fetchNextQuestion]);
+  }, [currentStep, fetchNextQuestion]);
 
   const cancelFlow = useCallback(() => {
     setIsActive(false);
     setCurrentStep(null);
-    setCollectedData({});
+    collectedDataRef.current = {};
     setSelectedOptions([]);
     setQuestionCount(0);
     setIsGeneratingQuote(false);
