@@ -4,19 +4,15 @@ import { QUOTE_TOPICS, calculateQuote, formatQuoteMessage } from '../config/quot
 export function useQuoteFlow(apiUrl, onComplete) {
   const [isActive, setIsActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [currentStep, setCurrentStep] = useState(null);
   const [answers, setAnswers] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
 
-  const getCurrentTopic = useCallback(() => {
-    return QUOTE_TOPICS[currentStepIndex] || null;
-  }, [currentStepIndex]);
-
   const generateQuestion = useCallback(async (topicIndex, prevAnswer = '') => {
-    const topic = QUOTE_TOPICS[topicIndex];
-    if (!topic) return null;
+    const topicConfig = QUOTE_TOPICS[topicIndex];
+    if (!topicConfig) return null;
 
     const coveredTopics = QUOTE_TOPICS
       .slice(0, topicIndex)
@@ -30,10 +26,13 @@ export function useQuoteFlow(apiUrl, onComplete) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          topic: topic.topic,
+          topic: topicConfig.topic,
+          topic_id: topicConfig.id,
+          default_options: topicConfig.options,
           covered_topics: coveredTopics,
           previous_answer: prevAnswer,
-          is_first: topicIndex === 0
+          is_first: topicIndex === 0,
+          is_email_step: topicConfig.inputType === 'email'
         })
       });
 
@@ -42,32 +41,34 @@ export function useQuoteFlow(apiUrl, onComplete) {
       }
 
       const data = await response.json();
-      setCurrentQuestion(data.question);
+      
+      const step = {
+        id: topicConfig.id,
+        question: data.question,
+        options: data.options?.length > 0 ? data.options : topicConfig.options,
+        multiSelect: data.multiSelect ?? topicConfig.multiSelect,
+        inputType: data.inputType || topicConfig.inputType || null
+      };
+
+      setCurrentStep(step);
       setIsLoadingQuestion(false);
-      return data.question;
+      return step;
     } catch (error) {
       console.error('Error generating question:', error);
-      const fallbackQuestions = {
-        company_type: "What type of company are you? Let me know so I can tailor this for you.",
-        company_stage: "What stage is your company at right now?",
-        platforms: "Which platforms do you need us to integrate?",
-        traffic: "Roughly how much monthly traffic do you get?",
-        dev_model: "How would you like us to work with your team?",
-        urgency: "When do you need this done by?",
-        customer_location: "Where are your customers located?",
-        compliance: "Any compliance requirements we should know about?",
-        goals: "What are the main things you want to achieve?",
-        tools: "What martech tools are you using or planning to use?",
-        documentation: "What kind of documentation would be helpful?",
-        training_hours: "How much training would your team need?",
-        support_duration: "How long would you need ongoing support?",
-        support_hours: "How many support hours per month?",
-        email: "Great! What's your work email so I can send the detailed quote?"
+      
+      const fallbackStep = {
+        id: topicConfig.id,
+        question: topicIndex === 0 
+          ? `Hey! Let's get you a quick quote. First, ${topicConfig.topic}?`
+          : `Great! Now tell me about your ${topicConfig.topic}?`,
+        options: topicConfig.options,
+        multiSelect: topicConfig.multiSelect || false,
+        inputType: topicConfig.inputType || null
       };
-      const fallback = fallbackQuestions[topic.id] || `Tell me about your ${topic.topic}`;
-      setCurrentQuestion(fallback);
+      
+      setCurrentStep(fallbackStep);
       setIsLoadingQuestion(false);
-      return fallback;
+      return fallbackStep;
     }
   }, [apiUrl]);
 
@@ -77,14 +78,14 @@ export function useQuoteFlow(apiUrl, onComplete) {
     setAnswers({});
     setSelectedOptions([]);
     setConversationHistory([]);
+    setCurrentStep(null);
     await generateQuestion(0);
   }, [generateQuestion]);
 
   const selectOption = useCallback((value) => {
-    const topic = getCurrentTopic();
-    if (!topic) return;
+    if (!currentStep) return;
 
-    if (topic.multiSelect) {
+    if (currentStep.multiSelect) {
       setSelectedOptions(prev => {
         if (prev.includes(value)) {
           return prev.filter(v => v !== value);
@@ -94,23 +95,22 @@ export function useQuoteFlow(apiUrl, onComplete) {
     } else {
       setSelectedOptions([value]);
     }
-  }, [getCurrentTopic]);
+  }, [currentStep]);
 
   const confirmSelection = useCallback(async () => {
-    const topic = getCurrentTopic();
-    if (!topic || selectedOptions.length === 0) return null;
+    if (!currentStep || selectedOptions.length === 0) return null;
 
-    const newAnswers = { ...answers, [topic.id]: selectedOptions };
+    const newAnswers = { ...answers, [currentStep.id]: selectedOptions };
     setAnswers(newAnswers);
 
-    const selectedLabels = topic.options
+    const selectedLabels = currentStep.options
       .filter(opt => selectedOptions.includes(opt.value))
       .map(opt => opt.label)
       .join(', ');
 
     setConversationHistory(prev => [
       ...prev,
-      { role: 'assistant', content: currentQuestion },
+      { role: 'assistant', content: currentStep.question },
       { role: 'user', content: selectedLabels }
     ]);
 
@@ -120,6 +120,7 @@ export function useQuoteFlow(apiUrl, onComplete) {
       const quote = calculateQuote(newAnswers);
       const quoteMessage = formatQuoteMessage(newAnswers, quote);
       setIsActive(false);
+      setCurrentStep(null);
       if (onComplete) {
         onComplete(newAnswers, quote, quoteMessage);
       }
@@ -131,18 +132,17 @@ export function useQuoteFlow(apiUrl, onComplete) {
     await generateQuestion(nextStepIndex, selectedLabels);
     
     return { completed: false, selectedLabels };
-  }, [currentStepIndex, selectedOptions, answers, currentQuestion, onComplete, getCurrentTopic, generateQuestion]);
+  }, [currentStepIndex, selectedOptions, answers, currentStep, onComplete, generateQuestion]);
 
   const submitTextInput = useCallback(async (value) => {
-    const topic = getCurrentTopic();
-    if (!topic || !value.trim()) return null;
+    if (!currentStep || !value.trim()) return null;
 
-    const newAnswers = { ...answers, [topic.id]: [value.trim()] };
+    const newAnswers = { ...answers, [currentStep.id]: [value.trim()] };
     setAnswers(newAnswers);
 
     setConversationHistory(prev => [
       ...prev,
-      { role: 'assistant', content: currentQuestion },
+      { role: 'assistant', content: currentStep.question },
       { role: 'user', content: value }
     ]);
 
@@ -152,6 +152,7 @@ export function useQuoteFlow(apiUrl, onComplete) {
       const quote = calculateQuote(newAnswers);
       const quoteMessage = formatQuoteMessage(newAnswers, quote);
       setIsActive(false);
+      setCurrentStep(null);
       if (onComplete) {
         onComplete(newAnswers, quote, quoteMessage);
       }
@@ -163,14 +164,14 @@ export function useQuoteFlow(apiUrl, onComplete) {
     await generateQuestion(nextStepIndex, value);
     
     return { completed: false, submittedValue: value };
-  }, [currentStepIndex, answers, currentQuestion, onComplete, getCurrentTopic, generateQuestion]);
+  }, [currentStepIndex, answers, currentStep, onComplete, generateQuestion]);
 
   const cancelFlow = useCallback(() => {
     setIsActive(false);
     setCurrentStepIndex(0);
     setAnswers({});
     setSelectedOptions([]);
-    setCurrentQuestion('');
+    setCurrentStep(null);
     setConversationHistory([]);
   }, []);
 
@@ -185,7 +186,13 @@ export function useQuoteFlow(apiUrl, onComplete) {
         (h, i) => h.role === 'assistant' && i === (prevIndex * 2)
       );
       if (historyQuestion) {
-        setCurrentQuestion(historyQuestion.content);
+        setCurrentStep({
+          id: prevTopic.id,
+          question: historyQuestion.content,
+          options: prevTopic.options,
+          multiSelect: prevTopic.multiSelect || false,
+          inputType: prevTopic.inputType || null
+        });
       } else {
         await generateQuestion(prevIndex);
       }
@@ -200,14 +207,9 @@ export function useQuoteFlow(apiUrl, onComplete) {
     };
   }, [currentStepIndex]);
 
-  const topic = getCurrentTopic();
-
   return {
     isActive,
-    currentStep: topic ? {
-      ...topic,
-      question: currentQuestion
-    } : null,
+    currentStep,
     selectedOptions,
     progress: getProgress(),
     isLoadingQuestion,

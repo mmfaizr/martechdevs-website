@@ -123,20 +123,23 @@ router.post('/conversations/:id/messages', async (req, res) => {
 
 router.post('/quote/question', async (req, res) => {
   try {
-    const { topic, covered_topics, previous_answer, is_first } = req.body;
+    const { topic, topic_id, default_options, covered_topics, previous_answer, is_first, is_email_step } = req.body;
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
-    const question = await geminiService.generateQuoteQuestion({
+    const result = await geminiService.generateQuoteQuestion({
       topic,
+      topicId: topic_id,
+      defaultOptions: default_options || [],
       coveredTopics: covered_topics || '',
       previousAnswer: previous_answer || '',
-      isFirst: is_first || false
+      isFirst: is_first || false,
+      isEmailStep: is_email_step || false
     });
 
-    res.json({ question });
+    res.json(result);
   } catch (error) {
     console.error('Error generating quote question:', error);
     res.status(500).json({ error: 'Failed to generate question' });
