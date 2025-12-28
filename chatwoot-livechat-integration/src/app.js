@@ -11,8 +11,18 @@ dotenv.config();
 const app = express();
 
 app.use(rawBodyMiddleware);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+  if (req.path.startsWith('/slack/')) {
+    return next();
+  }
+  express.json()(req, res, next);
+});
+app.use((req, res, next) => {
+  if (req.path.startsWith('/slack/')) {
+    return next();
+  }
+  express.urlencoded({ extended: true })(req, res, next);
+});
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

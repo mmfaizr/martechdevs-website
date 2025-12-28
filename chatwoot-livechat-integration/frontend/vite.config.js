@@ -1,22 +1,26 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production')
+  },
   build: {
     lib: {
-      entry: 'src/main.jsx',
-      name: 'ChatWidget',
-      fileName: (format) => `chat-widget.${format}.js`,
-      formats: ['umd', 'es']
+      entry: resolve(__dirname, 'src/main.jsx'),
+      name: 'MartechChat',
+      fileName: () => 'martech-chat.js',
+      formats: ['iife']
     },
+    cssCodeSplit: false,
     rollupOptions: {
-      external: [],
       output: {
-        globals: {}
+        inlineDynamicImports: true,
+        assetFileNames: 'martech-chat[extname]'
       }
-    }
+    },
+    minify: 'esbuild'
   }
 });
-
-

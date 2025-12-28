@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: chat-api
+    env: node
+    buildCommand: npm install
+    startCommand: node src/app.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      - key: SLACK_SUPPORT_CHANNEL_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3-pro-preview
+      - key: PORT
+        value: 3000
+      - key: NODE_ENV
+        value: production
+      - key: DEBOUNCE_WINDOW_MS
+        value: 3000
+      - key: MAX_WAIT_MS
+        value: 10000
+      - key: LOCK_TTL_MS
+        value: 60000
+
+  - type: worker
+    name: chat-worker
+    env: node
+    buildCommand: npm install
+    startCommand: node src/workers/ai-responder.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_SIGNING_SECRET
+        sync: false
+      - key: SLACK_SUPPORT_CHANNEL_ID
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3-pro-preview
+      - key: NODE_ENV
+        value: production
+      - key: DEBOUNCE_WINDOW_MS
+        value: 3000
+      - key: MAX_WAIT_MS
+        value: 10000
+      - key: LOCK_TTL_MS
+        value: 60000
+

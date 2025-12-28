@@ -3,18 +3,26 @@ import slackService from './client.js';
 import realtimeService from '../realtime.js';
 
 export async function handleSlackInteraction(req, res) {
-  res.status(200).send();
-
-  const payload = JSON.parse(req.body.payload);
-  
-  if (payload.type !== 'block_actions') return;
-
-  const action = payload.actions[0];
-  const conversationId = action.value;
-  const userId = payload.user.id;
-  const userName = payload.user.name;
-
   try {
+    res.status(200).send();
+
+    if (!req.body.payload) {
+      console.error('No payload in interaction request');
+      return;
+    }
+
+    const payload = JSON.parse(req.body.payload);
+    console.log('Slack interaction received:', payload.type);
+    
+    if (payload.type !== 'block_actions') return;
+
+    const action = payload.actions[0];
+    const conversationId = action.value;
+    const userId = payload.user.id;
+    const userName = payload.user.name;
+
+    console.log(`Action: ${action.action_id}, Conversation: ${conversationId}, User: ${userName}`);
+
     switch (action.action_id) {
       case 'takeover':
         await handleTakeover(conversationId, userId, userName);

@@ -1,9 +1,31 @@
-import { Worker } from 'bullmq';
+import bullmq from 'bullmq';
+const { Worker } = bullmq;
 import { Redis } from 'ioredis';
 import orchestrator from '../services/orchestrator.js';
 import config from '../config/index.js';
 
-const redis = new Redis(config.redis.url);
+const redisUrl = config.redis.url;
+const redisOptions = {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: true,
+  connectTimeout: 10000
+};
+
+if (redisUrl.startsWith('rediss://')) {
+  redisOptions.tls = {
+    rejectUnauthorized: true
+  };
+}
+
+const redis = new Redis(redisUrl, redisOptions);
+
+redis.on('error', (err) => {
+  console.error('Redis error in worker:', err.message);
+});
+
+redis.on('connect', () => {
+  console.log('✓ Worker connected to Redis');
+});
 
 const worker = new Worker(
   'ai-responses',

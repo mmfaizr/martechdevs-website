@@ -12,8 +12,15 @@ oauth_config:
   scopes:
     bot:
       - chat:write
+      - chat:write.public
       - channels:history
       - channels:read
+      - channels:join
+      - groups:read
+      - groups:write
+      - groups:history
+      - im:history
+      - mpim:history
       - users:read
 
 settings:

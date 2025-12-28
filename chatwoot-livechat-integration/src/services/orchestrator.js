@@ -1,12 +1,34 @@
 import { Redis } from 'ioredis';
-import { Queue, Worker } from 'bullmq';
+import bullmq from 'bullmq';
+const { Queue, Worker } = bullmq;
 import db from '../db/queries.js';
 import geminiService from './gemini.js';
 import slackService from './slack/client.js';
 import realtimeService from './realtime.js';
 import config from '../config/index.js';
 
-const redis = new Redis(config.redis.url);
+const redisUrl = config.redis.url;
+const redisOptions = {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: true,
+  connectTimeout: 10000
+};
+
+if (redisUrl.startsWith('rediss://')) {
+  redisOptions.tls = {
+    rejectUnauthorized: true
+  };
+}
+
+const redis = new Redis(redisUrl, redisOptions);
+
+redis.on('error', (err) => {
+  console.error('Redis error in orchestrator:', err.message);
+});
+
+redis.on('connect', () => {
+  console.log('✓ Orchestrator connected to Redis');
+});
 
 const DEBOUNCE_WINDOW_MS = config.orchestrator.debounceWindowMs;
 const MAX_WAIT_MS = config.orchestrator.maxWaitMs;
@@ -24,7 +46,11 @@ class Orchestrator {
     
     if (conversation.mode !== 'AI_ACTIVE') {
       const message = await db.getMessage(messageId);
-      await slackService.mirrorMessage(conversation, message);
+      try {
+        await slackService.mirrorMessage(conversation, message);
+      } catch (err) {
+        console.warn('Slack mirror failed:', err.message);
+      }
       return;
     }
 
@@ -151,6 +177,7 @@ class Orchestrator {
         sender_type: 'ai'
       });
 
+      console.log(`[AI] Sending AI message to SSE for conversation ${conversationId}`);
       realtimeService.sendToConversation(conversationId, {
         type: 'message',
         message: {
@@ -161,7 +188,11 @@ class Orchestrator {
         }
       });
 
-      await slackService.mirrorMessage(conversation, message);
+      try {
+        await slackService.mirrorMessage(conversation, message);
+      } catch (err) {
+        console.warn('Slack mirror failed:', err.message);
+      }
 
       if (parts.length > 1) {
         await this.delay(200);
@@ -177,10 +208,15 @@ class Orchestrator {
     if (needsHandoff) {
       console.log(`Handoff requested for conversation ${conversationId}`);
       await db.updateConversationMode(conversationId, 'HANDOFF_PENDING');
-      await slackService.postHandoffRequest(
-        conversation,
-        'AI has determined this conversation needs human assistance.'
-      );
+      
+      try {
+        await slackService.postHandoffRequest(
+          conversation,
+          'AI has determined this conversation needs human assistance.'
+        );
+      } catch (err) {
+        console.warn('Slack handoff notification failed:', err.message);
+      }
       
       realtimeService.sendToConversation(conversationId, {
         type: 'status',

@@ -1,0 +1,45 @@
+<!--
+  MartechDevs Chat Widget - Embed Snippet
+  
+  Copy this snippet to any website to add the chat widget.
+  Place it just before the closing </body> tag.
+-->
+
+<!-- Option 1: Self-hosted (recommended) -->
+<link rel="stylesheet" href="https://your-domain.com/chat/martech-chat.css">
+<script src="https://your-domain.com/chat/martech-chat.js"></script>
+<script>
+  window.initMartechChat({
+    apiUrl: 'https://your-chat-api.com/api',
+    customerInfo: {
+      // Optional: pre-fill with known user data
+      // customer_id: 'user_123',
+      // customer_name: 'John Doe',
+      // customer_email: 'john@example.com'
+    },
+    theme: 'light',        // 'light' or 'dark'
+    autoOpen: true,        // auto-open chat after delay
+    autoOpenDelay: 3000    // delay in ms before auto-open
+  });
+</script>
+
+<!-- Option 2: With customer identification (for logged-in users) -->
+<!--
+<script>
+  // Wait for your app to load user data, then init
+  document.addEventListener('DOMContentLoaded', function() {
+    var chat = window.initMartechChat({
+      apiUrl: 'https://your-chat-api.com/api',
+      customerInfo: {
+        customer_id: window.currentUser?.id,
+        customer_name: window.currentUser?.name,
+        customer_email: window.currentUser?.email
+      }
+    });
+    
+    // Later, update customer info when user logs in
+    // chat.updateCustomerInfo({ customer_id: 'new_id', customer_name: 'New Name' });
+  });
+</script>
+-->
+

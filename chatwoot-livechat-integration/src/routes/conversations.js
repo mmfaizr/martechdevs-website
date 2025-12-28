@@ -31,12 +31,16 @@ router.post('/conversations', async (req, res) => {
       customer_metadata
     });
 
-    const { channelId, threadTs } = await slackService.createConversationThread(conversation);
-    
-    await db.updateConversation(conversation.id, {
-      slack_channel_id: channelId,
-      slack_thread_ts: threadTs
-    });
+    try {
+      const { channelId, threadTs } = await slackService.createConversationThread(conversation);
+      
+      await db.updateConversation(conversation.id, {
+        slack_channel_id: channelId,
+        slack_thread_ts: threadTs
+      });
+    } catch (slackError) {
+      console.warn('Slack integration unavailable, continuing without it:', slackError.message);
+    }
 
     await db.createEvent({
       conversation_id: conversation.id,
@@ -126,7 +130,16 @@ router.get('/conversations/:id/stream', async (req, res) => {
 
     realtimeService.addConnection(id, res);
 
+    const keepaliveInterval = setInterval(() => {
+      try {
+        res.write(': keepalive\n\n');
+      } catch (err) {
+        clearInterval(keepaliveInterval);
+      }
+    }, 15000);
+
     req.on('close', () => {
+      clearInterval(keepaliveInterval);
       console.log(`SSE connection closed for conversation ${id}`);
     });
   } catch (error) {

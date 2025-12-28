@@ -1,10 +1,12 @@
 {
-  "name": "chat-widget",
+  "name": "@martechdevs/chat-widget",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:copy": "vite build && npm run copy:martechdevs",
+    "copy:martechdevs": "mkdir -p ../../martechdevs-web/public/chat && cp dist/martech-chat.js dist/martech-chat.css ../../martechdevs-web/public/chat/",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,5 +20,7 @@
     "vite": "^6.0.3"
   }
 }
+
+
 
 
