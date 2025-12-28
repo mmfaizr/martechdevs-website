@@ -121,6 +121,15 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     }
   }, [currentStep]);
 
+  const selectAndConfirm = useCallback(async (option) => {
+    if (!currentStep) return null;
+    
+    setSelectedOptions([]);
+    const result = await fetchNextQuestion(option.label, collectedData);
+    
+    return { ...result, selectedLabels: option.label };
+  }, [currentStep, collectedData, fetchNextQuestion]);
+
   const confirmSelection = useCallback(async () => {
     if (!currentStep || selectedOptions.length === 0) return null;
 
@@ -171,6 +180,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     isGeneratingQuote,
     startFlow,
     selectOption,
+    selectAndConfirm,
     confirmSelection,
     submitTextInput,
     cancelFlow,

@@ -80,9 +80,11 @@ export default function ChatWidget({
 
     if (quoteFlow.isActive && quoteFlow.currentStep?.inputType) {
       const inputValue = input;
+      const currentQuestion = quoteFlow.currentStep.question;
       setInput('');
       setQuoteMessages(prev => [
         ...prev,
+        { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
         { id: `user_${Date.now()}`, type: 'user_input', content: inputValue, created_at: new Date().toISOString() }
       ]);
       const result = await quoteFlow.submitTextInput(inputValue);
@@ -128,11 +130,29 @@ export default function ChatWidget({
     quoteFlow.selectOption(value);
   };
 
+  const handleSingleOptionSelect = async (option) => {
+    setQuoteMessages(prev => [
+      ...prev,
+      { id: `q_${Date.now()}`, type: 'ai_question', content: quoteFlow.currentStep.question, created_at: new Date().toISOString() },
+      { id: `user_${Date.now()}`, type: 'user_selection', content: option.label, created_at: new Date().toISOString() }
+    ]);
+    
+    const result = await quoteFlow.selectAndConfirm(option);
+    if (result?.completed) {
+      setQuoteMessages(prev => [
+        ...prev,
+        { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
+      ]);
+    }
+  };
+
   const handleConfirmSelection = async () => {
+    const currentQuestion = quoteFlow.currentStep?.question;
     const result = await quoteFlow.confirmSelection();
     if (result) {
       setQuoteMessages(prev => [
         ...prev,
+        { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
         { id: `user_${Date.now()}`, type: 'user_selection', content: result.selectedLabels, created_at: new Date().toISOString() }
       ]);
       if (result.completed) {
@@ -251,6 +271,7 @@ export default function ChatWidget({
                     step={quoteFlow.currentStep}
                     selectedOptions={quoteFlow.selectedOptions}
                     onSelect={handleOptionSelect}
+                    onSingleSelect={handleSingleOptionSelect}
                     onConfirm={handleConfirmSelection}
                     onBack={quoteFlow.canGoBack ? quoteFlow.goBack : null}
                     onCancel={quoteFlow.cancelFlow}
@@ -364,7 +385,15 @@ function QuoteProgress({ progress }) {
   );
 }
 
-function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCancel }) {
+function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCancel, onSingleSelect }) {
+  const handleOptionClick = (option) => {
+    if (step.multiSelect) {
+      onSelect(option.value);
+    } else {
+      onSingleSelect(option);
+    }
+  };
+
   return (
     <div className="quote-step">
       <div className="message ai">
@@ -380,7 +409,7 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
             <button
               key={option.value}
               className={`quote-option ${selectedOptions.includes(option.value) ? 'selected' : ''}`}
-              onClick={() => onSelect(option.value)}
+              onClick={() => handleOptionClick(option)}
             >
               <span className="option-label">{option.label}</span>
               {selectedOptions.includes(option.value) && (
@@ -391,25 +420,25 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
         </div>
       )}
 
-      <div className="quote-actions">
-        {onBack && (
-          <button className="quote-nav-btn back" onClick={onBack}>
-            ← Back
+      {step.multiSelect && (
+        <div className="quote-actions">
+          {onBack && (
+            <button className="quote-nav-btn back" onClick={onBack}>
+              ← Back
+            </button>
+          )}
+          <button className="quote-nav-btn cancel" onClick={onCancel}>
+            Cancel
           </button>
-        )}
-        <button className="quote-nav-btn cancel" onClick={onCancel}>
-          Cancel
-        </button>
-        {step.options.length > 0 && (
           <button 
             className="quote-nav-btn confirm" 
             onClick={onConfirm}
             disabled={selectedOptions.length === 0}
           >
-            {step.multiSelect ? `Continue (${selectedOptions.length})` : 'Continue'} →
+            Continue ({selectedOptions.length}) →
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -438,6 +467,18 @@ function QuoteMessage({ message, onScheduleCall }) {
   if (message.type === 'booking_confirmed') {
     return (
       <div className="message ai booking-confirmed">
+        <div className="message-header">AI Assistant</div>
+        <div className="message-content">
+          <Markdown>{message.content}</Markdown>
+        </div>
+        <div className="message-time">{formatTime(message.created_at)}</div>
+      </div>
+    );
+  }
+
+  if (message.type === 'ai_question') {
+    return (
+      <div className="message ai">
         <div className="message-header">AI Assistant</div>
         <div className="message-content">
           <Markdown>{message.content}</Markdown>
