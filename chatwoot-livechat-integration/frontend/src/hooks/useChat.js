@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-export function useChat(apiUrl, customerInfo) {
+export function useChat(apiUrl, customerInfo, onQuoteFlowTrigger) {
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('ai_active');
@@ -9,6 +9,7 @@ export function useChat(apiUrl, customerInfo) {
   const [isLoading, setIsLoading] = useState(false);
   const eventSourceRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
+  const onQuoteFlowTriggerRef = useRef(onQuoteFlowTrigger);
 
   useEffect(() => {
     initConversation();
@@ -74,11 +75,29 @@ export function useChat(apiUrl, customerInfo) {
             break;
           
           case 'message':
-            setMessages(prev => {
-              const exists = prev.find(m => m.id === data.message.id);
-              if (exists) return prev;
-              return [...prev, data.message];
-            });
+            const msg = data.message;
+            
+            if (msg.content?.includes('[START_QUOTE_FLOW]')) {
+              msg.content = msg.content.replace('[START_QUOTE_FLOW]', '').trim();
+              
+              setMessages(prev => {
+                const exists = prev.find(m => m.id === msg.id);
+                if (exists) return prev;
+                return [...prev, msg];
+              });
+              
+              setTimeout(() => {
+                if (onQuoteFlowTriggerRef.current) {
+                  onQuoteFlowTriggerRef.current();
+                }
+              }, 500);
+            } else {
+              setMessages(prev => {
+                const exists = prev.find(m => m.id === msg.id);
+                if (exists) return prev;
+                return [...prev, msg];
+              });
+            }
             setIsLoading(false);
             break;
           

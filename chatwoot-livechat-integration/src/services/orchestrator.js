@@ -145,7 +145,7 @@ class Orchestrator {
       : newCustomerMessages.map((m, i) => `[${i + 1}] ${m.content}`).join('\n');
 
     console.log(`Generating AI response for conversation ${conversationId}`);
-    const { text: aiResponse, needsHandoff } = await geminiService.generateResponse(
+    const { text: aiResponse, needsHandoff, startQuoteFlow } = await geminiService.generateResponse(
       allMessages.filter(m => m.sender_type !== 'human'),
       customerInput
     );
@@ -170,19 +170,26 @@ class Orchestrator {
 
     const parts = this.splitResponse(aiResponse, 3000);
 
-    for (const part of parts) {
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLastPart = i === parts.length - 1;
+      
       const message = await db.createMessage({
         conversation_id: conversationId,
         content: part,
         sender_type: 'ai'
       });
 
+      const sseContent = (isLastPart && startQuoteFlow) 
+        ? `${part} [START_QUOTE_FLOW]` 
+        : part;
+
       console.log(`[AI] Sending AI message to SSE for conversation ${conversationId}`);
       realtimeService.sendToConversation(conversationId, {
         type: 'message',
         message: {
           id: message.id,
-          content: part,
+          content: sseContent,
           sender_type: 'ai',
           created_at: message.created_at
         }

@@ -17,8 +17,20 @@ export default function ChatWidget({
   const [input, setInput] = useState('');
   const [quoteMessages, setQuoteMessages] = useState([]);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [pendingQuoteStart, setPendingQuoteStart] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  const handleQuoteComplete = (answers, quote, quoteMessage) => {
+    setQuoteMessages(prev => [
+      ...prev,
+      { id: `quote_${Date.now()}`, type: 'quote_result', content: quoteMessage, created_at: new Date().toISOString() }
+    ]);
+  };
+
+  const handleQuoteFlowTrigger = () => {
+    setPendingQuoteStart(true);
+  };
   
   const {
     conversationId,
@@ -28,16 +40,17 @@ export default function ChatWidget({
     isConnected,
     sendMessage,
     isLoading
-  } = useChat(apiUrl, customerInfo);
-
-  const handleQuoteComplete = (answers, quote, quoteMessage) => {
-    setQuoteMessages(prev => [
-      ...prev,
-      { id: `quote_${Date.now()}`, type: 'quote_result', content: quoteMessage, created_at: new Date().toISOString() }
-    ]);
-  };
+  } = useChat(apiUrl, customerInfo, handleQuoteFlowTrigger);
 
   const quoteFlow = useQuoteFlow(apiUrl, conversationId, handleQuoteComplete);
+
+  useEffect(() => {
+    if (pendingQuoteStart && conversationId && !quoteFlow.isActive) {
+      setQuoteMessages([]);
+      quoteFlow.startFlow();
+      setPendingQuoteStart(false);
+    }
+  }, [pendingQuoteStart, conversationId, quoteFlow]);
 
   useEffect(() => {
     if (autoOpen && !isOpen && !hasAutoOpened) {

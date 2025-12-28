@@ -246,11 +246,16 @@ Generate your response:`;
       const text = response.text();
       
       const needsHandoff = text.includes('[HANDOFF_REQUESTED]');
-      const cleanText = text.replace('[HANDOFF_REQUESTED]', '').trim();
+      const startQuoteFlow = text.includes('[START_QUOTE_FLOW]');
+      const cleanText = text
+        .replace('[HANDOFF_REQUESTED]', '')
+        .replace('[START_QUOTE_FLOW]', '')
+        .trim();
 
       return { 
         text: cleanText, 
         needsHandoff,
+        startQuoteFlow,
         finishReason: response.candidates[0]?.finishReason
       };
     } catch (error) {
