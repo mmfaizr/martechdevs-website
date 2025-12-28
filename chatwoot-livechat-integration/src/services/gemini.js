@@ -1,122 +1,109 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 import config from '../config/index.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const loadQuotePrompt = () => {
-  try {
-    return readFileSync(join(__dirname, '../config/system-prompts/quote-flow.txt'), 'utf-8');
-  } catch (error) {
-    console.warn('Could not load quote flow prompt');
-    return '';
-  }
+const QUOTE_SCHEMA = {
+  company_type: 'Type of company',
+  company_stage: 'Company stage (early/growth/enterprise)',
+  platforms: 'Platforms needing integration',
+  traffic: 'Monthly traffic volume',
+  dev_model: 'Full implementation or copilot',
+  urgency: 'Project timeline',
+  customer_locations: 'Customer locations',
+  compliance: 'Compliance requirements',
+  goals: 'Main goals',
+  tools: 'Martech tools',
+  documentation: 'Documentation needs',
+  training_hours: 'Training hours',
+  support_duration: 'Support duration',
+  support_hours: 'Monthly support hours',
+  email: 'Work email'
 };
 
-const QUOTE_QUESTION_SCHEMA = {
+const REQUIRED_FIELDS = ['company_type', 'company_stage', 'platforms', 'traffic', 'dev_model', 'urgency', 'goals', 'tools', 'email'];
+
+const QUOTE_RESPONSE_SCHEMA = {
   type: "object",
   properties: {
     question: {
       type: "string",
-      description: "A friendly, conversational question to ask the user about the topic. Should be natural and varied, not robotic."
+      description: "Your conversational question to the user"
     },
     options: {
       type: "array",
-      description: "List of options for the user to choose from",
       items: {
         type: "object",
         properties: {
-          value: {
-            type: "string",
-            description: "A short snake_case identifier for this option"
-          },
-          label: {
-            type: "string",
-            description: "Human-readable label to display"
-          }
+          value: { type: "string" },
+          label: { type: "string" }
         },
         required: ["value", "label"]
-      }
+      },
+      description: "Suggested options for the user (can be empty for free-text questions)"
     },
-    multiSelect: {
+    multi_select: {
       type: "boolean",
-      description: "Whether the user can select multiple options"
+      description: "Whether user can select multiple options"
     },
-    inputType: {
+    input_type: {
       type: ["string", "null"],
-      description: "If set to 'email', show a text input instead of options"
+      description: "Set to 'email' for email input, null otherwise"
+    },
+    collected: {
+      type: "object",
+      description: "Data extracted from user's previous answer"
+    },
+    is_complete: {
+      type: "boolean",
+      description: "True if all required data has been collected"
     }
   },
-  required: ["question", "options", "multiSelect"]
+  required: ["question", "options", "multi_select", "is_complete"]
 };
 
 class GeminiService {
   constructor() {
     this.client = new GoogleGenerativeAI(config.gemini.apiKey);
     this.model = config.gemini.model;
-    this.quotePrompt = loadQuotePrompt();
   }
 
-  async generateQuoteQuestion({ topic, topicId, defaultOptions, coveredTopics, previousAnswer, isFirst, isEmailStep, multiSelect }) {
+  async generateQuoteStep(previousAnswer, collectedData = {}) {
     try {
       const model = this.client.getGenerativeModel({ 
         model: this.model,
         generationConfig: {
           responseMimeType: "application/json",
-          responseSchema: QUOTE_QUESTION_SCHEMA,
-          temperature: 0.9,
-          maxOutputTokens: 500,
+          responseSchema: QUOTE_RESPONSE_SCHEMA,
+          temperature: 0.85,
+          maxOutputTokens: 800,
         }
       });
 
-      let prompt;
-      if (isEmailStep) {
-        prompt = `You are a friendly sales assistant for MartechDevs wrapping up a quote conversation.
+      const missingRequired = REQUIRED_FIELDS.filter(f => !collectedData[f]);
+      const missingOptional = Object.keys(QUOTE_SCHEMA).filter(f => !REQUIRED_FIELDS.includes(f) && !collectedData[f]);
 
-The customer has answered all the questions. Now ask for their work email to send the quote.
+      const prompt = `You are a friendly, conversational sales assistant for MartechDevs, a martech integration company. You're gathering information to generate a quote.
 
-Generate a warm, natural closing question asking for their email. Be appreciative of their time.
+DATA SCHEMA (what we need to collect):
+${Object.entries(QUOTE_SCHEMA).map(([k, v]) => `- ${k}: ${v}${REQUIRED_FIELDS.includes(k) ? ' (REQUIRED)' : ''}`).join('\n')}
 
-Return JSON with:
-- question: Your friendly message asking for email
-- options: [] (empty array since this is a text input)
-- multiSelect: false
-- inputType: "email"`;
-      } else if (isFirst) {
-        prompt = `You are a friendly sales assistant for MartechDevs helping gather requirements for a quote.
+ALREADY COLLECTED:
+${Object.keys(collectedData).length > 0 ? Object.entries(collectedData).map(([k, v]) => `- ${k}: ${JSON.stringify(v)}`).join('\n') : 'Nothing yet'}
 
-Generate a warm, conversational opening message that:
-1. Briefly introduces yourself (1 sentence max)
-2. Asks about their ${topic}
+STILL NEEDED (required): ${missingRequired.length > 0 ? missingRequired.join(', ') : 'None - all required fields collected!'}
+STILL NEEDED (optional): ${missingOptional.join(', ')}
 
-The available options for this question are:
-${defaultOptions.map(o => `- ${o.label}`).join('\n')}
+${previousAnswer ? `USER'S LAST ANSWER: "${previousAnswer}"` : 'This is the start of the conversation.'}
 
-Return JSON with:
-- question: Your friendly opening message and question (under 50 words total)
-- options: Use these exact options: ${JSON.stringify(defaultOptions)}
-- multiSelect: ${multiSelect}
-- inputType: null`;
-      } else {
-        prompt = `You are a friendly sales assistant for MartechDevs helping gather requirements for a quote.
+INSTRUCTIONS:
+1. ${previousAnswer ? 'First, extract any data from their answer and put it in "collected"' : 'Start with a warm, brief intro (1 sentence) then ask your first question'}
+2. Ask ONE question about the next missing field - prioritize required fields
+3. Be conversational and natural - vary your phrasing, acknowledge their answers briefly
+4. Provide helpful options when appropriate (but keep them concise)
+5. For multi-choice questions (platforms, tools, goals), set multi_select: true
+6. When asking for email, set input_type: "email" and options: []
+7. If ALL required fields are collected, set is_complete: true
 
-The customer just told you: "${previousAnswer}"
-Topics already covered: ${coveredTopics || 'none yet'}
-
-Now ask about their ${topic}.
-
-The available options for this question are:
-${defaultOptions.map(o => `- ${o.label}`).join('\n')}
-
-Generate JSON with:
-- question: Start with a brief, natural acknowledgment (2-5 words), then ask about ${topic} conversationally. Keep under 40 words total.
-- options: Use these exact options: ${JSON.stringify(defaultOptions)}
-- multiSelect: ${multiSelect}
-- inputType: null`;
-      }
+Generate your response:`;
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
@@ -124,69 +111,37 @@ Generate JSON with:
 
       const responseText = result.response.text();
       const parsed = JSON.parse(responseText);
-      
-      if (!parsed.options || parsed.options.length === 0) {
-        parsed.options = defaultOptions;
-      }
-      
-      parsed.multiSelect = multiSelect;
 
-      return parsed;
-    } catch (error) {
-      console.error('Gemini Quote Question error:', error);
+      const newCollected = { ...collectedData };
+      if (parsed.collected) {
+        Object.assign(newCollected, parsed.collected);
+      }
+
+      const stillMissing = REQUIRED_FIELDS.filter(f => !newCollected[f]);
+      const isComplete = stillMissing.length === 0 && newCollected.email;
+
       return {
-        question: isFirst 
-          ? `Hey there! Let's get you a quick quote. First, what type of company are you?`
-          : `Got it! Now, tell me about your ${topic}?`,
-        options: defaultOptions || [],
-        multiSelect: multiSelect || false,
-        inputType: isEmailStep ? 'email' : null
-      };
-    }
-  }
-
-  async generateQuoteResponse(conversationHistory, customerMessage) {
-    try {
-      const model = this.client.getGenerativeModel({ 
-        model: this.model,
-        systemInstruction: this.quotePrompt
-      });
-
-      const contents = this.buildContents(conversationHistory, customerMessage);
-
-      const result = await model.generateContent({
-        contents,
-        generationConfig: {
-          temperature: 0.8,
-          maxOutputTokens: 1024,
-          topP: 0.95,
-        }
-      });
-
-      const response = result.response;
-      const text = response.text();
-      
-      const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/);
-      let quoteData = null;
-      let displayText = text;
-      
-      if (jsonMatch) {
-        try {
-          quoteData = JSON.parse(jsonMatch[1]);
-          displayText = text.replace(/```json\s*[\s\S]*?\s*```/, '').trim();
-        } catch (e) {
-          console.warn('Failed to parse quote JSON:', e.message);
-        }
-      }
-
-      return { 
-        text: displayText, 
-        quoteData,
-        isComplete: quoteData?.complete || false
+        question: parsed.question,
+        options: parsed.options || [],
+        multi_select: parsed.multi_select || false,
+        input_type: parsed.input_type || null,
+        collected_data: newCollected,
+        is_complete: isComplete
       };
     } catch (error) {
-      console.error('Gemini Quote API error:', error);
-      throw new Error(`Failed to generate quote response: ${error.message}`);
+      console.error('Gemini Quote Step error:', error);
+      
+      const missingRequired = REQUIRED_FIELDS.filter(f => !collectedData[f]);
+      const nextField = missingRequired[0] || 'email';
+      
+      return {
+        question: `Could you tell me about your ${QUOTE_SCHEMA[nextField].toLowerCase()}?`,
+        options: [],
+        multi_select: false,
+        input_type: nextField === 'email' ? 'email' : null,
+        collected_data: collectedData,
+        is_complete: false
+      };
     }
   }
 

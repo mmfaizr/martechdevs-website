@@ -122,84 +122,45 @@ router.post('/conversations/:id/messages', async (req, res) => {
   }
 });
 
-router.post('/quote/question', async (req, res) => {
+router.post('/quote/next', async (req, res) => {
   try {
-    const { conversation_id, topic, topic_id, default_options, covered_topics, previous_answer, is_first, is_email_step, multi_select } = req.body;
+    const { conversation_id, previous_answer, collected_data } = req.body;
 
-    if (!topic) {
-      return res.status(400).json({ error: 'Topic is required' });
-    }
+    const result = await geminiService.generateQuoteStep(previous_answer || '', collected_data || {});
 
-    const result = await geminiService.generateQuoteQuestion({
-      topic,
-      topicId: topic_id,
-      defaultOptions: default_options || [],
-      coveredTopics: covered_topics || '',
-      previousAnswer: previous_answer || '',
-      isFirst: is_first || false,
-      isEmailStep: is_email_step || false,
-      multiSelect: multi_select || false
-    });
-
-    if (conversation_id && result.question) {
+    if (conversation_id) {
       try {
         const conversation = await db.getConversation(conversation_id);
         if (conversation) {
-          const message = await db.createMessage({
-            conversation_id,
-            content: result.question,
-            sender_type: 'ai',
-            source: 'quote_flow'
-          });
+          if (previous_answer) {
+            const customerMsg = await db.createMessage({
+              conversation_id,
+              content: previous_answer,
+              sender_type: 'customer',
+              source: 'quote_flow'
+            });
+            await slackService.mirrorMessage(conversation, customerMsg).catch(() => {});
+          }
 
-          try {
-            await slackService.mirrorMessage(conversation, message);
-          } catch (slackErr) {
-            console.warn('Slack mirror failed for quote question:', slackErr.message);
+          if (result.question && !result.is_complete) {
+            const aiMsg = await db.createMessage({
+              conversation_id,
+              content: result.question,
+              sender_type: 'ai',
+              source: 'quote_flow'
+            });
+            await slackService.mirrorMessage(conversation, aiMsg).catch(() => {});
           }
         }
       } catch (dbErr) {
-        console.warn('Failed to store quote question:', dbErr.message);
+        console.warn('Failed to store quote messages:', dbErr.message);
       }
     }
 
     res.json(result);
   } catch (error) {
-    console.error('Error generating quote question:', error);
-    res.status(500).json({ error: 'Failed to generate question' });
-  }
-});
-
-router.post('/quote/answer', async (req, res) => {
-  try {
-    const { conversation_id, answer } = req.body;
-
-    if (!conversation_id || !answer) {
-      return res.status(400).json({ error: 'conversation_id and answer are required' });
-    }
-
-    const conversation = await db.getConversation(conversation_id);
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation not found' });
-    }
-
-    const message = await db.createMessage({
-      conversation_id,
-      content: answer,
-      sender_type: 'customer',
-      source: 'quote_flow'
-    });
-
-    try {
-      await slackService.mirrorMessage(conversation, message);
-    } catch (slackErr) {
-      console.warn('Slack mirror failed for quote answer:', slackErr.message);
-    }
-
-    res.json({ success: true, message });
-  } catch (error) {
-    console.error('Error storing quote answer:', error);
-    res.status(500).json({ error: 'Failed to store answer' });
+    console.error('Error in quote flow:', error);
+    res.status(500).json({ error: 'Failed to process quote step' });
   }
 });
 
