@@ -378,21 +378,21 @@ export default function AllServiceSections() {
             transition={{ duration: 0.3 }}
             className="sticky top-[84px] z-30 w-full pointer-events-none flex justify-center"
           >
-            <div className="pointer-events-auto w-[90%] max-w-[1150px] relative">
-              <div className="bg-white/95 backdrop-blur-md border-x border-b border-gray-200 shadow-sm rounded-b-2xl px-4 py-2.5 mx-auto w-full origin-top">
-                <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
+            <div className="pointer-events-auto w-[95%] md:w-[90%] max-w-[1150px] relative">
+              <div className="bg-white/95 backdrop-blur-md border-x border-b border-gray-200 shadow-sm rounded-b-2xl px-2 py-1.5 md:px-4 md:py-2.5 mx-auto w-full origin-top">
+                <div className="flex flex-wrap justify-center gap-0.5 md:gap-2">
                   {services.map((service) => (
                     <button
                       key={service.id}
                       onClick={() => scrollToSection(service.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                      className={`flex items-center gap-1 md:gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-medium transition-all duration-200 border ${
                         activeSection === service.id
                           ? 'bg-white text-gray-900 border-emerald-500 shadow-sm ring-1 ring-emerald-500'
                           : 'bg-white text-gray-600 border-transparent hover:bg-gray-50 hover:border-gray-200 hover:text-gray-900'
                       }`}
                     >
                       {/* Logo Icon */}
-                      <div className={`w-3.5 h-3.5 relative flex-shrink-0`}>
+                      <div className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 relative flex-shrink-0`}>
                          <Image
                           src={`/assets/tool logos icons/${service.toolLogos[0].icon}`}
                           alt=""
@@ -402,7 +402,7 @@ export default function AllServiceSections() {
                           }`}
                         />
                       </div>
-                      <span className="truncate max-w-[100px] md:max-w-none">{service.navTitle}</span>
+                      <span className="truncate max-w-[70px] md:max-w-none">{service.navTitle}</span>
                     </button>
                   ))}
                 </div>

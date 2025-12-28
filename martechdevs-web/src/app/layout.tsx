@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import "./globals.css";
+import MartechChat from "@/components/MartechChat";
 
 const interTight = Inter_Tight({
   subsets: ["latin"],
@@ -28,6 +29,11 @@ export default function RootLayout({
     <html lang="en" className={interTight.variable} suppressHydrationWarning>
       <body className="antialiased font-sans" suppressHydrationWarning>
         {children}
+        <MartechChat
+          apiUrl={process.env.NEXT_PUBLIC_CHAT_API_URL || "https://claychat-api.onrender.com/api"}
+          autoOpen={true}
+          autoOpenDelay={3000}
+        />
       </body>
     </html>
   );

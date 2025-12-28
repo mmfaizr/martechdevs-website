@@ -51,7 +51,7 @@ export default function ServiceSection({
                   alt={tool.name}
                   width={28}
                   height={28}
-                  className="w-7 h-7 object-contain"
+                  className="w-5 h-5 md:w-7 md:h-7 object-contain"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
