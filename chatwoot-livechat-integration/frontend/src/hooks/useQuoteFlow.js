@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { QUOTE_TOPICS, calculateQuote, formatQuoteMessage } from '../config/quoteFlowConfig';
+import { QUOTE_TOPICS, calculateQuote } from '../config/quoteFlowConfig';
 
 export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   const [isActive, setIsActive] = useState(false);
@@ -8,6 +8,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   const [answers, setAnswers] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [isLoadingQuestion, setIsLoadingQuestion] = useState(false);
+  const [isGeneratingQuote, setIsGeneratingQuote] = useState(false);
   const [conversationHistory, setConversationHistory] = useState([]);
 
   const sendAnswerToBackend = useCallback(async (answer) => {
@@ -23,20 +24,26 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     }
   }, [apiUrl, conversationId]);
 
-  const sendQuoteComplete = useCallback(async (quoteSummary, email) => {
-    if (!conversationId) return;
+  const generateSalesQuote = useCallback(async (allAnswers, calculatedQuote) => {
     try {
-      await fetch(`${apiUrl}/quote/complete`, {
+      const response = await fetch(`${apiUrl}/quote/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          conversation_id: conversationId, 
-          quote_summary: quoteSummary,
-          email 
+          conversation_id: conversationId,
+          answers: allAnswers,
+          calculated_quote: calculatedQuote,
+          email: allAnswers.email?.[0]
         })
       });
+
+      if (!response.ok) throw new Error('Failed to generate quote');
+      
+      const data = await response.json();
+      return data.quote_message;
     } catch (err) {
-      console.warn('Failed to send quote completion:', err);
+      console.error('Failed to generate sales quote:', err);
+      return null;
     }
   }, [apiUrl, conversationId]);
 
@@ -110,6 +117,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     setSelectedOptions([]);
     setConversationHistory([]);
     setCurrentStep(null);
+    setIsGeneratingQuote(false);
     await generateQuestion(0);
   }, [generateQuestion]);
 
@@ -150,17 +158,19 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     const nextStepIndex = currentStepIndex + 1;
     
     if (nextStepIndex >= QUOTE_TOPICS.length) {
-      const quote = calculateQuote(newAnswers);
-      const quoteMessage = formatQuoteMessage(newAnswers, quote);
+      setIsGeneratingQuote(true);
+      const calculatedQuote = calculateQuote(newAnswers);
       
-      await sendQuoteComplete(quoteMessage, newAnswers.email?.[0]);
+      const salesQuote = await generateSalesQuote(newAnswers, calculatedQuote);
       
       setIsActive(false);
       setCurrentStep(null);
+      setIsGeneratingQuote(false);
+      
       if (onComplete) {
-        onComplete(newAnswers, quote, quoteMessage);
+        onComplete(newAnswers, calculatedQuote, salesQuote);
       }
-      return { completed: true, selectedLabels, quote, quoteMessage };
+      return { completed: true, selectedLabels, quote: calculatedQuote, quoteMessage: salesQuote };
     }
 
     setCurrentStepIndex(nextStepIndex);
@@ -168,7 +178,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     await generateQuestion(nextStepIndex, selectedLabels);
     
     return { completed: false, selectedLabels };
-  }, [currentStepIndex, selectedOptions, answers, currentStep, onComplete, generateQuestion, sendAnswerToBackend, sendQuoteComplete]);
+  }, [currentStepIndex, selectedOptions, answers, currentStep, onComplete, generateQuestion, sendAnswerToBackend, generateSalesQuote]);
 
   const submitTextInput = useCallback(async (value) => {
     if (!currentStep || !value.trim()) return null;
@@ -187,17 +197,19 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     const nextStepIndex = currentStepIndex + 1;
     
     if (nextStepIndex >= QUOTE_TOPICS.length) {
-      const quote = calculateQuote(newAnswers);
-      const quoteMessage = formatQuoteMessage(newAnswers, quote);
+      setIsGeneratingQuote(true);
+      const calculatedQuote = calculateQuote(newAnswers);
       
-      await sendQuoteComplete(quoteMessage, newAnswers.email?.[0]);
+      const salesQuote = await generateSalesQuote(newAnswers, calculatedQuote);
       
       setIsActive(false);
       setCurrentStep(null);
+      setIsGeneratingQuote(false);
+      
       if (onComplete) {
-        onComplete(newAnswers, quote, quoteMessage);
+        onComplete(newAnswers, calculatedQuote, salesQuote);
       }
-      return { completed: true, submittedValue: value, quote, quoteMessage };
+      return { completed: true, submittedValue: value, quote: calculatedQuote, quoteMessage: salesQuote };
     }
 
     setCurrentStepIndex(nextStepIndex);
@@ -205,7 +217,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     await generateQuestion(nextStepIndex, value);
     
     return { completed: false, submittedValue: value };
-  }, [currentStepIndex, answers, currentStep, onComplete, generateQuestion, sendAnswerToBackend, sendQuoteComplete]);
+  }, [currentStepIndex, answers, currentStep, onComplete, generateQuestion, sendAnswerToBackend, generateSalesQuote]);
 
   const cancelFlow = useCallback(() => {
     setIsActive(false);
@@ -214,6 +226,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     setSelectedOptions([]);
     setCurrentStep(null);
     setConversationHistory([]);
+    setIsGeneratingQuote(false);
   }, []);
 
   const goBack = useCallback(async () => {
@@ -254,6 +267,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     selectedOptions,
     progress: getProgress(),
     isLoadingQuestion,
+    isGeneratingQuote,
     startFlow,
     selectOption,
     confirmSelection,

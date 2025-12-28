@@ -1,12 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../hooks/useChat';
 import { useQuoteFlow } from '../hooks/useQuoteFlow';
+import Markdown from './Markdown';
+import CalEmbed from './CalEmbed';
 
-export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', autoOpen = true, autoOpenDelay = 3000 }) {
+export default function ChatWidget({ 
+  apiUrl, 
+  customerInfo, 
+  theme = 'light', 
+  autoOpen = true, 
+  autoOpenDelay = 3000,
+  calLink = 'martechdevs/discovery'
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [input, setInput] = useState('');
   const [quoteMessages, setQuoteMessages] = useState([]);
+  const [showCalendar, setShowCalendar] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   
@@ -43,14 +53,14 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     if (isOpen) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, quoteMessages, isOpen, quoteFlow.isActive, quoteFlow.currentStep]);
+  }, [messages, quoteMessages, isOpen, quoteFlow.isActive, quoteFlow.currentStep, showCalendar]);
 
   useEffect(() => {
-    if (isOpen && !quoteFlow.isActive) {
+    if (isOpen && !quoteFlow.isActive && !showCalendar) {
       const t = setTimeout(() => inputRef.current?.focus(), 250);
       return () => clearTimeout(t);
     }
-  }, [isOpen, quoteFlow.isActive]);
+  }, [isOpen, quoteFlow.isActive, showCalendar]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -78,6 +88,13 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     if (lowerInput.includes('quote') || lowerInput.includes('pricing') || lowerInput.includes('cost') || lowerInput.includes('price')) {
       setQuoteMessages([]);
       quoteFlow.startFlow();
+      sendMessage(input);
+      setInput('');
+      return;
+    }
+    
+    if (lowerInput.includes('call') || lowerInput.includes('schedule') || lowerInput.includes('meeting') || lowerInput.includes('book')) {
+      setShowCalendar(true);
       sendMessage(input);
       setInput('');
       return;
@@ -119,6 +136,23 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
     quoteFlow.startFlow();
   };
 
+  const handleScheduleCall = () => {
+    setShowCalendar(true);
+  };
+
+  const handleBookingComplete = (details) => {
+    setShowCalendar(false);
+    setQuoteMessages(prev => [
+      ...prev,
+      { 
+        id: `booking_${Date.now()}`, 
+        type: 'booking_confirmed', 
+        content: "Great! Your discovery call has been scheduled. You'll receive a confirmation email shortly with the meeting details. Looking forward to speaking with you! 🎉",
+        created_at: new Date().toISOString()
+      }
+    ]);
+  };
+
   const allMessages = [...messages];
 
   return (
@@ -147,6 +181,16 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
             <ConnectionOverlay status={status} />
           )}
 
+          {showCalendar && (
+            <div className="calendar-overlay">
+              <CalEmbed 
+                calLink={calLink}
+                onBookingComplete={handleBookingComplete}
+                onClose={() => setShowCalendar(false)}
+              />
+            </div>
+          )}
+
           <div className="messages-container">
             {allMessages.length === 0 && !quoteFlow.isActive && (
               <div className="message ai welcome">
@@ -154,7 +198,7 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
                 <div className="message-content">
                   Hi — want help with anything on this page?
                 </div>
-                <QuickActions onStartQuote={handleStartQuote} />
+                <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} />
                 <div className="message-time">Just now</div>
               </div>
             )}
@@ -168,10 +212,21 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
                 <QuoteProgress progress={quoteFlow.progress} />
                 
                 {quoteMessages.map(msg => (
-                  <QuoteMessage key={msg.id} message={msg} />
+                  <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
                 ))}
 
-                {quoteFlow.isLoadingQuestion ? (
+                {quoteFlow.isGeneratingQuote ? (
+                  <div className="message ai generating-quote">
+                    <div className="message-header">AI Assistant</div>
+                    <div className="message-content">
+                      <div className="generating-quote-indicator">
+                        <span className="quote-gen-icon">📋</span>
+                        <span>Crafting your personalized quote...</span>
+                        <TypingIndicator />
+                      </div>
+                    </div>
+                  </div>
+                ) : quoteFlow.isLoadingQuestion ? (
                   <div className="message ai">
                     <div className="message-header">AI Assistant</div>
                     <div className="message-content">
@@ -192,8 +247,8 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
             )}
 
             {!quoteFlow.isActive && quoteMessages.length > 0 && (
-              quoteMessages.filter(m => m.type === 'quote_result').map(msg => (
-                <QuoteMessage key={msg.id} message={msg} />
+              quoteMessages.filter(m => m.type === 'quote_result' || m.type === 'booking_confirmed').map(msg => (
+                <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
               ))
             )}
             
@@ -265,12 +320,16 @@ export default function ChatWidget({ apiUrl, customerInfo, theme = 'light', auto
   );
 }
 
-function QuickActions({ onStartQuote }) {
+function QuickActions({ onStartQuote, onScheduleCall }) {
   return (
     <div className="quick-actions">
       <button className="quick-action-btn quote-btn" onClick={onStartQuote}>
         <span className="quick-action-icon">💰</span>
         Get Instant Quote
+      </button>
+      <button className="quick-action-btn schedule-btn" onClick={onScheduleCall}>
+        <span className="quick-action-icon">📅</span>
+        Schedule a Call
       </button>
     </div>
   );
@@ -297,7 +356,9 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
     <div className="quote-step">
       <div className="message ai">
         <div className="message-header">AI Assistant</div>
-        <div className="message-content">{step.question}</div>
+        <div className="message-content">
+          <Markdown>{step.question}</Markdown>
+        </div>
       </div>
 
       {step.options.length > 0 && (
@@ -308,7 +369,6 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
               className={`quote-option ${selectedOptions.includes(option.value) ? 'selected' : ''}`}
               onClick={() => onSelect(option.value)}
             >
-              <span className="option-icon">{option.icon}</span>
               <span className="option-label">{option.label}</span>
               {selectedOptions.includes(option.value) && (
                 <span className="option-check">✓</span>
@@ -341,24 +401,33 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
   );
 }
 
-function QuoteMessage({ message }) {
+function QuoteMessage({ message, onScheduleCall }) {
   if (message.type === 'quote_result') {
     return (
       <div className="message ai quote-result">
         <div className="message-header">AI Assistant</div>
         <div className="message-content quote-content">
-          {message.content.split('\n').map((line, i) => (
-            <React.Fragment key={i}>
-              {line.startsWith('**') && line.endsWith('**') ? (
-                <strong>{line.replace(/\*\*/g, '')}</strong>
-              ) : line.startsWith('•') ? (
-                <div className="quote-line-item">{line}</div>
-              ) : (
-                line
-              )}
-              {i < message.content.split('\n').length - 1 && <br />}
-            </React.Fragment>
-          ))}
+          <Markdown>{message.content}</Markdown>
+          {onScheduleCall && (
+            <div className="quote-cta">
+              <button className="schedule-call-btn" onClick={onScheduleCall}>
+                <span>📅</span> Schedule Discovery Call
+              </button>
+              <span className="cta-note">No commitment - just a conversation</span>
+            </div>
+          )}
+        </div>
+        <div className="message-time">{formatTime(message.created_at)}</div>
+      </div>
+    );
+  }
+
+  if (message.type === 'booking_confirmed') {
+    return (
+      <div className="message ai booking-confirmed">
+        <div className="message-header">AI Assistant</div>
+        <div className="message-content">
+          <Markdown>{message.content}</Markdown>
         </div>
         <div className="message-time">{formatTime(message.created_at)}</div>
       </div>
@@ -387,7 +456,7 @@ function Message({ message }) {
         {isHuman && `${message.agent_name || 'Agent'}`}
       </div>
       <div className="message-content">
-        {message.content}
+        {isAI ? <Markdown>{message.content}</Markdown> : message.content}
       </div>
       <div className="message-time">
         {formatTime(message.created_at)}
@@ -421,14 +490,6 @@ function TypingIndicator() {
       <span></span>
       <span></span>
     </div>
-  );
-}
-
-function ChatIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M21 11.5C21 16.75 16.75 21 11.5 21C10.39 21 9.32999 20.83 8.35999 20.52L3 22L4.48 16.64C4.17 15.67 4 14.61 4 13.5C4 8.25 8.25 4 13.5 4C18.75 4 23 8.25 23 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
   );
 }
 

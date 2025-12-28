@@ -15,6 +15,7 @@ interface MartechChatConfig {
   theme?: 'light' | 'dark';
   autoOpen?: boolean;
   autoOpenDelay?: number;
+  calLink?: string;
 }
 
 interface MartechChatInstance {
@@ -36,6 +37,7 @@ interface Props {
   theme?: 'light' | 'dark';
   autoOpen?: boolean;
   autoOpenDelay?: number;
+  calLink?: string;
 }
 
 export default function MartechChat({
@@ -43,7 +45,8 @@ export default function MartechChat({
   customerInfo,
   theme = 'light',
   autoOpen = true,
-  autoOpenDelay = 3000
+  autoOpenDelay = 3000,
+  calLink = 'https://cal.com/faizur-rahman-vvsm0e/15min'
 }: Props) {
   const chatRef = useRef<MartechChatInstance | null>(null);
   const loadedRef = useRef(false);
@@ -82,7 +85,8 @@ export default function MartechChat({
           },
           theme,
           autoOpen,
-          autoOpenDelay
+          autoOpenDelay,
+          calLink
         });
       })
       .catch(console.error);

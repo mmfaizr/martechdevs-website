@@ -12,7 +12,8 @@ class MartechChat {
       autoOpen: config.autoOpen !== undefined ? config.autoOpen : true,
       autoOpenDelay: config.autoOpenDelay || 3000,
       containerId: config.containerId || 'martech-chat-root',
-      position: config.position || 'center'
+      position: config.position || 'center',
+      calLink: config.calLink || 'https://cal.com/faizur-rahman-vvsm0e/15min'
     };
     this.root = null;
     this.container = null;
@@ -39,6 +40,7 @@ class MartechChat {
         theme={this.config.theme}
         autoOpen={this.config.autoOpen}
         autoOpenDelay={this.config.autoOpenDelay}
+        calLink={this.config.calLink}
       />
     );
   }

@@ -4,6 +4,7 @@ import slackService from '../services/slack/client.js';
 import orchestrator from '../services/orchestrator.js';
 import realtimeService from '../services/realtime.js';
 import geminiService from '../services/gemini.js';
+import quoteGenerator from '../services/quoteGenerator.js';
 
 const router = express.Router();
 
@@ -201,9 +202,26 @@ router.post('/quote/answer', async (req, res) => {
   }
 });
 
+router.post('/quote/generate', async (req, res) => {
+  try {
+    const { answers, calculated_quote } = req.body;
+
+    if (!answers || !calculated_quote) {
+      return res.status(400).json({ error: 'answers and calculated_quote are required' });
+    }
+
+    const salesQuote = await quoteGenerator.generateSalesQuote(answers, calculated_quote);
+    
+    res.json({ quote_message: salesQuote });
+  } catch (error) {
+    console.error('Error generating sales quote:', error);
+    res.status(500).json({ error: 'Failed to generate quote' });
+  }
+});
+
 router.post('/quote/complete', async (req, res) => {
   try {
-    const { conversation_id, quote_summary, email } = req.body;
+    const { conversation_id, quote_summary, email, answers, calculated_quote } = req.body;
 
     if (!conversation_id) {
       return res.status(400).json({ error: 'conversation_id is required' });
@@ -214,22 +232,27 @@ router.post('/quote/complete', async (req, res) => {
       return res.status(404).json({ error: 'Conversation not found' });
     }
 
+    let finalQuoteSummary = quote_summary;
+    
+    if (answers && calculated_quote && !quote_summary) {
+      finalQuoteSummary = await quoteGenerator.generateSalesQuote(answers, calculated_quote);
+    }
+
     const message = await db.createMessage({
       conversation_id,
-      content: quote_summary,
+      content: finalQuoteSummary,
       sender_type: 'ai',
       source: 'quote_flow'
     });
 
     try {
       await slackService.mirrorMessage(conversation, message);
-      
-      await slackService.postQuoteSummary(conversation, email, quote_summary);
+      await slackService.postQuoteSummary(conversation, email, finalQuoteSummary);
     } catch (slackErr) {
       console.warn('Slack mirror failed for quote completion:', slackErr.message);
     }
 
-    res.json({ success: true });
+    res.json({ success: true, quote_message: finalQuoteSummary });
   } catch (error) {
     console.error('Error completing quote:', error);
     res.status(500).json({ error: 'Failed to complete quote' });
