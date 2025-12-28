@@ -124,7 +124,7 @@ router.post('/conversations/:id/messages', async (req, res) => {
 
 router.post('/quote/question', async (req, res) => {
   try {
-    const { conversation_id, topic, topic_id, default_options, covered_topics, previous_answer, is_first, is_email_step } = req.body;
+    const { conversation_id, topic, topic_id, default_options, covered_topics, previous_answer, is_first, is_email_step, multi_select } = req.body;
 
     if (!topic) {
       return res.status(400).json({ error: 'Topic is required' });
@@ -137,7 +137,8 @@ router.post('/quote/question', async (req, res) => {
       coveredTopics: covered_topics || '',
       previousAnswer: previous_answer || '',
       isFirst: is_first || false,
-      isEmailStep: is_email_step || false
+      isEmailStep: is_email_step || false,
+      multiSelect: multi_select || false
     });
 
     if (conversation_id && result.question) {

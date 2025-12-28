@@ -70,7 +70,8 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
           covered_topics: coveredTopics,
           previous_answer: prevAnswer,
           is_first: topicIndex === 0,
-          is_email_step: topicConfig.inputType === 'email'
+          is_email_step: topicConfig.inputType === 'email',
+          multi_select: topicConfig.multiSelect || false
         })
       });
 

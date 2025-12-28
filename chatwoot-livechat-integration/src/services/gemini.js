@@ -60,7 +60,7 @@ class GeminiService {
     this.quotePrompt = loadQuotePrompt();
   }
 
-  async generateQuoteQuestion({ topic, topicId, defaultOptions, coveredTopics, previousAnswer, isFirst, isEmailStep }) {
+  async generateQuoteQuestion({ topic, topicId, defaultOptions, coveredTopics, previousAnswer, isFirst, isEmailStep, multiSelect }) {
     try {
       const model = this.client.getGenerativeModel({ 
         model: this.model,
@@ -98,7 +98,7 @@ ${defaultOptions.map(o => `- ${o.label}`).join('\n')}
 Return JSON with:
 - question: Your friendly opening message and question (under 50 words total)
 - options: Use these exact options: ${JSON.stringify(defaultOptions)}
-- multiSelect: ${defaultOptions.length > 3 ? 'true' : 'false'}
+- multiSelect: ${multiSelect}
 - inputType: null`;
       } else {
         prompt = `You are a friendly sales assistant for MartechDevs helping gather requirements for a quote.
@@ -114,7 +114,7 @@ ${defaultOptions.map(o => `- ${o.label}`).join('\n')}
 Generate JSON with:
 - question: Start with a brief, natural acknowledgment (2-5 words), then ask about ${topic} conversationally. Keep under 40 words total.
 - options: Use these exact options: ${JSON.stringify(defaultOptions)}
-- multiSelect: ${topic.includes('select all') || topic.includes('multi') || defaultOptions.length > 5 ? 'true' : 'false'}
+- multiSelect: ${multiSelect}
 - inputType: null`;
       }
 
@@ -128,6 +128,8 @@ Generate JSON with:
       if (!parsed.options || parsed.options.length === 0) {
         parsed.options = defaultOptions;
       }
+      
+      parsed.multiSelect = multiSelect;
 
       return parsed;
     } catch (error) {
@@ -137,7 +139,7 @@ Generate JSON with:
           ? `Hey there! Let's get you a quick quote. First, what type of company are you?`
           : `Got it! Now, tell me about your ${topic}?`,
         options: defaultOptions || [],
-        multiSelect: defaultOptions?.length > 5,
+        multiSelect: multiSelect || false,
         inputType: isEmailStep ? 'email' : null
       };
     }
