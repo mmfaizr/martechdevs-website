@@ -124,13 +124,28 @@ router.post('/conversations/:id/messages', async (req, res) => {
 
 router.post('/quote/next', async (req, res) => {
   try {
-    const { conversation_id, previous_answer, collected_data } = req.body;
+    const { conversation_id, previous_answer, collected_data, previous_field } = req.body;
 
-    console.log('[Quote Flow] Generating step:', { conversation_id, previous_answer: previous_answer?.substring(0, 50), collected_keys: Object.keys(collected_data || {}) });
+    console.log('[Quote Flow] Generating step:', { 
+      conversation_id, 
+      previous_answer: previous_answer?.substring(0, 50), 
+      previous_field,
+      collected_keys: Object.keys(collected_data || {}) 
+    });
     
-    const result = await geminiService.generateQuoteStep(previous_answer || '', collected_data || {});
+    const result = await geminiService.generateQuoteStep(
+      previous_answer || '', 
+      collected_data || {},
+      previous_field || null
+    );
     
-    console.log('[Quote Flow] Result:', { question: result.question?.substring(0, 50), options_count: result.options?.length, is_complete: result.is_complete });
+    console.log('[Quote Flow] Result:', { 
+      question: result.question?.substring(0, 50), 
+      options_count: result.options?.length, 
+      is_complete: result.is_complete,
+      next_field: result.next_field,
+      collected_keys: Object.keys(result.collected_data || {})
+    });
 
     if (conversation_id) {
       try {

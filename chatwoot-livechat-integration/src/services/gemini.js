@@ -129,101 +129,111 @@ class GeminiService {
     this.model = config.gemini.model;
   }
 
-  async generateQuoteStep(previousAnswer, collectedData = {}) {
+  async generateQuoteStep(previousAnswer, collectedData = {}, previousField = null) {
     try {
       const model = this.client.getGenerativeModel({ 
         model: this.model,
         generationConfig: {
           responseMimeType: "application/json",
           responseSchema: QUOTE_RESPONSE_SCHEMA,
-          temperature: 0.85,
+          temperature: 0.7,
           maxOutputTokens: 800,
         }
       });
 
-      const missingRequired = REQUIRED_FIELDS.filter(f => !collectedData[f]);
-      const missingOptional = Object.keys(QUOTE_SCHEMA).filter(f => !REQUIRED_FIELDS.includes(f) && !collectedData[f]);
+      let updatedData = { ...collectedData };
+      
+      if (previousAnswer && previousField && QUOTE_SCHEMA[previousField]) {
+        const fieldConfig = QUOTE_SCHEMA[previousField];
+        if (fieldConfig.options) {
+          const matchedOption = fieldConfig.options.find(
+            opt => opt.toLowerCase() === previousAnswer.toLowerCase() ||
+                   previousAnswer.toLowerCase().includes(opt.toLowerCase()) ||
+                   opt.toLowerCase().includes(previousAnswer.toLowerCase())
+          );
+          if (matchedOption) {
+            updatedData[previousField] = matchedOption;
+          } else {
+            updatedData[previousField] = previousAnswer;
+          }
+        } else {
+          updatedData[previousField] = previousAnswer;
+        }
+        console.log(`[Gemini Quote] Extracted ${previousField}:`, updatedData[previousField]);
+      }
+
+      const missingRequired = REQUIRED_FIELDS.filter(f => !updatedData[f]);
+      const missingOptional = Object.keys(QUOTE_SCHEMA).filter(f => !REQUIRED_FIELDS.includes(f) && !updatedData[f]);
       
       const nextField = missingRequired[0] || missingOptional[0];
       const nextFieldConfig = nextField ? QUOTE_SCHEMA[nextField] : null;
 
-      const schemaDescription = Object.entries(QUOTE_SCHEMA).map(([key, config]) => {
-        let line = `- ${key}: ${config.description}`;
-        if (REQUIRED_FIELDS.includes(key)) line += ' (REQUIRED)';
-        if (config.options) line += `\n  OPTIONS: ${config.options.join(', ')}`;
-        if (config.multiSelect) line += '\n  (user can select multiple)';
-        if (config.inputType === 'email') line += '\n  (free text email input)';
-        return line;
-      }).join('\n');
+      if (!nextField) {
+        return {
+          question: null,
+          options: [],
+          multi_select: false,
+          input_type: null,
+          collected_data: updatedData,
+          is_complete: true,
+          next_field: null
+        };
+      }
 
-      const prompt = `You are a friendly, conversational sales assistant for MartechDevs, a martech integration company. You're gathering information to generate a quote.
+      const prompt = `You are a friendly sales assistant for MartechDevs. Generate the next question for a quote flow.
 
-DATA SCHEMA (what we need to collect):
-${schemaDescription}
+CURRENT DATA COLLECTED: ${JSON.stringify(updatedData)}
 
-ALREADY COLLECTED:
-${Object.keys(collectedData).length > 0 ? Object.entries(collectedData).map(([k, v]) => `- ${k}: ${JSON.stringify(v)}`).join('\n') : 'Nothing yet'}
+NEXT FIELD TO COLLECT: ${nextField}
+FIELD DESCRIPTION: ${nextFieldConfig.description}
+${nextFieldConfig.options ? `OPTIONS: ${nextFieldConfig.options.join(', ')}` : ''}
+${nextFieldConfig.multiSelect ? 'USER CAN SELECT MULTIPLE' : ''}
+${nextFieldConfig.inputType === 'email' ? 'THIS IS AN EMAIL INPUT - no options needed' : ''}
 
-STILL NEEDED (required): ${missingRequired.length > 0 ? missingRequired.join(', ') : 'None - all required fields collected!'}
-STILL NEEDED (optional): ${missingOptional.join(', ')}
+${previousAnswer ? `User just answered: "${previousAnswer}"` : 'This is the first question.'}
 
-NEXT FIELD TO ASK ABOUT: ${nextField || 'None - complete!'}
-${nextFieldConfig?.options ? `USE THESE OPTIONS: ${JSON.stringify(nextFieldConfig.options.map(o => ({ value: o.toLowerCase().replace(/[^a-z0-9]+/g, '_'), label: o })))}` : ''}
-${nextFieldConfig?.multiSelect ? 'SET multi_select: true' : ''}
-${nextFieldConfig?.inputType === 'email' ? 'SET input_type: "email" and options: []' : ''}
-
-${previousAnswer ? `USER'S LAST ANSWER: "${previousAnswer}"` : 'This is the start of the conversation.'}
-
-INSTRUCTIONS:
-1. ${previousAnswer ? 'First, extract any data from their answer and put it in "collected" - match their answer to the closest option values' : 'Start with a warm, brief intro (1 sentence max) then ask your first question'}
-2. Ask ONE question about "${nextField}" - use the OPTIONS provided above
-3. Be conversational and natural - vary your phrasing, briefly acknowledge their previous answer (2-5 words max)
-4. Return the exact options from the list above (use value/label format)
-5. Keep your question under 40 words
-6. If ALL required fields are collected, set is_complete: true
-
-Generate your response:`;
+Generate a short, friendly question (under 30 words) asking about ${nextField}. ${previousAnswer ? 'Briefly acknowledge their answer.' : ''}`;
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
       });
 
       const responseText = result.response.text();
-      console.log('[Gemini Quote] Raw response:', responseText.substring(0, 500));
+      console.log('[Gemini Quote] Raw response:', responseText.substring(0, 300));
       
       let parsed;
       try {
         parsed = JSON.parse(responseText);
       } catch (parseErr) {
-        console.error('[Gemini Quote] JSON parse error:', parseErr.message);
-        throw new Error('Invalid JSON from Gemini');
+        console.error('[Gemini Quote] JSON parse error, using fallback');
+        parsed = { question: `What is your ${nextFieldConfig.description.toLowerCase()}?` };
       }
 
-      if (!parsed.question) {
-        console.error('[Gemini Quote] No question in response:', parsed);
-        throw new Error('No question in Gemini response');
-      }
-
-      const newCollected = { ...collectedData };
-      if (parsed.collected) {
-        Object.assign(newCollected, parsed.collected);
-      }
-
-      const stillMissing = REQUIRED_FIELDS.filter(f => !newCollected[f]);
-      const isComplete = stillMissing.length === 0 && newCollected.email;
+      const options = nextFieldConfig?.options 
+        ? nextFieldConfig.options.map(o => ({ 
+            value: o.toLowerCase().replace(/[^a-z0-9]+/g, '_'), 
+            label: o 
+          }))
+        : [];
 
       return {
-        question: parsed.question,
-        options: parsed.options || [],
-        multi_select: parsed.multi_select || false,
-        input_type: parsed.input_type || null,
-        collected_data: newCollected,
-        is_complete: isComplete
+        question: parsed.question || `What is your ${nextFieldConfig.description.toLowerCase()}?`,
+        options: options,
+        multi_select: nextFieldConfig?.multiSelect || false,
+        input_type: nextFieldConfig?.inputType || null,
+        collected_data: updatedData,
+        is_complete: false,
+        next_field: nextField
       };
     } catch (error) {
       console.error('Gemini Quote Step error:', error.message);
       
-      const missingRequired = REQUIRED_FIELDS.filter(f => !collectedData[f]);
+      let updatedData = { ...collectedData };
+      if (previousAnswer && previousField) {
+        updatedData[previousField] = previousAnswer;
+      }
+      
+      const missingRequired = REQUIRED_FIELDS.filter(f => !updatedData[f]);
       const nextField = missingRequired[0] || 'company_type';
       const fieldConfig = QUOTE_SCHEMA[nextField];
       
@@ -234,7 +244,7 @@ Generate your response:`;
           }))
         : [];
       
-      const isFirst = Object.keys(collectedData).length === 0;
+      const isFirst = Object.keys(updatedData).length === 0;
       
       return {
         question: isFirst 
@@ -243,8 +253,9 @@ Generate your response:`;
         options: fallbackOptions,
         multi_select: fieldConfig?.multiSelect || false,
         input_type: fieldConfig?.inputType || null,
-        collected_data: collectedData,
-        is_complete: false
+        collected_data: updatedData,
+        is_complete: false,
+        next_field: nextField
       };
     }
   }

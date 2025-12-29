@@ -10,6 +10,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   const [questionCount, setQuestionCount] = useState(0);
   
   const collectedDataRef = useRef({});
+  const currentFieldRef = useRef(null);
 
   const fetchNextQuestion = useCallback(async (previousAnswer = '') => {
     setIsLoadingQuestion(true);
@@ -18,6 +19,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
       console.log('[QuoteFlow] Fetching next question:', { 
         conversationId, 
         previousAnswer: previousAnswer?.substring(0, 30),
+        previousField: currentFieldRef.current,
         collectedKeys: Object.keys(collectedDataRef.current)
       });
       
@@ -27,7 +29,8 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
         body: JSON.stringify({
           conversation_id: conversationId || null,
           previous_answer: previousAnswer,
-          collected_data: collectedDataRef.current
+          collected_data: collectedDataRef.current,
+          previous_field: currentFieldRef.current
         })
       });
 
@@ -75,7 +78,13 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
         multiSelect: data.multi_select || false,
         inputType: data.input_type || null
       };
-      console.log('[QuoteFlow] Setting step:', { question: step.question?.substring(0, 50), options: step.options?.length });
+      
+      currentFieldRef.current = data.next_field || null;
+      console.log('[QuoteFlow] Setting step:', { 
+        question: step.question?.substring(0, 50), 
+        options: step.options?.length,
+        nextField: currentFieldRef.current 
+      });
       setCurrentStep(step);
       setQuestionCount(prev => prev + 1);
       setIsLoadingQuestion(false);
@@ -106,6 +115,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     setIsActive(true);
     setCurrentStep(null);
     collectedDataRef.current = {};
+    currentFieldRef.current = null;
     setSelectedOptions([]);
     setQuestionCount(0);
     setIsGeneratingQuote(false);
@@ -163,6 +173,7 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
     setIsActive(false);
     setCurrentStep(null);
     collectedDataRef.current = {};
+    currentFieldRef.current = null;
     setSelectedOptions([]);
     setQuestionCount(0);
     setIsGeneratingQuote(false);
