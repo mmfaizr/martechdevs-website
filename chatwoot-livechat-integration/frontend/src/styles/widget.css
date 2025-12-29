@@ -773,8 +773,20 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 8px 0;
+  padding: 12px 0;
   margin-top: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.quote-options::-webkit-scrollbar {
+  width: 4px;
+}
+
+.quote-options::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 2px;
 }
 
 .quote-option {
@@ -837,13 +849,10 @@
 }
 
 .quote-actions-sticky {
-  position: sticky;
-  bottom: 0;
-  background: linear-gradient(to top, var(--bg) 80%, transparent);
-  padding: 16px 0 8px;
-  margin-top: 12px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding-top: 8px;
 }
 
 .quote-inline-input {
@@ -1247,13 +1256,12 @@
   }
 
   .quote-options {
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: 220px;
   }
 
   .quote-option {
     flex: 1 1 calc(50% - 4px);
-    min-width: 140px;
+    min-width: 120px;
   }
 
   .quick-actions {
