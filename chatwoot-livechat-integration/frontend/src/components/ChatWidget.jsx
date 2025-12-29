@@ -78,7 +78,7 @@ export default function ChatWidget({
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    if (quoteFlow.isActive && quoteFlow.currentStep?.inputType) {
+    if (quoteFlow.isActive && quoteFlow.currentStep) {
       const inputValue = input;
       const currentQuestion = quoteFlow.currentStep.question;
       setInput('');
@@ -224,6 +224,10 @@ export default function ChatWidget({
             </div>
           )}
 
+          {quoteFlow.isActive && (
+            <QuoteProgress progress={quoteFlow.progress} onStartOver={quoteFlow.cancelFlow} />
+          )}
+
           <div className="messages-container">
             {allMessages.length === 0 && !quoteFlow.isActive && (
               <div className="message ai welcome">
@@ -232,7 +236,7 @@ export default function ChatWidget({
                   Hi — want help with anything on this page?
                 </div>
                 <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} />
-                <div className="message-time">Just now</div>
+                <div className="message-time">{formatTime(new Date().toISOString())}</div>
               </div>
             )}
             
@@ -242,8 +246,6 @@ export default function ChatWidget({
 
             {quoteFlow.isActive && (
               <>
-                <QuoteProgress progress={quoteFlow.progress} />
-                
                 {quoteMessages.map(msg => (
                   <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
                 ))}
@@ -273,8 +275,6 @@ export default function ChatWidget({
                     onSelect={handleOptionSelect}
                     onSingleSelect={handleSingleOptionSelect}
                     onConfirm={handleConfirmSelection}
-                    onBack={quoteFlow.canGoBack ? quoteFlow.goBack : null}
-                    onCancel={quoteFlow.cancelFlow}
                   />
                 )}
               </>
@@ -299,15 +299,17 @@ export default function ChatWidget({
 
           {status !== 'closed' ? (
             <div className="input-area">
-              {quoteFlow.isActive && quoteFlow.currentStep?.inputType ? (
+              {quoteFlow.isActive ? (
                 <>
                   <input
                     ref={inputRef}
-                    type={quoteFlow.currentStep.inputType}
+                    type={quoteFlow.currentStep?.inputType || 'text'}
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={`Enter your ${quoteFlow.currentStep.inputType}...`}
+                    placeholder={quoteFlow.currentStep?.inputType === 'email' 
+                      ? 'Enter your work email...' 
+                      : 'Type your answer or select above...'}
                     className="quote-input"
                   />
                   <button
@@ -318,10 +320,6 @@ export default function ChatWidget({
                     <SendIcon />
                   </button>
                 </>
-              ) : quoteFlow.isActive ? (
-                <div className="quote-input-hint">
-                  Select options above or type to filter
-                </div>
               ) : (
                 <>
                   <textarea
@@ -369,7 +367,7 @@ function QuickActions({ onStartQuote, onScheduleCall }) {
   );
 }
 
-function QuoteProgress({ progress }) {
+function QuoteProgress({ progress, onStartOver }) {
   return (
     <div className="quote-progress">
       <div className="quote-progress-bar">
@@ -381,11 +379,14 @@ function QuoteProgress({ progress }) {
       <span className="quote-progress-text">
         Step {progress.current} of {progress.total}
       </span>
+      <button className="start-over-btn" onClick={onStartOver}>
+        Start over
+      </button>
     </div>
   );
 }
 
-function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCancel, onSingleSelect }) {
+function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onSingleSelect }) {
   const handleOptionClick = (option) => {
     if (step.multiSelect) {
       onSelect(option.value);
@@ -401,6 +402,7 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
         <div className="message-content">
           <Markdown>{step.question}</Markdown>
         </div>
+        <div className="message-time">{formatTime(new Date().toISOString())}</div>
       </div>
 
       {step.options.length > 0 && (
@@ -420,20 +422,11 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onBack, onCance
         </div>
       )}
 
-      {step.multiSelect && (
+      {step.multiSelect && selectedOptions.length > 0 && (
         <div className="quote-actions">
-          {onBack && (
-            <button className="quote-nav-btn back" onClick={onBack}>
-              ← Back
-            </button>
-          )}
-          <button className="quote-nav-btn cancel" onClick={onCancel}>
-            Cancel
-          </button>
           <button 
             className="quote-nav-btn confirm" 
             onClick={onConfirm}
-            disabled={selectedOptions.length === 0}
           >
             Continue ({selectedOptions.length}) →
           </button>

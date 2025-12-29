@@ -180,19 +180,32 @@ class GeminiService {
         };
       }
 
-      const prompt = `You are a friendly sales assistant for MartechDevs. Generate the next question for a quote flow.
+      const collectedSummary = Object.entries(updatedData)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(', ');
 
-CURRENT DATA COLLECTED: ${JSON.stringify(updatedData)}
+      const prompt = `You are a friendly, conversational sales consultant for MartechDevs (a martech integration agency). You're having a natural chat to understand a prospect's needs for a quote.
 
-NEXT FIELD TO COLLECT: ${nextField}
-FIELD DESCRIPTION: ${nextFieldConfig.description}
-${nextFieldConfig.options ? `OPTIONS: ${nextFieldConfig.options.join(', ')}` : ''}
-${nextFieldConfig.multiSelect ? 'USER CAN SELECT MULTIPLE' : ''}
-${nextFieldConfig.inputType === 'email' ? 'THIS IS AN EMAIL INPUT - no options needed' : ''}
+CONTEXT:
+${collectedSummary ? `What we know so far: ${collectedSummary}` : 'This is the start of our conversation.'}
+${previousAnswer ? `They just told us: "${previousAnswer}"` : ''}
 
-${previousAnswer ? `User just answered: "${previousAnswer}"` : 'This is the first question.'}
+YOUR TASK:
+Ask about their ${nextFieldConfig.description.toLowerCase()} in a natural, conversational way.
 
-Generate a short, friendly question (under 30 words) asking about ${nextField}. ${previousAnswer ? 'Briefly acknowledge their answer.' : ''}`;
+GUIDELINES:
+- Sound like a real person, not a form
+- Keep it under 25 words
+- ${previousAnswer ? 'Briefly acknowledge what they said (2-4 words max) before asking' : 'Start with a warm greeting since this is the first question'}
+- Be curious and helpful, not robotic
+- Vary your phrasing - don't use "What is your..." format
+
+EXAMPLE STYLES (don't copy exactly, be creative):
+- "Nice! And which platforms are you looking to integrate?"
+- "Got it. Curious - what's driving the urgency here?"
+- "Makes sense. What tools are already in your stack?"
+
+Generate just the question text:`;
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
@@ -244,12 +257,20 @@ Generate a short, friendly question (under 30 words) asking about ${nextField}. 
           }))
         : [];
       
-      const isFirst = Object.keys(updatedData).length === 0;
+      const fallbackQuestions = {
+        company_type: "Hey there! Let's put together a quote for you. What kind of company are you?",
+        company_stage: "Nice! And where are you at in your journey - startup, growth, or enterprise?",
+        platforms: "Which platforms do you need to integrate?",
+        traffic: "Roughly how much monthly traffic are we talking?",
+        dev_model: "Would you prefer we handle everything, or work alongside your team?",
+        urgency: "What's your timeline looking like?",
+        goals: "What are you hoping to achieve with this project?",
+        tools: "What martech tools are you using or planning to use?",
+        email: "Last thing - where should we send your quote?"
+      };
       
       return {
-        question: isFirst 
-          ? `Hey! Let's get you a quick quote. First, what type of company are you?`
-          : `Thanks! Now, ${fieldConfig?.description?.toLowerCase() || 'tell me more'}?`,
+        question: fallbackQuestions[nextField] || `Tell me about your ${fieldConfig?.description?.toLowerCase() || 'requirements'}`,
         options: fallbackOptions,
         multi_select: fieldConfig?.multiSelect || false,
         input_type: fieldConfig?.inputType || null,
