@@ -198,6 +198,9 @@ export default function ChatWidget({
             <div className="header-content">
               <h3>Support</h3>
               <StatusBadge status={quoteFlow.isActive ? 'quote' : status} agentName={agentName} />
+              {quoteFlow.isActive && (
+                <QuoteProgressMini progress={quoteFlow.progress} onStartOver={quoteFlow.cancelFlow} />
+              )}
             </div>
             <button
               className="close-button"
@@ -220,10 +223,6 @@ export default function ChatWidget({
                 onClose={() => setShowCalendar(false)}
               />
             </div>
-          )}
-
-          {quoteFlow.isActive && (
-            <QuoteProgress progress={quoteFlow.progress} onStartOver={quoteFlow.cancelFlow} />
           )}
 
           <div className="messages-container">
@@ -366,20 +365,18 @@ function QuickActions({ onStartQuote, onScheduleCall }) {
   );
 }
 
-function QuoteProgress({ progress, onStartOver }) {
+function QuoteProgressMini({ progress, onStartOver }) {
   return (
-    <div className="quote-progress">
-      <div className="quote-progress-bar">
+    <div className="quote-progress-mini">
+      <div className="progress-mini-bar">
         <div 
-          className="quote-progress-fill" 
+          className="progress-mini-fill" 
           style={{ width: `${progress.percentage}%` }}
         />
       </div>
-      <span className="quote-progress-text">
-        Step {progress.current} of {progress.total}
-      </span>
-      <button className="start-over-btn" onClick={onStartOver}>
-        Start over
+      <span className="progress-mini-text">{progress.current}/{progress.total}</span>
+      <button className="restart-btn" onClick={onStartOver} title="Start over">
+        ↺
       </button>
     </div>
   );
