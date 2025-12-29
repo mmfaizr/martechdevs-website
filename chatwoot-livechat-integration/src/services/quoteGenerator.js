@@ -84,18 +84,21 @@ class QuoteGenerator {
   }
 
   buildPrompt(answers, quote) {
-    const companyType = answers.company_type?.[0] || 'company';
-    const stage = answers.company_stage?.[0] || 'growth stage';
-    const platforms = answers.platforms?.join(', ') || 'web';
-    const traffic = answers.traffic?.[0] || 'moderate';
-    const devModel = answers.dev_model?.[0] === 'copilot' ? 'working alongside their dev team' : 'full implementation';
-    const urgency = answers.urgency?.[0] || 'standard';
-    const locations = answers.customer_location?.join(', ') || 'worldwide';
-    const compliance = answers.compliance?.filter(c => c !== 'none').join(', ') || 'standard';
-    const goals = answers.goals?.join(', ') || 'data integration';
-    const tools = answers.tools?.filter(t => t !== 'not_sure').join(', ') || 'various martech tools';
-    const training = answers.training_hours?.[0] || 'minimal';
-    const support = answers.support_hours?.[0] || 'standard';
+    const getVal = (val) => Array.isArray(val) ? val[0] : val;
+    const getList = (val) => Array.isArray(val) ? val.join(', ') : val;
+    
+    const companyType = getVal(answers.company_type) || 'company';
+    const stage = getVal(answers.company_stage) || 'growth stage';
+    const platforms = getList(answers.platforms) || 'web';
+    const traffic = getVal(answers.traffic) || 'moderate';
+    const devModel = (getVal(answers.dev_model) || '').toLowerCase().includes('copilot') ? 'working alongside their dev team' : 'full implementation';
+    const urgency = getVal(answers.urgency) || 'standard';
+    const locations = getList(answers.customer_locations) || 'worldwide';
+    const compliance = getList(answers.compliance) || 'standard';
+    const goals = getList(answers.goals) || 'data integration';
+    const tools = getList(answers.tools) || 'various martech tools';
+    const training = getVal(answers.training_hours) || 'minimal';
+    const support = getVal(answers.support_hours) || 'standard';
 
     return `You are an expert sales consultant for MartechDevs, a premier martech integration agency. Generate a compelling, personalized quote response that sounds like a seasoned sales professional closing a deal.
 
@@ -160,8 +163,9 @@ Generate a quote response that would make the client excited to work with you.`;
   }
 
   getFallbackQuote(answers, quote) {
-    const companyType = answers.company_type?.[0]?.replace(/_/g, ' ') || 'your company';
-    const tools = answers.tools?.filter(t => t !== 'not_sure').slice(0, 3).join(', ') || 'your martech stack';
+    const companyType = (Array.isArray(answers.company_type) ? answers.company_type[0] : answers.company_type)?.replace(/_/g, ' ') || 'your company';
+    const toolsRaw = Array.isArray(answers.tools) ? answers.tools : [answers.tools];
+    const tools = toolsRaw.filter(t => t && t !== 'not_sure').slice(0, 3).join(', ') || 'your martech stack';
     
     return `## Thanks for sharing those details!
 
