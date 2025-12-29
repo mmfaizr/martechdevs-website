@@ -87,13 +87,7 @@ export default function ChatWidget({
         { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
         { id: `user_${Date.now()}`, type: 'user_input', content: inputValue, created_at: new Date().toISOString() }
       ]);
-      const result = await quoteFlow.submitTextInput(inputValue);
-      if (result?.completed) {
-        setQuoteMessages(prev => [
-          ...prev,
-          { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
-        ]);
-      }
+      await quoteFlow.submitTextInput(inputValue);
       return;
     }
 

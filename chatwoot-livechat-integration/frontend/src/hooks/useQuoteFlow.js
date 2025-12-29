@@ -46,28 +46,43 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
       console.log('[QuoteFlow] Updated collected data:', collectedDataRef.current);
       
       if (data.is_complete) {
+        console.log('[QuoteFlow] Flow complete, generating quote...');
         setIsGeneratingQuote(true);
-        const quote = calculateQuote(data.collected_data);
+        setIsLoadingQuestion(false);
         
-        const quoteResponse = await fetch(`${apiUrl}/quote/complete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            conversation_id: conversationId,
-            answers: data.collected_data,
-            calculated_quote: quote,
-            email: data.collected_data.email
-          })
-        });
+        try {
+          const quote = calculateQuote(data.collected_data);
+          
+          const quoteResponse = await fetch(`${apiUrl}/quote/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              conversation_id: conversationId,
+              answers: data.collected_data,
+              calculated_quote: quote,
+              email: data.collected_data.email
+            })
+          });
 
-        const quoteData = await quoteResponse.json();
-        
-        setIsActive(false);
-        setCurrentStep(null);
-        setIsGeneratingQuote(false);
-        
-        if (onComplete) {
-          onComplete(data.collected_data, quote, quoteData.quote_message);
+          const quoteData = await quoteResponse.json();
+          
+          setIsActive(false);
+          setCurrentStep(null);
+          setIsGeneratingQuote(false);
+          
+          if (onComplete) {
+            onComplete(data.collected_data, quote, quoteData.quote_message);
+          }
+        } catch (quoteError) {
+          console.error('[QuoteFlow] Quote generation error:', quoteError);
+          const quote = calculateQuote(data.collected_data);
+          setIsActive(false);
+          setCurrentStep(null);
+          setIsGeneratingQuote(false);
+          
+          if (onComplete) {
+            onComplete(data.collected_data, quote, 'Your quote has been prepared! Check your email for details.');
+          }
         }
         return { completed: true };
       }
@@ -92,21 +107,31 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
       return { completed: false };
     } catch (error) {
       console.error('[QuoteFlow] Error fetching question:', error);
-      
-      setCurrentStep({
-        question: "Let's get you a quote! What type of company are you?",
-        options: [
-          { value: 'b2b_saas', label: 'B2B SaaS' },
-          { value: 'b2c_saas', label: 'B2C SaaS' },
-          { value: 'e_commerce', label: 'E-commerce' },
-          { value: 'fintech', label: 'Fintech' },
-          { value: 'other', label: 'Other' }
-        ],
-        multiSelect: false,
-        inputType: null
-      });
-      setQuestionCount(1);
       setIsLoadingQuestion(false);
+      
+      if (Object.keys(collectedDataRef.current).length === 0) {
+        currentFieldRef.current = 'company_type';
+        setCurrentStep({
+          question: "Let's get you a quote! What type of company are you?",
+          options: [
+            { value: 'b2b_saas', label: 'B2B SaaS' },
+            { value: 'b2c_saas', label: 'B2C SaaS' },
+            { value: 'e_commerce', label: 'E-commerce' },
+            { value: 'fintech', label: 'Fintech' },
+            { value: 'other', label: 'Other' }
+          ],
+          multiSelect: false,
+          inputType: null
+        });
+        setQuestionCount(1);
+      } else {
+        setCurrentStep({
+          question: "Hmm, something went wrong. Could you try that again?",
+          options: [],
+          multiSelect: false,
+          inputType: 'text'
+        });
+      }
       return { completed: false, error: true };
     }
   }, [apiUrl, conversationId, onComplete]);
@@ -180,11 +205,12 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
   }, []);
 
   const getProgress = useCallback(() => {
-    const estimatedTotal = 10;
+    const estimatedTotal = 9;
+    const current = Math.min(questionCount, estimatedTotal);
     return {
-      current: questionCount,
+      current: current,
       total: estimatedTotal,
-      percentage: Math.min(90, Math.round((questionCount / estimatedTotal) * 100))
+      percentage: Math.min(95, Math.round((current / estimatedTotal) * 100))
     };
   }, [questionCount]);
 
