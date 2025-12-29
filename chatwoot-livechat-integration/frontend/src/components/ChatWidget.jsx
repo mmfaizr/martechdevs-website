@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../hooks/useChat';
 import { useQuoteFlow } from '../hooks/useQuoteFlow';
+import { getFullVisitorContext } from '../utils/visitorContext';
 import Markdown from './Markdown';
 import CalEmbed from './CalEmbed';
 
@@ -18,8 +19,32 @@ export default function ChatWidget({
   const [quoteMessages, setQuoteMessages] = useState([]);
   const [showCalendar, setShowCalendar] = useState(false);
   const [pendingQuoteStart, setPendingQuoteStart] = useState(false);
+  const [greeting, setGreeting] = useState(null);
+  const [greetingLoading, setGreetingLoading] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    const fetchGreeting = async () => {
+      try {
+        const visitorContext = await getFullVisitorContext();
+        const res = await fetch(`${apiUrl}/greeting`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(visitorContext)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setGreeting(data.greeting);
+        }
+      } catch (e) {
+        console.warn('Failed to fetch greeting:', e.message);
+      } finally {
+        setGreetingLoading(false);
+      }
+    };
+    fetchGreeting();
+  }, [apiUrl]);
 
   const handleQuoteComplete = (answers, quote, quoteMessage) => {
     setQuoteMessages(prev => [
@@ -230,9 +255,15 @@ export default function ChatWidget({
               <div className="message ai welcome">
                 <div className="message-header">AI Assistant</div>
                 <div className="message-content">
-                  Hi — want help with anything on this page?
+                  {greetingLoading ? (
+                    <TypingIndicator />
+                  ) : (
+                    greeting || "Hey - anything I can help you with today?"
+                  )}
                 </div>
-                <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} />
+                {!greetingLoading && (
+                  <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} />
+                )}
                 <div className="message-time">{formatTime(new Date().toISOString())}</div>
               </div>
             )}

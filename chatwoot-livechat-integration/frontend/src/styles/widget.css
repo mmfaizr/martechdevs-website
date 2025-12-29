@@ -1117,21 +1117,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .cal-close-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: 0;
   background: transparent;
   color: var(--text-tertiary);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 20px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1145,7 +1145,9 @@
 
 .cal-embed-frame {
   flex: 1;
-  padding: 16px;
+  padding: 8px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cal-loading {
@@ -1153,9 +1155,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 40px;
+  gap: 10px;
+  padding: 30px;
   color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .cal-spinner {

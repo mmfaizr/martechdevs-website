@@ -129,6 +129,95 @@ class GeminiService {
     this.model = config.gemini.model;
   }
 
+  async generateGreeting(visitorContext = {}) {
+    try {
+      const model = this.client.getGenerativeModel({
+        model: this.model,
+        systemInstruction: config.greetingPrompt
+      });
+
+      const contextSummary = this.formatVisitorContext(visitorContext);
+
+      const prompt = `Generate a personalized opening message for this visitor.
+
+VISITOR CONTEXT:
+${contextSummary}
+
+Remember: Internalize this context to inform your tone and angle. Do NOT explicitly reference the data. Return ONLY the greeting message.`;
+
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.9,
+          maxOutputTokens: 100,
+          topP: 0.95,
+        }
+      });
+
+      const text = result.response.text().trim();
+      return { greeting: text };
+    } catch (error) {
+      console.error('Gemini greeting error:', error.message);
+      return { greeting: "Hey - anything I can help you with today?" };
+    }
+  }
+
+  formatVisitorContext(ctx) {
+    const lines = [];
+    
+    if (ctx.referrer) {
+      const ref = ctx.referrer;
+      if (ref.includes('google')) lines.push('- Arrived from Google search');
+      else if (ref.includes('linkedin')) lines.push('- Arrived from LinkedIn');
+      else if (ref.includes('twitter') || ref.includes('x.com')) lines.push('- Arrived from Twitter/X');
+      else if (ref === 'direct') lines.push('- Direct visit (typed URL or bookmark)');
+      else lines.push(`- Referred from: ${ref}`);
+    }
+
+    if (ctx.utm_source || ctx.utm_campaign) {
+      const campaign = [ctx.utm_source, ctx.utm_medium, ctx.utm_campaign].filter(Boolean).join(' / ');
+      if (campaign) lines.push(`- Campaign: ${campaign}`);
+    }
+
+    if (ctx.device) {
+      lines.push(`- Device: ${ctx.device}`);
+    }
+
+    if (ctx.country) {
+      const location = [ctx.city, ctx.country].filter(Boolean).join(', ');
+      lines.push(`- Location: ${location}`);
+    }
+
+    if (ctx.timezone) {
+      lines.push(`- Timezone: ${ctx.timezone}`);
+    }
+
+    if (ctx.local_time) {
+      const hour = parseInt(ctx.local_time.split(':')[0]);
+      let timeOfDay = 'daytime';
+      if (hour < 6) timeOfDay = 'late night';
+      else if (hour < 12) timeOfDay = 'morning';
+      else if (hour < 17) timeOfDay = 'afternoon';
+      else if (hour < 21) timeOfDay = 'evening';
+      else timeOfDay = 'night';
+      lines.push(`- Local time: ${ctx.local_time} (${timeOfDay})`);
+    }
+
+    if (ctx.current_page) {
+      lines.push(`- Viewing: ${ctx.current_page}`);
+    }
+
+    if (ctx.pages_viewed && ctx.pages_viewed > 1) {
+      lines.push(`- Pages viewed this session: ${ctx.pages_viewed}`);
+    }
+
+    if (ctx.returning_visitor) {
+      lines.push('- Returning visitor');
+    }
+
+    return lines.length > 0 ? lines.join('\n') : '- New visitor, no additional context';
+  }
+
   async generateQuoteStep(previousAnswer, collectedData = {}, previousField = null) {
     try {
       const model = this.client.getGenerativeModel({ 

@@ -48,16 +48,17 @@ export default function CalEmbed({ calLink, onBookingComplete, onClose }) {
       <div 
         className="cal-embed-frame"
         data-cal-link={calLink}
-        data-cal-config='{"layout":"month_view"}'
+        data-cal-config='{"layout":"column_view"}'
         style={{ width: '100%', height: '100%', overflow: 'auto' }}
       >
         <iframe
-          src={`${fullCalLink}?embed=true&theme=light`}
+          src={`${fullCalLink}?embed=true&theme=light&layout=column_view&hideEventTypeDetails=1`}
           style={{ 
             width: '100%', 
-            height: '400px', 
+            height: '100%',
+            minHeight: '480px',
             border: 'none',
-            borderRadius: '8px'
+            borderRadius: '4px'
           }}
           title="Schedule a call"
         />

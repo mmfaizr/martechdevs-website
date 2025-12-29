@@ -8,12 +8,20 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const loadSystemPrompt = () => {
+const loadPrompt = (filename) => {
   try {
-    return readFileSync(join(__dirname, 'system-prompts', 'default.txt'), 'utf-8');
+    return readFileSync(join(__dirname, 'system-prompts', filename), 'utf-8');
   } catch (error) {
-    console.warn('Could not load system prompt file, using default');
-    return `You are a helpful customer support assistant.
+    console.warn(`Could not load ${filename}, using fallback`);
+    return null;
+  }
+};
+
+const loadSystemPrompt = () => {
+  const prompt = loadPrompt('default.txt');
+  if (prompt) return prompt;
+  
+  return `You are a helpful customer support assistant.
 
 ## Handoff Rules
 Request human handoff when:
@@ -29,7 +37,13 @@ When handoff is needed, end your response with:
 - Be concise and helpful
 - Ask clarifying questions when needed
 - Provide step-by-step instructions for technical issues`;
-  }
+};
+
+const loadGreetingPrompt = () => {
+  const prompt = loadPrompt('greeting-prompt.txt');
+  if (prompt) return prompt;
+  
+  return `Generate a brief, friendly opening message for a website chat widget. Maximum 2 sentences. Be conversational and ask an open question.`;
 };
 
 export const config = {
@@ -57,7 +71,8 @@ export const config = {
     maxWaitMs: parseInt(process.env.MAX_WAIT_MS || '10000'),
     lockTtlMs: parseInt(process.env.LOCK_TTL_MS || '60000')
   },
-  systemPrompt: loadSystemPrompt()
+  systemPrompt: loadSystemPrompt(),
+  greetingPrompt: loadGreetingPrompt()
 };
 
 export default config;

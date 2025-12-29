@@ -10,6 +10,17 @@ const router = express.Router();
 
 const quoteSessionStore = new Map();
 
+router.post('/greeting', async (req, res) => {
+  try {
+    const visitorContext = req.body;
+    const result = await geminiService.generateGreeting(visitorContext);
+    res.json(result);
+  } catch (error) {
+    console.error('Error generating greeting:', error);
+    res.json({ greeting: "Hey - anything I can help you with today?" });
+  }
+});
+
 router.post('/conversations', async (req, res) => {
   try {
     const { customer_id, customer_name, customer_email, customer_metadata } = req.body;
