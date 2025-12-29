@@ -11,12 +11,15 @@ const router = express.Router();
 const quoteSessionStore = new Map();
 
 router.post('/greeting', async (req, res) => {
+  console.log('[Greeting API] Received request');
   try {
     const visitorContext = req.body;
+    console.log('[Greeting API] Context keys:', Object.keys(visitorContext));
     const result = await geminiService.generateGreeting(visitorContext);
+    console.log('[Greeting API] Result:', result.greeting?.substring(0, 50));
     res.json(result);
   } catch (error) {
-    console.error('Error generating greeting:', error);
+    console.error('[Greeting API] Error:', error.message);
     res.json({ greeting: "Hey - anything I can help you with today?" });
   }
 });

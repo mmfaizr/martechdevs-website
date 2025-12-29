@@ -130,6 +130,7 @@ class GeminiService {
   }
 
   async generateGreeting(visitorContext = {}) {
+    console.log('[Greeting] Generating for context:', JSON.stringify(visitorContext).substring(0, 200));
     try {
       const model = this.client.getGenerativeModel({
         model: this.model,
@@ -155,9 +156,12 @@ Remember: Internalize this context to inform your tone and angle. Do NOT explici
       });
 
       const text = result.response.text().trim();
+      console.log('[Greeting] Generated:', text);
       return { greeting: text };
     } catch (error) {
-      console.error('Gemini greeting error:', error.message);
+      console.error('Gemini greeting error:', error.message, error.stack);
+      console.error('Model used:', this.model);
+      console.error('Greeting prompt loaded:', !!config.greetingPrompt);
       return { greeting: "Hey - anything I can help you with today?" };
     }
   }
