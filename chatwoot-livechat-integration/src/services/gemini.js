@@ -132,9 +132,10 @@ class GeminiService {
   async generateGreeting(visitorContext = {}) {
     console.log('[Greeting] Generating for context:', JSON.stringify(visitorContext).substring(0, 200));
     try {
+      const greetingPrompt = config.greetingPrompt || 'Generate a brief, friendly opening message for a website chat widget. Maximum 2 sentences.';
       const model = this.client.getGenerativeModel({
         model: this.model,
-        systemInstruction: config.greetingPrompt
+        systemInstruction: greetingPrompt
       });
 
       const contextSummary = this.formatVisitorContext(visitorContext);
