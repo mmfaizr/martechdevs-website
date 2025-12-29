@@ -145,17 +145,13 @@ class GeminiService {
       
       if (previousAnswer && previousField && QUOTE_SCHEMA[previousField]) {
         const fieldConfig = QUOTE_SCHEMA[previousField];
-        if (fieldConfig.options) {
+        if (fieldConfig.options && fieldConfig.options.length > 0) {
           const matchedOption = fieldConfig.options.find(
             opt => opt.toLowerCase() === previousAnswer.toLowerCase() ||
                    previousAnswer.toLowerCase().includes(opt.toLowerCase()) ||
                    opt.toLowerCase().includes(previousAnswer.toLowerCase())
           );
-          if (matchedOption) {
-            updatedData[previousField] = matchedOption;
-          } else {
-            updatedData[previousField] = previousAnswer;
-          }
+          updatedData[previousField] = matchedOption || previousAnswer;
         } else {
           updatedData[previousField] = previousAnswer;
         }
@@ -163,12 +159,11 @@ class GeminiService {
       }
 
       const missingRequired = REQUIRED_FIELDS.filter(f => !updatedData[f]);
-      const missingOptional = Object.keys(QUOTE_SCHEMA).filter(f => !REQUIRED_FIELDS.includes(f) && !updatedData[f]);
+      console.log('[Gemini Quote] Missing required:', missingRequired);
+      console.log('[Gemini Quote] Collected so far:', Object.keys(updatedData));
       
-      const nextField = missingRequired[0] || missingOptional[0];
-      const nextFieldConfig = nextField ? QUOTE_SCHEMA[nextField] : null;
-
-      if (!nextField) {
+      if (missingRequired.length === 0) {
+        console.log('[Gemini Quote] ALL REQUIRED FIELDS COLLECTED - COMPLETING');
         return {
           question: null,
           options: [],
@@ -179,33 +174,28 @@ class GeminiService {
           next_field: null
         };
       }
+      
+      const nextField = missingRequired[0];
+      const nextFieldConfig = QUOTE_SCHEMA[nextField];
 
       const collectedSummary = Object.entries(updatedData)
         .map(([k, v]) => `${k}: ${v}`)
         .join(', ');
 
-      const prompt = `You are a friendly, conversational sales consultant for MartechDevs (a martech integration agency). You're having a natural chat to understand a prospect's needs for a quote.
+      const prompt = `You are a friendly sales consultant for MartechDevs. Generate a conversational question for a quote flow.
 
-CONTEXT:
-${collectedSummary ? `What we know so far: ${collectedSummary}` : 'This is the start of our conversation.'}
-${previousAnswer ? `They just told us: "${previousAnswer}"` : ''}
+CONTEXT: ${collectedSummary || 'Starting fresh'}
+${previousAnswer ? `User just said: "${previousAnswer}"` : 'First question'}
 
-YOUR TASK:
-Ask about their ${nextFieldConfig.description.toLowerCase()} in a natural, conversational way.
+ASK ABOUT: ${nextFieldConfig.description}
 
-GUIDELINES:
-- Sound like a real person, not a form
-- Keep it under 25 words
-- ${previousAnswer ? 'Briefly acknowledge what they said (2-4 words max) before asking' : 'Start with a warm greeting since this is the first question'}
-- Be curious and helpful, not robotic
-- Vary your phrasing - don't use "What is your..." format
+RULES:
+- Be conversational, not robotic
+- Under 25 words
+- ${previousAnswer ? 'Briefly acknowledge their answer' : 'Warm greeting'}
+- Vary phrasing creatively
 
-EXAMPLE STYLES (don't copy exactly, be creative):
-- "Nice! And which platforms are you looking to integrate?"
-- "Got it. Curious - what's driving the urgency here?"
-- "Makes sense. What tools are already in your stack?"
-
-Generate just the question text:`;
+Return JSON: {"question": "your question here"}`;
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }]
@@ -247,7 +237,22 @@ Generate just the question text:`;
       }
       
       const missingRequired = REQUIRED_FIELDS.filter(f => !updatedData[f]);
-      const nextField = missingRequired[0] || 'company_type';
+      console.log('[Gemini Fallback] Missing required:', missingRequired);
+      
+      if (missingRequired.length === 0) {
+        console.log('[Gemini Fallback] ALL FIELDS COLLECTED - COMPLETING');
+        return {
+          question: null,
+          options: [],
+          multi_select: false,
+          input_type: null,
+          collected_data: updatedData,
+          is_complete: true,
+          next_field: null
+        };
+      }
+      
+      const nextField = missingRequired[0];
       const fieldConfig = QUOTE_SCHEMA[nextField];
       
       const fallbackOptions = fieldConfig?.options 
