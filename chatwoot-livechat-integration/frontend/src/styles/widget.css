@@ -836,6 +836,71 @@
   border-top: 1px solid var(--border);
 }
 
+.quote-actions-sticky {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg) 80%, transparent);
+  padding: 16px 0 8px;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.quote-inline-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  background: var(--brand-subtle);
+  border-radius: 12px;
+  border: 1px solid rgba(26, 158, 117, 0.15);
+}
+
+.inline-email-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.inline-email-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-glow);
+  outline: none;
+}
+
+.inline-email-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.inline-submit-btn {
+  padding: 14px 24px;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-md);
+}
+
+.inline-submit-btn:hover:not(:disabled) {
+  background: var(--brand-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.inline-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .quote-nav-btn {
   padding: 10px 18px;
   border-radius: 10px;

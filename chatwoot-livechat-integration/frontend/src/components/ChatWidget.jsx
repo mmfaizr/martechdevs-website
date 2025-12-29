@@ -149,13 +149,17 @@ export default function ChatWidget({
         { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
         { id: `user_${Date.now()}`, type: 'user_selection', content: result.selectedLabels, created_at: new Date().toISOString() }
       ]);
-      if (result.completed) {
-        setQuoteMessages(prev => [
-          ...prev,
-          { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
-        ]);
-      }
     }
+  };
+
+  const handleInlineTextSubmit = async (value) => {
+    const currentQuestion = quoteFlow.currentStep?.question;
+    setQuoteMessages(prev => [
+      ...prev,
+      { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
+      { id: `user_${Date.now()}`, type: 'user_input', content: value, created_at: new Date().toISOString() }
+    ]);
+    await quoteFlow.submitTextInput(value);
   };
 
   const handleStartQuote = () => {
@@ -269,6 +273,7 @@ export default function ChatWidget({
                     onSelect={handleOptionSelect}
                     onSingleSelect={handleSingleOptionSelect}
                     onConfirm={handleConfirmSelection}
+                    onTextSubmit={handleInlineTextSubmit}
                   />
                 )}
               </>
@@ -380,12 +385,28 @@ function QuoteProgress({ progress, onStartOver }) {
   );
 }
 
-function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onSingleSelect }) {
+function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onSingleSelect, onTextSubmit }) {
+  const [textInput, setTextInput] = useState('');
+  
   const handleOptionClick = (option) => {
     if (step.multiSelect) {
       onSelect(option.value);
     } else {
       onSingleSelect(option);
+    }
+  };
+
+  const handleTextSubmit = () => {
+    if (textInput.trim()) {
+      onTextSubmit(textInput.trim());
+      setTextInput('');
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleTextSubmit();
     }
   };
 
@@ -399,7 +420,26 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onSingleSelect 
         <div className="message-time">{formatTime(new Date().toISOString())}</div>
       </div>
 
-      {step.options.length > 0 && (
+      {step.inputType === 'email' ? (
+        <div className="quote-inline-input">
+          <input
+            type="email"
+            value={textInput}
+            onChange={e => setTextInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter your work email..."
+            className="inline-email-input"
+            autoFocus
+          />
+          <button 
+            className="inline-submit-btn"
+            onClick={handleTextSubmit}
+            disabled={!textInput.trim() || !textInput.includes('@')}
+          >
+            Get Quote →
+          </button>
+        </div>
+      ) : step.options.length > 0 ? (
         <div className="quote-options">
           {step.options.map(option => (
             <button
@@ -414,10 +454,10 @@ function QuoteStep({ step, selectedOptions, onSelect, onConfirm, onSingleSelect 
             </button>
           ))}
         </div>
-      )}
+      ) : null}
 
       {step.multiSelect && selectedOptions.length > 0 && (
-        <div className="quote-actions">
+        <div className="quote-actions-sticky">
           <button 
             className="quote-nav-btn confirm" 
             onClick={onConfirm}
