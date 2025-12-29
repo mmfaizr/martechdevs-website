@@ -132,37 +132,38 @@ class GeminiService {
   async generateGreeting(visitorContext = {}) {
     console.log('[Greeting] Generating for context:', JSON.stringify(visitorContext).substring(0, 200));
     try {
-      const greetingPrompt = config.greetingPrompt || 'Generate a brief, friendly opening message for a website chat widget. Maximum 2 sentences.';
-      const model = this.client.getGenerativeModel({
-        model: this.model,
-        systemInstruction: greetingPrompt
-      });
-
+      const model = this.client.getGenerativeModel({ model: this.model });
       const contextSummary = this.formatVisitorContext(visitorContext);
 
-      const prompt = `Generate a personalized opening message for this visitor.
+      const prompt = `You are a friendly sales assistant for MartechDevs, a martech integration company. 
 
-VISITOR CONTEXT:
+Generate a brief, personalized opening message for a website chat widget visitor. Use the context below to inform your tone, but DO NOT explicitly mention the data. Maximum 2 short sentences. Be conversational, not robotic.
+
+Context:
 ${contextSummary}
 
-Remember: Internalize this context to inform your tone and angle. Do NOT explicitly reference the data. Return ONLY the greeting message.`;
+Reply with ONLY the greeting message, nothing else.`;
+
+      console.log('[Greeting] Prompt length:', prompt.length);
 
       const result = await model.generateContent({
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: 0.9,
-          maxOutputTokens: 100,
-          topP: 0.95,
+          temperature: 0.8,
+          maxOutputTokens: 16000,
         }
       });
 
-      const text = result.response.text().trim();
-      console.log('[Greeting] Generated:', text);
+      const response = result.response;
+      console.log('[Greeting] Finish reason:', response.candidates?.[0]?.finishReason);
+      const text = response.text().trim();
+      console.log('[Greeting] Generated:', text || '(empty)');
+      if (!text) {
+        return { greeting: "Hey - anything I can help you with today?" };
+      }
       return { greeting: text };
     } catch (error) {
-      console.error('Gemini greeting error:', error.message, error.stack);
-      console.error('Model used:', this.model);
-      console.error('Greeting prompt loaded:', !!config.greetingPrompt);
+      console.error('Gemini greeting error:', error.message);
       return { greeting: "Hey - anything I can help you with today?" };
     }
   }
