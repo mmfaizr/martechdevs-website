@@ -132,6 +132,8 @@ INSTRUCTIONS:
 6. Timeline should be realistic based on complexity
 7. End with a clear CTA: schedule a no-commitment discovery call
 8. Sound human, not robotic - use contractions, be personable
+9. DO NOT use any emojis. Keep it professional.
+10. Keep responses concise and scannable.
 
 Generate a quote response that would make the client excited to work with you.`;
   }
@@ -139,25 +141,26 @@ Generate a quote response that would make the client excited to work with you.`;
   formatQuoteMessage(data, quote) {
     const parts = [];
 
-    parts.push(`## ${data.greeting}\n`);
+    parts.push(`${data.greeting}\n`);
     parts.push(`${data.problem_understanding}\n`);
-    parts.push(`### 💡 How We'll Help\n${data.solution_teaser}\n`);
-    parts.push(`### 📋 What's Included\n${data.scope_summary}\n`);
-    parts.push(`### ⏱️ Timeline\n${data.timeline}\n`);
+    parts.push(`**Our Approach**\n${data.solution_teaser}\n`);
+    parts.push(`**Scope**\n${data.scope_summary}\n`);
+    parts.push(`**Timeline**\n${data.timeline}\n`);
     
-    parts.push(`### 💰 Your Investment\n`);
-    parts.push(`**One-time Implementation:** ${data.investment.one_time}\n`);
+    parts.push(`**Investment**\n`);
+    parts.push(`One-time: ${data.investment.one_time}\n`);
     if (quote.monthly > 0) {
-      parts.push(`**Monthly Support:** ${data.investment.monthly || `$${quote.monthly.toLocaleString()}/month`}\n`);
+      parts.push(`Monthly support: ${data.investment.monthly || `$${quote.monthly.toLocaleString()}/month`}\n`);
     }
-    parts.push(`\n*${data.investment.justification}*\n`);
+    parts.push(`\n${data.investment.justification}\n`);
 
     if (data.urgency_note) {
-      parts.push(`### ⚡ Timeline Note\n${data.urgency_note}\n`);
+      parts.push(`**Timeline Note**\n${data.urgency_note}\n`);
     }
 
-    parts.push(`### 🚀 Next Steps\n${data.next_steps}\n`);
-    parts.push(`---\n${data.closing}`);
+    parts.push(`**Next Steps**\n${data.next_steps}\n`);
+    parts.push(`${data.closing}\n`);
+    parts.push(`[SHOW_CALENDAR]`);
 
     return parts.join('\n');
   }
@@ -167,30 +170,29 @@ Generate a quote response that would make the client excited to work with you.`;
     const toolsRaw = Array.isArray(answers.tools) ? answers.tools : [answers.tools];
     const tools = toolsRaw.filter(t => t && t !== 'not_sure').slice(0, 3).join(', ') || 'your martech stack';
     
-    return `## Thanks for sharing those details!
+    return `Thanks for sharing those details.
 
 Based on what you've told me about ${companyType}, I can see you're looking to streamline your data infrastructure and get more value from tools like ${tools}.
 
-### 💡 How We'll Help
-We'll build a robust, scalable integration that connects your systems seamlessly - giving you the single source of truth you need to make confident decisions.
+**Our Approach**
+We'll build a robust, scalable integration that connects your systems seamlessly, giving you the single source of truth you need to make confident decisions.
 
-### 📋 What's Included
+**Scope**
 ${quote.breakdown.map(b => `- ${b.item}`).join('\n')}
 
-### ⏱️ Timeline
+**Timeline**
 Typically 2-4 weeks for core implementation, with ongoing optimization based on your needs.
 
-### 💰 Your Investment
-**One-time Implementation:** $${quote.oneTime.toLocaleString()}
-${quote.monthly > 0 ? `**Monthly Support:** $${quote.monthly.toLocaleString()}/month` : ''}
+**Investment**
+One-time: $${quote.oneTime.toLocaleString()}
+${quote.monthly > 0 ? `Monthly support: $${quote.monthly.toLocaleString()}/month` : ''}
 
-*This investment typically pays for itself within 3-6 months through improved efficiency and data accuracy.*
+This investment typically pays for itself within 3-6 months through improved efficiency and data accuracy.
 
-### 🚀 Next Steps
-I'd love to hop on a quick 30-minute discovery call to dive deeper into your specific needs. No commitment - just a conversation to see if we're a good fit.
+**Next Steps**
+Let's schedule a 30-minute discovery call to dive deeper into your specific needs. No commitment, just a conversation to see if we're a good fit.
 
----
-Looking forward to potentially working together! 🙌`;
+[SHOW_CALENDAR]`;
   }
 }
 

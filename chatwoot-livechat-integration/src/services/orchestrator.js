@@ -132,7 +132,8 @@ class Orchestrator {
     const allMessages = messages;
     const newCustomerMessages = messages.filter(m => 
       m.id > lastHandledId && 
-      m.sender_type === 'customer'
+      m.sender_type === 'customer' &&
+      m.source !== 'quote_flow'
     );
 
     if (newCustomerMessages.length === 0) {
@@ -145,8 +146,11 @@ class Orchestrator {
       : newCustomerMessages.map((m, i) => `[${i + 1}] ${m.content}`).join('\n');
 
     console.log(`Generating AI response for conversation ${conversationId}`);
+    const relevantMessages = allMessages.filter(m => 
+      m.sender_type !== 'human' && m.source !== 'quote_flow'
+    );
     const { text: aiResponse, needsHandoff, startQuoteFlow } = await geminiService.generateResponse(
-      allMessages.filter(m => m.sender_type !== 'human'),
+      relevantMessages,
       customerInput
     );
 

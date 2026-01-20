@@ -47,10 +47,17 @@ export default function ChatWidget({
   }, [apiUrl]);
 
   const handleQuoteComplete = (answers, quote, quoteMessage) => {
+    const hasCalendarTrigger = quoteMessage.includes('[SHOW_CALENDAR]');
+    const cleanMessage = quoteMessage.replace('[SHOW_CALENDAR]', '').trim();
+    
     setQuoteMessages(prev => [
       ...prev,
-      { id: `quote_${Date.now()}`, type: 'quote_result', content: quoteMessage, created_at: new Date().toISOString() }
+      { id: `quote_${Date.now()}`, type: 'quote_result', content: cleanMessage, created_at: new Date().toISOString() }
     ]);
+    
+    if (hasCalendarTrigger) {
+      setTimeout(() => setShowCalendar(true), 500);
+    }
   };
 
   const handleQuoteFlowTrigger = () => {
