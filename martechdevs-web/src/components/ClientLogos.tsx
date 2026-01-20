@@ -53,10 +53,10 @@ export default function ClientLogos() {
           className="text-center mb-8"
         >
           <p className="text-gray-400 text-xs uppercase tracking-widest font-medium mb-1">
-            Trusted by ambitious companies
+            Our clients
           </p>
           <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
-            Trusted by leading companies
+            Trusted by fast-growing teams
           </h2>
         </motion.div>
 

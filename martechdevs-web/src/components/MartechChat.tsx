@@ -78,10 +78,16 @@ export default function MartechChat({
 
     loadScript()
       .then(() => {
+        let visitorId = localStorage.getItem('mtd_visitor_id');
+        if (!visitorId) {
+          visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('mtd_visitor_id', visitorId);
+        }
+
         chatRef.current = window.initMartechChat({
           apiUrl,
           customerInfo: customerInfo || {
-            customer_id: `visitor_${Date.now()}`,
+            customer_id: visitorId,
           },
           theme,
           autoOpen,
