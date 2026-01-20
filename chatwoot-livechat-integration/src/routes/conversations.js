@@ -127,7 +127,10 @@ router.post('/conversations/:id/messages', async (req, res) => {
       source: 'widget'
     });
 
-    await orchestrator.onCustomerMessage(id, message.id);
+    // Non-blocking - don't fail the request if AI processing fails
+    orchestrator.onCustomerMessage(id, message.id).catch(err => {
+      console.error('Orchestrator error (non-blocking):', err.message);
+    });
 
     res.status(201).json(message);
   } catch (error) {
