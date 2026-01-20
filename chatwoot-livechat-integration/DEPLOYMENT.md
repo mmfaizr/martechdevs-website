@@ -2,6 +2,41 @@
 
 This guide covers deploying the AI chat system to production.
 
+## Git Repositories
+
+This project uses **two GitHub repositories**:
+
+| Repo | Purpose | Render Service |
+|------|---------|----------------|
+| `mmfaizr/martechdevs-website` (origin) | Main website + chat widget | Vercel (website) |
+| `mmfaizr/claychat` (claychat) | Chat backend API | Render (claychat-api, claychat-bg-worker) |
+
+### Pushing Changes
+
+**Always push to both repos** when making backend changes:
+
+```bash
+# From the main project directory
+cd "/Users/faizur/Desktop/Martechpal/Martechdevs Website"
+
+# Push to both remotes
+git push origin main      # Website repo
+git push claychat main    # Backend repo (triggers Render deploy)
+```
+
+Or push to both at once:
+```bash
+git push origin main && git push claychat main
+```
+
+### Verify Remotes
+```bash
+git remote -v
+# Should show:
+# claychat   git@github.com:mmfaizr/claychat.git
+# origin     git@github.com:mmfaizr/martechdevs-website.git
+```
+
 ## Architecture Overview
 
 - **Backend API + Worker**: Node.js services (Railway, Render, or Fly.io)
@@ -264,16 +299,35 @@ Should return: `{"challenge":"test123"}`
 - [ ] Database connection over SSL
 - [ ] Redis connection over TLS
 
+## Upstash Redis Notes
+
+**Free tier limit**: 500K commands/month
+
+The BullMQ worker polls Redis continuously, using ~10-15K commands/day even when idle.
+
+**If you hit the limit:**
+1. Upgrade Upstash (~$10/month for 10M commands), OR
+2. Create a new free Upstash instance and update `REDIS_URL` in both Render services
+
+**REDIS_URL format** (must use `rediss://` with double 's' for TLS):
+```
+rediss://default:YOUR_PASSWORD@your-instance.upstash.io:6379
+```
+
+**Update in Render:**
+1. claychat-api → Environment → REDIS_URL
+2. claychat-bg-worker → Environment → REDIS_URL
+
 ## Cost Estimates (per 1000 conversations/month)
 
 | Service | Cost |
 |---------|------|
 | Railway/Render | $5-10 (starter tier) |
 | Supabase | Free tier sufficient |
-| Upstash Redis | Free tier sufficient |
+| Upstash Redis | Free tier or $10/month |
 | Gemini API | $0.50-2.00 |
 | Slack | Free |
-| **Total** | **~$6-13/month** |
+| **Total** | **~$6-23/month** |
 
 ## Support
 
