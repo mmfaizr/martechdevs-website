@@ -83,43 +83,66 @@ export default function Footer() {
             <div className="grid md:grid-cols-5">
               {/* Info Panel */}
               <div className="md:col-span-2 bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 md:p-8 text-white">
-                <div className="mb-5">
-                  <Image
-                    src="/assets/martechdevs_logo.svg"
-                    alt="MartechDevs"
-                    width={130}
-                    height={32}
-                    className="h-7 w-auto brightness-0 invert"
-                    style={{ width: 'auto' }}
-                  />
-                </div>
-                <h3 className="text-lg font-semibold mb-1">Free Consultation</h3>
-                <p className="text-emerald-100 text-sm mb-5">
+                <h3 className="text-xl font-semibold mb-1">Free Consultation</h3>
+                <p className="text-emerald-100 text-sm mb-6">
                   30-minute strategy call to discuss your data and growth challenges.
                 </p>
                 
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-white/20 rounded flex items-center justify-center text-xs">⏱️</span>
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                        <path strokeLinecap="round" strokeWidth="2" d="M12 6v6l4 2"/>
+                      </svg>
+                    </span>
                     30 minutes
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-white/20 rounded flex items-center justify-center text-xs">📹</span>
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                    </span>
                     Google Meet / Zoom
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 bg-white/20 rounded flex items-center justify-center text-xs">✓</span>
+                  <div className="flex items-center gap-3">
+                    <span className="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </span>
                     No obligation
                   </div>
                 </div>
 
                 <div className="mt-6 pt-5 border-t border-white/20 text-sm">
-                  <p className="text-emerald-100 mb-2">What we&apos;ll cover:</p>
-                  <ul className="space-y-1.5">
-                    <li>✓ Your current stack & challenges</li>
-                    <li>✓ Quick wins & opportunities</li>
-                    <li>✓ Integration roadmap</li>
-                    <li>✓ Timeline & next steps</li>
+                  <p className="text-emerald-100 mb-3">What we&apos;ll cover:</p>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Your current stack & challenges
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Quick wins & opportunities
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Integration roadmap
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-emerald-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Timeline & next steps
+                    </li>
                   </ul>
                 </div>
               </div>

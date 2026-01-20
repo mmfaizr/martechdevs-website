@@ -8,18 +8,26 @@ class SlackService {
   }
 
   async createConversationThread(conversation) {
+    const meta = conversation.customer_metadata || {};
+    
+    const location = [meta.city, meta.country].filter(Boolean).join(', ');
+    const deviceInfo = [meta.os, meta.browser].filter(Boolean).join(' / ');
+    const resolution = meta.screen_width && meta.screen_height ? `${meta.screen_width}x${meta.screen_height}` : null;
+    const page = meta.current_page || '/';
+    const referrer = meta.referrer && meta.referrer !== 'direct' ? meta.referrer.replace(/^https?:\/\//, '').split('/')[0] : null;
+    
+    const line1 = [location, deviceInfo].filter(Boolean).join(' • ') || 'New visitor';
+    const line2 = [resolution, referrer ? `from ${referrer}` : null].filter(Boolean).join(' • ');
+
     const result = await this.client.chat.postMessage({
       channel: this.channelId,
-      text: `💬 New conversation from *${conversation.customer_name || 'Unknown'}*`,
+      text: `New conversation: ${line1}`,
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `💬 *New Conversation*\n` +
-                  `*Customer:* ${conversation.customer_name || 'Unknown'}\n` +
-                  `*Email:* ${conversation.customer_email || 'N/A'}\n` +
-                  `*ID:* \`${conversation.id}\``
+            text: `*New Conversation*\n${line1}${line2 ? `\n${line2}` : ''}\n${page}`
           }
         }
       ]

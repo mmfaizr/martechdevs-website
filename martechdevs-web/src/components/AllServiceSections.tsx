@@ -256,12 +256,12 @@ const services = [
       { iconFile: 'Secure & Compliant Data Activation-  .svg', title: 'Secure & Compliant Data Activation:', description: 'Controlled and secure use of warehouse intelligence and insights.' },
     ],
     whatYouGet: [
-      { iconFile: 'integrate icon.svg', title: 'Proactive Churn Prevention:', description: 'Auto-trigger offers in marketing tools for "at-risk" users.' },
-      { iconFile: 'integrate icon.svg', title: 'Smarter Lead Nurturing:', description: 'Send "Product Qualified Leads" from warehouse to CRM.' },
-      { iconFile: 'integrate icon.svg', title: 'Hyper-Personalized Campaigns:', description: 'Marketing messages informed by LTV, product affinity.' },
-      { iconFile: 'integrate icon.svg', title: 'Contextual Support Flags:', description: 'High-value/at-risk customer alerts in support tools.' },
-      { iconFile: 'integrate icon.svg', title: 'Unified Customer Intelligence:', description: 'Marketing, sales, support act on same core insights.' },
-      { iconFile: 'integrate icon.svg', title: 'Faster, More Relevant Operations:', description: 'Everyday tools empowered by deep data.' },
+      { iconFile: 'Subscription Savers-   .svg', title: 'Proactive Churn Prevention:', description: 'Auto-trigger offers in marketing tools for "at-risk" users.' },
+      { iconFile: 'Hot Lead Identification-  .svg', title: 'Smarter Lead Nurturing:', description: 'Send "Product Qualified Leads" from warehouse to CRM.' },
+      { iconFile: 'Target Campaigns Based on Warehouse Models-  .svg', title: 'Hyper-Personalized Campaigns:', description: 'Marketing messages informed by LTV, product affinity.' },
+      { iconFile: 'Complete Customer History-   .svg', title: 'Contextual Support Flags:', description: 'High-value/at-risk customer alerts in support tools.' },
+      { iconFile: 'Cross-Team Alignment-  .svg', title: 'Unified Customer Intelligence:', description: 'Marketing, sales, support act on same core insights.' },
+      { iconFile: 'Faster, Reliable Reporting-   .svg', title: 'Faster, More Relevant Operations:', description: 'Everyday tools empowered by deep data.' },
     ],
   },
 ];
@@ -273,7 +273,7 @@ export default function AllServiceSections() {
   // Use scroll listener for more precise "sticky" state detection
   useEffect(() => {
     const handleScroll = () => {
-      const container = document.getElementById('services-container');
+      const container = document.getElementById('services');
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
@@ -366,7 +366,7 @@ export default function AllServiceSections() {
   };
 
   return (
-    <div className="relative min-h-screen" id="services-container">
+    <div className="relative min-h-screen" id="services">
       
       {/* Sticky Navigation - Merged seamlessly with main header */}
       <AnimatePresence>

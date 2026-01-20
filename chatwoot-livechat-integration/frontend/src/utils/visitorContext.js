@@ -17,12 +17,28 @@ export function collectVisitorContext() {
   } catch (e) {}
 
   try {
-    const ua = navigator.userAgent.toLowerCase();
-    if (/mobile|android|iphone|ipad|ipod/.test(ua)) {
-      ctx.device = /ipad|tablet/.test(ua) ? 'tablet' : 'mobile';
+    const ua = navigator.userAgent;
+    const uaLower = ua.toLowerCase();
+    
+    if (/mobile|android|iphone|ipad|ipod/.test(uaLower)) {
+      ctx.device = /ipad|tablet/.test(uaLower) ? 'tablet' : 'mobile';
     } else {
       ctx.device = 'desktop';
     }
+    
+    if (/iphone/.test(uaLower)) ctx.os = 'iOS';
+    else if (/ipad/.test(uaLower)) ctx.os = 'iPadOS';
+    else if (/mac/.test(uaLower)) ctx.os = 'macOS';
+    else if (/android/.test(uaLower)) ctx.os = 'Android';
+    else if (/windows/.test(uaLower)) ctx.os = 'Windows';
+    else if (/linux/.test(uaLower)) ctx.os = 'Linux';
+    else ctx.os = 'Unknown';
+    
+    if (/chrome/.test(uaLower) && !/edg/.test(uaLower)) ctx.browser = 'Chrome';
+    else if (/safari/.test(uaLower) && !/chrome/.test(uaLower)) ctx.browser = 'Safari';
+    else if (/firefox/.test(uaLower)) ctx.browser = 'Firefox';
+    else if (/edg/.test(uaLower)) ctx.browser = 'Edge';
+    else ctx.browser = 'Other';
   } catch (e) {
     ctx.device = 'unknown';
   }
