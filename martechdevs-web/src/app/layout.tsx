@@ -10,11 +10,14 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "MartechDevs - We Integrate Your Martech + Analytics Tools",
+  title: "martechdevs - We Integrate Your Martech + Analytics Tools",
   description: "We integrate your Martech + Analytics tools. Lightning fast. Get accurate data, automated messaging, and unified customer views.",
   keywords: "martech, analytics, Segment, Mixpanel, HubSpot, data integration, customer data platform",
+  icons: {
+    icon: "/favicon.svg",
+  },
   openGraph: {
-    title: "MartechDevs - We Integrate Your Martech + Analytics Tools",
+    title: "martechdevs - We Integrate Your Martech + Analytics Tools",
     description: "Get accurate data, automated messaging, and unified customer views.",
     type: "website",
   },
