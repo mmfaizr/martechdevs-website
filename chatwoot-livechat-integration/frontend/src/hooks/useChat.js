@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getFullVisitorContext } from '../utils/visitorContext';
 
 export function useChat(apiUrl, customerInfo, onQuoteFlowTrigger) {
   const [conversationId, setConversationId] = useState(null);
@@ -24,10 +25,15 @@ export function useChat(apiUrl, customerInfo, onQuoteFlowTrigger) {
 
   const initConversation = async () => {
     try {
+      const visitorContext = await getFullVisitorContext();
+      
       const res = await fetch(`${apiUrl}/conversations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(customerInfo)
+        body: JSON.stringify({
+          ...customerInfo,
+          customer_metadata: visitorContext
+        })
       });
       
       if (!res.ok) throw new Error('Failed to create conversation');
