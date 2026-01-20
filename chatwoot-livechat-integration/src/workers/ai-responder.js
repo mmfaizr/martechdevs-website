@@ -43,9 +43,12 @@ const worker = new Worker(
   },
   {
     connection: redis,
-    concurrency: 5,
-    removeOnComplete: { count: 100 },
-    removeOnFail: { count: 100 }
+    concurrency: 2,
+    removeOnComplete: { count: 50 },
+    removeOnFail: { count: 50 },
+    drainDelay: 10,
+    stalledInterval: 60000,
+    lockDuration: 60000
   }
 );
 
