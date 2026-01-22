@@ -120,7 +120,6 @@ RULES:
 
 Example tone: "Thanks for sharing all that! Sounds like you're trying to get Segment and HubSpot talking to each other properly..."`;
   }
-  }
 
   formatQuoteMessage(data, quote) {
     const parts = [];
