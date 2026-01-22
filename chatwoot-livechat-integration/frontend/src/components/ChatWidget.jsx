@@ -351,7 +351,7 @@ export default function ChatWidget({
                   )}
                 </div>
                 {!greetingLoading && (
-                  <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} />
+                  <QuickActions onStartQuote={handleStartQuote} onScheduleCall={handleScheduleCall} onTalkToHuman={() => setShowHandoffUI(true)} />
                 )}
                 <div className="message-time">{formatTime(new Date().toISOString())}</div>
               </div>
@@ -532,7 +532,7 @@ export default function ChatWidget({
   );
 }
 
-function QuickActions({ onStartQuote, onScheduleCall }) {
+function QuickActions({ onStartQuote, onScheduleCall, onTalkToHuman }) {
   return (
     <div className="quick-actions">
       <button className="quick-action-btn quote-btn" onClick={onStartQuote}>
@@ -552,6 +552,13 @@ function QuickActions({ onStartQuote, onScheduleCall }) {
           <line x1="3" y1="10" x2="21" y2="10"/>
         </svg>
         Schedule a Call
+      </button>
+      <button className="quick-action-btn human-btn" onClick={onTalkToHuman}>
+        <svg className="quick-action-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        Talk to a Human
       </button>
     </div>
   );
