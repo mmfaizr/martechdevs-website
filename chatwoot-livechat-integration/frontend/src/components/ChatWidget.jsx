@@ -18,6 +18,7 @@ export default function ChatWidget({
   const [input, setInput] = useState('');
   const [quoteMessages, setQuoteMessages] = useState([]);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [showBookCallButton, setShowBookCallButton] = useState(false);
   const [pendingQuoteStart, setPendingQuoteStart] = useState(false);
   const [greeting, setGreeting] = useState(null);
   const [greetingLoading, setGreetingLoading] = useState(true);
@@ -46,17 +47,35 @@ export default function ChatWidget({
     fetchGreeting();
   }, [apiUrl]);
 
+  useEffect(() => {
+    const handleOpenQuote = () => {
+      setIsOpen(true);
+      setHasAutoOpened(true);
+      setTimeout(() => {
+        setQuoteMessages([]);
+        if (conversationId) {
+          quoteFlow.startFlow();
+        } else {
+          setPendingQuoteStart(true);
+        }
+      }, 300);
+    };
+    
+    window.addEventListener('openChatQuote', handleOpenQuote);
+    return () => window.removeEventListener('openChatQuote', handleOpenQuote);
+  }, [conversationId, quoteFlow]);
+
   const handleQuoteComplete = (answers, quote, quoteMessage) => {
-    const hasCalendarTrigger = quoteMessage.includes('[SHOW_CALENDAR]');
-    const cleanMessage = quoteMessage.replace('[SHOW_CALENDAR]', '').trim();
+    const hasBookCallTrigger = quoteMessage.includes('[SHOW_BOOK_CALL_BUTTON]');
+    const cleanMessage = quoteMessage.replace('[SHOW_BOOK_CALL_BUTTON]', '').replace('[SHOW_CALENDAR]', '').trim();
     
     setQuoteMessages(prev => [
       ...prev,
       { id: `quote_${Date.now()}`, type: 'quote_result', content: cleanMessage, created_at: new Date().toISOString() }
     ]);
     
-    if (hasCalendarTrigger) {
-      setTimeout(() => setShowCalendar(true), 500);
+    if (hasBookCallTrigger) {
+      setShowBookCallButton(true);
     }
   };
 
@@ -85,14 +104,14 @@ export default function ChatWidget({
   }, [pendingQuoteStart, conversationId, quoteFlow]);
 
   useEffect(() => {
-    if (autoOpen && !isOpen && !hasAutoOpened) {
+    if (autoOpen && !isOpen && !hasAutoOpened && greeting && !greetingLoading) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         setHasAutoOpened(true);
       }, autoOpenDelay);
       return () => clearTimeout(timer);
     }
-  }, [autoOpen, isOpen, hasAutoOpened, autoOpenDelay]);
+  }, [autoOpen, isOpen, hasAutoOpened, autoOpenDelay, greeting, greetingLoading]);
 
   useEffect(() => {
     if (isOpen) {
@@ -317,9 +336,24 @@ export default function ChatWidget({
             )}
 
             {!quoteFlow.isActive && quoteMessages.length > 0 && (
-              quoteMessages.filter(m => m.type === 'quote_result' || m.type === 'booking_confirmed').map(msg => (
-                <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
-              ))
+              <>
+                {quoteMessages.filter(m => m.type === 'quote_result' || m.type === 'booking_confirmed').map(msg => (
+                  <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
+                ))}
+                {showBookCallButton && !showCalendar && (
+                  <div className="book-call-cta">
+                    <button className="book-call-btn" onClick={() => { setShowCalendar(true); setShowBookCallButton(false); }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                      </svg>
+                      Book a Discovery Call
+                    </button>
+                  </div>
+                )}
+              </>
             )}
             
             {isLoading && !quoteFlow.isActive && (
@@ -336,26 +370,31 @@ export default function ChatWidget({
           {status !== 'closed' ? (
             <div className="input-area">
               {quoteFlow.isActive ? (
-                <>
-                  <input
-                    ref={inputRef}
-                    type={quoteFlow.currentStep?.inputType || 'text'}
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder={quoteFlow.currentStep?.inputType === 'email' 
-                      ? 'Enter your work email...' 
-                      : 'Type your answer or select above...'}
-                    className="quote-input"
-                  />
-                  <button
-                    onClick={handleSend}
-                    disabled={!input.trim()}
-                    className="send-button"
-                  >
-                    <SendIcon />
-                  </button>
-                </>
+                quoteFlow.isGeneratingQuote ? (
+                  <div className="generating-quote-notice">Generating your quote...</div>
+                ) : (
+                  <>
+                    <input
+                      ref={inputRef}
+                      type={quoteFlow.currentStep?.inputType || 'text'}
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={quoteFlow.currentStep?.inputType === 'email' 
+                        ? 'Enter your work email...' 
+                        : 'Type your answer or select above...'}
+                      className="quote-input"
+                      disabled={quoteFlow.isLoadingQuestion}
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!input.trim() || quoteFlow.isLoadingQuestion}
+                      className="send-button"
+                    >
+                      <SendIcon />
+                    </button>
+                  </>
+                )
               ) : (
                 <>
                   <textarea

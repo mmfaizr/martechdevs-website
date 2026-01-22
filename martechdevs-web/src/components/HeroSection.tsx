@@ -42,15 +42,18 @@ export default function HeroSection() {
               <a href="#pricing" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Simple pricing</a>
             </nav>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
+                className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors items-center gap-2"
+              >
+                Get Instant Quote
+              </button>
               <a
                 href="#book-call"
-                className="hidden md:flex bg-gray-50 hover:bg-gray-100 text-gray-900 px-6 py-2.5 rounded-full text-sm font-semibold transition-colors items-center gap-2 border border-gray-200"
+                className="hidden md:flex bg-gray-50 hover:bg-gray-100 text-gray-900 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors items-center gap-2 border border-gray-200"
               >
                 Book a call
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
               </a>
 
               {/* Mobile Menu Button */}
@@ -121,16 +124,19 @@ export default function HeroSection() {
                 Simple pricing
               </a>
               
-              <div className="pt-6 border-t border-gray-100">
+              <div className="pt-6 border-t border-gray-100 space-y-3">
+                <button
+                  className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
+                  onClick={() => { setMobileMenuOpen(false); window.dispatchEvent(new CustomEvent('openChatQuote')); }}
+                >
+                  Get Instant Quote
+                </button>
                 <a
                   href="#book-call"
-                  className="inline-flex bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
+                  className="inline-flex bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-3 rounded-full text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Book a call
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
                 </a>
               </div>
             </div>
@@ -355,15 +361,15 @@ export default function HeroSection() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="hidden lg:block"
               >
-                <a
-                  href="#pricing"
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
                   className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
                 >
-                  See our flat pricing & timeline commitment
+                  Generate Instant Transparent Quote
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
+                </button>
               </motion.div>
 
               {/* Marketing Attribution Box - REMOVED as requested */}
