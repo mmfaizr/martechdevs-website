@@ -104,14 +104,14 @@ export default function ChatWidget({
   }, [pendingQuoteStart, conversationId, quoteFlow]);
 
   useEffect(() => {
-    if (autoOpen && !isOpen && !hasAutoOpened && !greetingLoading) {
+    if (autoOpen && !isOpen && !hasAutoOpened && greeting) {
       const timer = setTimeout(() => {
         setIsOpen(true);
         setHasAutoOpened(true);
       }, autoOpenDelay);
       return () => clearTimeout(timer);
     }
-  }, [autoOpen, isOpen, hasAutoOpened, autoOpenDelay, greetingLoading]);
+  }, [autoOpen, isOpen, hasAutoOpened, autoOpenDelay, greeting]);
 
   useEffect(() => {
     if (isOpen) {
