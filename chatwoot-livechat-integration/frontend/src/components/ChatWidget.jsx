@@ -632,7 +632,7 @@ function Message({ message }) {
 
 function StatusBadge({ status, agentName }) {
   const statusConfig = {
-    'ai_active': { text: 'AI Assistant', color: 'blue' },
+    'ai_active': { text: 'Our custom built AI Assistant', color: 'blue' },
     'handoff_pending': { text: 'Connecting...', color: 'yellow' },
     'human_active': { text: agentName || 'Agent', color: 'green' },
     'closed': { text: 'Closed', color: 'gray' },
