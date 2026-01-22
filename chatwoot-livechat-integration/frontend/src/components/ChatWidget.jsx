@@ -47,24 +47,6 @@ export default function ChatWidget({
     fetchGreeting();
   }, [apiUrl]);
 
-  useEffect(() => {
-    const handleOpenQuote = () => {
-      setIsOpen(true);
-      setHasAutoOpened(true);
-      setTimeout(() => {
-        setQuoteMessages([]);
-        if (conversationId) {
-          quoteFlow.startFlow();
-        } else {
-          setPendingQuoteStart(true);
-        }
-      }, 300);
-    };
-    
-    window.addEventListener('openChatQuote', handleOpenQuote);
-    return () => window.removeEventListener('openChatQuote', handleOpenQuote);
-  }, [conversationId, quoteFlow]);
-
   const handleQuoteComplete = (answers, quote, quoteMessage) => {
     const hasBookCallTrigger = quoteMessage.includes('[SHOW_BOOK_CALL_BUTTON]');
     const cleanMessage = quoteMessage.replace('[SHOW_BOOK_CALL_BUTTON]', '').replace('[SHOW_CALENDAR]', '').trim();
@@ -102,6 +84,18 @@ export default function ChatWidget({
       setPendingQuoteStart(false);
     }
   }, [pendingQuoteStart, conversationId, quoteFlow]);
+
+  useEffect(() => {
+    const handleOpenQuote = () => {
+      setIsOpen(true);
+      setHasAutoOpened(true);
+      setQuoteMessages([]);
+      setPendingQuoteStart(true);
+    };
+    
+    window.addEventListener('openChatQuote', handleOpenQuote);
+    return () => window.removeEventListener('openChatQuote', handleOpenQuote);
+  }, []);
 
   useEffect(() => {
     if (autoOpen && !isOpen && !hasAutoOpened && greeting) {
