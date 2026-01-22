@@ -45,6 +45,14 @@ export function useQuoteFlow(apiUrl, conversationId, onComplete) {
       collectedDataRef.current = data.collected_data || collectedDataRef.current;
       console.log('[QuoteFlow] Updated collected data:', collectedDataRef.current);
       
+      if (data.needs_handoff) {
+        console.log('[QuoteFlow] Handoff requested, stopping flow');
+        setIsActive(false);
+        setCurrentStep(null);
+        setIsLoadingQuestion(false);
+        return { completed: false, needsHandoff: true };
+      }
+      
       if (data.is_complete) {
         console.log('[QuoteFlow] Flow complete, generating quote...');
         setIsGeneratingQuote(true);

@@ -160,6 +160,7 @@ router.post('/quote/next', async (req, res) => {
       question: result.question?.substring(0, 50), 
       options_count: result.options?.length, 
       is_complete: result.is_complete,
+      needs_handoff: result.needs_handoff,
       next_field: result.next_field,
       collected_keys: Object.keys(result.collected_data || {})
     });
@@ -178,7 +179,10 @@ router.post('/quote/next', async (req, res) => {
             await slackService.mirrorMessage(conversation, customerMsg).catch(() => {});
           }
 
-          if (result.question && !result.is_complete) {
+          if (result.needs_handoff) {
+            await db.updateConversationMode(conversation_id, 'HANDOFF_PENDING');
+            await slackService.postHandoffRequest(conversation, `Customer requested human assistance during quote flow. Last message: "${previous_answer}"`).catch(() => {});
+          } else if (result.question && !result.is_complete) {
             const aiMsg = await db.createMessage({
               conversation_id,
               content: result.question,
@@ -426,6 +430,54 @@ function calculateQuote(data) {
     email: data.email
   };
 }
+
+router.post('/conversations/:id/handoff', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, reason } = req.body;
+
+    const conversation = await db.getConversation(id);
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }
+
+    if (email) {
+      await db.updateConversation(id, { customer_email: email });
+    }
+
+    await db.updateConversationMode(id, 'HANDOFF_PENDING');
+
+    const handoffMsg = await db.createMessage({
+      conversation_id: id,
+      content: `Customer requested to speak with a human.${email ? ` Email: ${email}` : ''}${reason ? ` Reason: ${reason}` : ''}`,
+      sender_type: 'system',
+      source: 'handoff'
+    });
+
+    try {
+      const updatedConversation = await db.getConversation(id);
+      await slackService.postHandoffRequest(
+        updatedConversation,
+        `Customer wants to speak with a human.\n${email ? `Email: ${email}\n` : ''}${reason ? `Context: ${reason}` : ''}`
+      );
+    } catch (slackErr) {
+      console.warn('Slack handoff notification failed:', slackErr.message);
+    }
+
+    realtimeService.sendToConversation(id, {
+      type: 'status',
+      status: 'handoff_pending'
+    });
+
+    res.json({ 
+      success: true, 
+      message: "We've notified our team. Someone will be with you shortly." 
+    });
+  } catch (error) {
+    console.error('Error processing handoff:', error);
+    res.status(500).json({ error: 'Failed to process handoff request' });
+  }
+});
 
 router.get('/conversations/:id/stream', async (req, res) => {
   try {

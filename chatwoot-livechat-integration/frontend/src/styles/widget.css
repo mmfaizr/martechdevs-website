@@ -1301,6 +1301,61 @@
   font-style: italic;
 }
 
+/* =========================================
+   HANDOFF UI
+   ========================================= */
+.handoff-ui {
+  padding: 0 12px;
+}
+
+.handoff-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.handoff-email-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.handoff-email-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-glow);
+}
+
+.handoff-submit-btn {
+  padding: 10px 18px;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.handoff-submit-btn:hover:not(:disabled) {
+  background: var(--brand-dark);
+}
+
+.handoff-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .chat-window {

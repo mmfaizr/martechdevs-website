@@ -226,6 +226,20 @@ Reply with ONLY the greeting message, nothing else.`;
 
   async generateQuoteStep(previousAnswer, collectedData = {}, previousField = null) {
     try {
+      if (previousAnswer && this.detectHandoffIntent(previousAnswer)) {
+        console.log('[Gemini Quote] Handoff intent detected');
+        return {
+          question: null,
+          options: [],
+          multi_select: false,
+          input_type: null,
+          collected_data: collectedData,
+          is_complete: false,
+          needs_handoff: true,
+          next_field: null
+        };
+      }
+
       const model = this.client.getGenerativeModel({ 
         model: this.model,
         generationConfig: {
@@ -446,6 +460,21 @@ Return JSON: {"question": "your question here"}`;
     }
 
     return contents;
+  }
+
+  detectHandoffIntent(message) {
+    const lowerMsg = message.toLowerCase();
+    const handoffPhrases = [
+      'talk to human', 'speak to human', 'real person', 'actual person',
+      'talk to someone', 'speak to someone', 'human please', 'real human',
+      'not a bot', 'agent please', 'talk to agent', 'speak to agent',
+      'customer service', 'support agent', 'live agent', 'live chat',
+      'representative', 'can i talk to', 'can i speak to', 'want to talk',
+      'need to talk', 'prefer to talk', 'rather talk', 'talk to a person',
+      'human agent', 'actual human', 'stop bot', 'no bot', 'real support'
+    ];
+    
+    return handoffPhrases.some(phrase => lowerMsg.includes(phrase));
   }
 }
 

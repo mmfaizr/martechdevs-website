@@ -22,6 +22,10 @@ export default function ChatWidget({
   const [pendingQuoteStart, setPendingQuoteStart] = useState(false);
   const [greeting, setGreeting] = useState(null);
   const [greetingLoading, setGreetingLoading] = useState(true);
+  const [showHandoffUI, setShowHandoffUI] = useState(false);
+  const [handoffEmail, setHandoffEmail] = useState('');
+  const [handoffSubmitting, setHandoffSubmitting] = useState(false);
+  const [handoffComplete, setHandoffComplete] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -120,8 +124,31 @@ export default function ChatWidget({
     }
   }, [isOpen, quoteFlow.isActive, showCalendar]);
 
+  const detectHandoffIntent = (msg) => {
+    const lowerMsg = msg.toLowerCase();
+    const handoffPhrases = [
+      'talk to human', 'speak to human', 'real person', 'actual person',
+      'talk to someone', 'speak to someone', 'human please', 'real human',
+      'agent please', 'talk to agent', 'speak to agent', 'live agent',
+      'representative', 'can i talk to', 'can i speak to', 'want to talk',
+      'human agent', 'stop bot', 'no bot', 'real support'
+    ];
+    return handoffPhrases.some(phrase => lowerMsg.includes(phrase));
+  };
+
   const handleSend = async () => {
     if (!input.trim()) return;
+
+    const lowerInput = input.toLowerCase();
+
+    if (detectHandoffIntent(input)) {
+      setInput('');
+      if (quoteFlow.isActive) {
+        quoteFlow.cancelFlow();
+      }
+      setShowHandoffUI(true);
+      return;
+    }
 
     if (quoteFlow.isActive && quoteFlow.currentStep) {
       const inputValue = input;
@@ -132,13 +159,15 @@ export default function ChatWidget({
         { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
         { id: `user_${Date.now()}`, type: 'user_input', content: inputValue, created_at: new Date().toISOString() }
       ]);
-      await quoteFlow.submitTextInput(inputValue);
+      const result = await quoteFlow.submitTextInput(inputValue);
+      if (result?.needsHandoff) {
+        setShowHandoffUI(true);
+      }
       return;
     }
 
     if (!isConnected) return;
     
-    const lowerInput = input.toLowerCase();
     if (lowerInput.includes('quote') || lowerInput.includes('pricing') || lowerInput.includes('cost') || lowerInput.includes('price')) {
       setQuoteMessages([]);
       quoteFlow.startFlow();
@@ -177,7 +206,9 @@ export default function ChatWidget({
     ]);
     
     const result = await quoteFlow.selectAndConfirm(option);
-    if (result?.completed) {
+    if (result?.needsHandoff) {
+      setShowHandoffUI(true);
+    } else if (result?.completed) {
       setQuoteMessages(prev => [
         ...prev,
         { id: `quote_${Date.now()}`, type: 'quote_result', content: result.quoteMessage, created_at: new Date().toISOString() }
@@ -188,7 +219,9 @@ export default function ChatWidget({
   const handleConfirmSelection = async () => {
     const currentQuestion = quoteFlow.currentStep?.question;
     const result = await quoteFlow.confirmSelection();
-    if (result) {
+    if (result?.needsHandoff) {
+      setShowHandoffUI(true);
+    } else if (result) {
       setQuoteMessages(prev => [
         ...prev,
         { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
@@ -204,7 +237,43 @@ export default function ChatWidget({
       { id: `q_${Date.now()}`, type: 'ai_question', content: currentQuestion, created_at: new Date().toISOString() },
       { id: `user_${Date.now()}`, type: 'user_input', content: value, created_at: new Date().toISOString() }
     ]);
-    await quoteFlow.submitTextInput(value);
+    const result = await quoteFlow.submitTextInput(value);
+    if (result?.needsHandoff) {
+      setShowHandoffUI(true);
+    }
+  };
+
+  const handleHandoffSubmit = async () => {
+    if (!handoffEmail.trim()) return;
+    
+    setHandoffSubmitting(true);
+    try {
+      const res = await fetch(`${apiUrl}/conversations/${conversationId}/handoff`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: handoffEmail.trim(),
+          reason: 'Customer requested human during quote flow'
+        })
+      });
+      
+      if (res.ok) {
+        setHandoffComplete(true);
+        setQuoteMessages(prev => [
+          ...prev,
+          { 
+            id: `handoff_${Date.now()}`, 
+            type: 'system_message', 
+            content: "Thanks! We've notified our team and someone will reach out shortly. In the meantime, feel free to book a call.",
+            created_at: new Date().toISOString()
+          }
+        ]);
+      }
+    } catch (err) {
+      console.error('Handoff submission failed:', err);
+    } finally {
+      setHandoffSubmitting(false);
+    }
   };
 
   const handleStartQuote = () => {
@@ -331,7 +400,7 @@ export default function ChatWidget({
 
             {!quoteFlow.isActive && quoteMessages.length > 0 && (
               <>
-                {quoteMessages.filter(m => m.type === 'quote_result' || m.type === 'booking_confirmed').map(msg => (
+                {quoteMessages.filter(m => m.type === 'quote_result' || m.type === 'booking_confirmed' || m.type === 'system_message').map(msg => (
                   <QuoteMessage key={msg.id} message={msg} onScheduleCall={handleScheduleCall} />
                 ))}
                 {showBookCallButton && !showCalendar && (
@@ -348,6 +417,48 @@ export default function ChatWidget({
                   </div>
                 )}
               </>
+            )}
+
+            {showHandoffUI && !handoffComplete && (
+              <div className="handoff-ui">
+                <div className="message ai">
+                  <div className="message-header">AI Assistant</div>
+                  <div className="message-content">
+                    No problem! I'll connect you with someone from our team. First, what's the best email to reach you?
+                  </div>
+                </div>
+                <div className="handoff-form">
+                  <input
+                    type="email"
+                    value={handoffEmail}
+                    onChange={(e) => setHandoffEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="handoff-email-input"
+                    disabled={handoffSubmitting}
+                  />
+                  <button 
+                    className="handoff-submit-btn"
+                    onClick={handleHandoffSubmit}
+                    disabled={!handoffEmail.trim() || handoffSubmitting}
+                  >
+                    {handoffSubmitting ? 'Submitting...' : 'Connect Me'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {handoffComplete && !showCalendar && (
+              <div className="book-call-cta">
+                <button className="book-call-btn" onClick={() => setShowCalendar(true)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  Book a Call Now
+                </button>
+              </div>
             )}
             
             {isLoading && !quoteFlow.isActive && (
