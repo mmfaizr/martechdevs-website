@@ -43,7 +43,7 @@ export default function HeroSection() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
-                className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors items-center gap-2"
+                className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-colors items-center gap-2 cursor-pointer"
               >
                 Get Instant Quote
               </button>
@@ -110,7 +110,7 @@ export default function HeroSection() {
               
               <div className="pt-6 border-t border-gray-100 space-y-3">
                 <button
-                  className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
+                  className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto cursor-pointer"
                   onClick={() => { setMobileMenuOpen(false); window.dispatchEvent(new CustomEvent('openChatQuote')); }}
                 >
                   Get Instant Quote
@@ -347,7 +347,7 @@ export default function HeroSection() {
               >
                 <button
                   onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
-                  className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
                 >
                   Generate Instant Transparent Quote
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
