@@ -37,9 +37,7 @@ export default function HeroSection() {
             <nav className="hidden md:flex items-center gap-8">
               <a href="#portfolio" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Portfolio</a>
               <a href="#services" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Services</a>
-              <a href="#ai-utilities" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">AI utilities</a>
               <a href="#testimonials" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Testimonials</a>
-              <a href="#pricing" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Simple pricing</a>
             </nav>
 
             <div className="flex items-center gap-3">
@@ -103,25 +101,11 @@ export default function HeroSection() {
                 Services
               </a>
               <a
-                href="#ai-utilities"
-                className="text-xl font-medium text-gray-800 hover:text-emerald-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                AI utilities
-              </a>
-              <a
                 href="#testimonials"
                 className="text-xl font-medium text-gray-800 hover:text-emerald-600 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Testimonials
-              </a>
-              <a
-                href="#pricing"
-                className="text-xl font-medium text-gray-800 hover:text-emerald-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Simple pricing
               </a>
               
               <div className="pt-6 border-t border-gray-100 space-y-3">
