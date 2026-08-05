@@ -163,16 +163,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Video card styling - removed hover effect */
 
-/* Hide YouCanBook.me branding */
-iframe[src*="youcanbook"] + div,
-a[href*="youcanbook.me/pb-pp"],
-a[data-testid="paidLink"],
-._link_ppnbm_9,
-._paid_ppnbm_27,
-a._base_1sq60_1[href*="youcanbook"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
+/* The YouCanBook.me branding rules that used to sit here are gone. They could
+   never have worked: every selector but the first targeted elements inside the
+   embed, which is a cross-origin document that no stylesheet of ours can reach.
+   The booking embed is Cal.com now and needs no overrides at all. */

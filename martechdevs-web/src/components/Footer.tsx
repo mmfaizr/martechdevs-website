@@ -54,7 +54,10 @@ const ICONS = {
 
 const CALL_FACTS = [
   { icon: ICONS.clock, label: '30 minutes' },
-  { icon: ICONS.video, label: 'Google Meet or Zoom' },
+  /* Not "Google Meet or Zoom" any more. The event behind this calendar is set
+     to Cal Video, so naming two other products was simply untrue. Worded so it
+     stays true if the location is switched in Cal.com later. */
+  { icon: ICONS.video, label: 'Video call, link on booking' },
   { icon: ICONS.shield, label: 'No obligation' },
 ];
 
@@ -100,20 +103,35 @@ const ALSO = 'Census, Customer.io, CleverTap, Intercom, Zendesk, Metabase, Table
 
 const LINKEDIN_PATH = 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z';
 
-const BOOKING_URL = 'https://martechdevs.youcanbook.me/';
+/* Cal.com, not YouCanBookMe.
+ *
+ * The YouCanBookMe embed does not work in a third-party iframe. Its document
+ * loads - the load event fires in about a second - and then the app never
+ * paints, so the card was a blank white pane on the live site. Reproduced in
+ * isolation on a page with nothing else on it, across all four of their
+ * documented URL variants (noframe, skipHeaderFooter, both, neither); the same
+ * URL opened directly renders fine. Their session cookies carry no
+ * SameSite=None, so they are withheld once framed, which fits. Nothing about it
+ * is fixable from this side - we cannot set headers on their domain - and it
+ * fails the same way in Safari, which has blocked third-party storage for years.
+ *
+ * Cal.com renders correctly in the identical frame, checked side by side before
+ * this was changed. The event type behind this slug is a 30-minute Discovery
+ * Call created for it, so the length matches what the panel promises. */
+const BOOKING_URL = 'https://cal.com/faizur-rahman-vvsm0e/discovery';
 
-/* How much of the top of the embed to hide. See the note at the iframe. */
-const CROP = 14;
+/* No crop. That existed to hide a dark strip YouCanBookMe painted at the top of
+ * its embed; Cal.com has no such chrome, so cutting anything here would just
+ * eat the calendar. */
 
 /* How long to keep the skeleton up AFTER the frame's load event.
  *
- * The frame fires load at about 1s, but that is the document, not the
- * calendar: youcanbook.me is a single-page app that then renders the month on
- * its own clock, so hiding the skeleton on load swaps a placeholder for an
- * empty white box, which is the flicker this is meant to prevent. There is no
- * better signal to wait for - the embed posts no message at any point in its
- * lifecycle, which I checked by listening on the parent for the whole load
- * (zero messages from that origin), so a timed hold is the only lever. */
+ * The frame fires load at about 1.4s and Cal.com has painted the month by
+ * then, so this is a buffer rather than a fix - it covers a slow connection
+ * where the app boots after its document is done. Kept small for that reason.
+ * A timed hold is the only lever available either way: nothing is readable
+ * across the origin boundary, and the embed is not required to announce
+ * itself. */
 const SKELETON_HOLD_MS = 700;
 const SKELETON_FADE_MS = 500;
 
@@ -214,8 +232,13 @@ export default function Footer() {
                 </div>
               </div>
 
-              {/* The calendar itself. */}
-              <div className="md:col-span-3 relative min-h-[520px]">
+              {/* The calendar itself. 620, not 520: Cal.com spends its first
+                  ~365 on the event header - avatar, title, duration, location,
+                  timezone - before the month starts, and at 520 the grid was
+                  cut off at the first row of dates, so nothing bookable was
+                  visible without scrolling inside the frame. At 620 two full
+                  weeks of selectable days show on arrival. */}
+              <div className="md:col-span-3 relative min-h-[620px]">
                 {/* Built to the shape of the thing it is standing in for - a
                     Today pill, a month title between two arrows, the weekday
                     row, then five weeks of round day cells - so the handover is
@@ -252,28 +275,14 @@ export default function Footer() {
                   </div>
                 )}
 
-                {/* The dark strip at the top of the embed is CROPPED, not
-                    styled away: the frame is a cross-origin document, so no
-                    stylesheet of ours can reach inside it. (Worth knowing that
-                    the youcanbook rules already sitting in globals.css cannot
-                    work either, for the same reason.) The only lever from this
-                    side is to make the window smaller than the page and slide
-                    the page up inside it.
-                    Checked before doing it: with the booking page online, the
-                    frame carries no "Powered by YouCanBookMe" text at any
-                    width, so what is being cut is decorative chrome and not the
-                    vendor's attribution.
-                    CROP is measured off the rendered embed rather than the DOM,
-                    which is unreachable, so it is deliberately a few units more
-                    than the strip: the calendar's own top padding is about 23,
-                    and overshooting eats a little of that where undershooting
-                    would leave a visible dark sliver. */}
+                {/* embed=true is Cal.com's own embedded mode - it drops the
+                    page-level chrome the standalone booking page carries, so
+                    nothing has to be cropped from this side. */}
                 <div className="absolute inset-0 overflow-hidden">
                   <iframe
-                    src={`${BOOKING_URL}?noframe=true&skipHeaderFooter=true`}
+                    src={`${BOOKING_URL}?embed=true&layout=month_view`}
                     title="Book a discovery call with MartechDevs"
-                    className="absolute left-0 w-full border-0"
-                    style={{ top: -CROP, height: `calc(100% + ${CROP}px)` }}
+                    className="absolute inset-0 w-full h-full border-0"
                     onLoad={() => setBookingLoaded(true)}
                   />
                 </div>
