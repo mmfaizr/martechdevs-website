@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -102,8 +102,36 @@ const LINKEDIN_PATH = 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.0
 
 const BOOKING_URL = 'https://martechdevs.youcanbook.me/';
 
+/* How much of the top of the embed to hide. See the note at the iframe. */
+const CROP = 14;
+
+/* How long to keep the skeleton up AFTER the frame's load event.
+ *
+ * The frame fires load at about 1s, but that is the document, not the
+ * calendar: youcanbook.me is a single-page app that then renders the month on
+ * its own clock, so hiding the skeleton on load swaps a placeholder for an
+ * empty white box, which is the flicker this is meant to prevent. There is no
+ * better signal to wait for - the embed posts no message at any point in its
+ * lifecycle, which I checked by listening on the parent for the whole load
+ * (zero messages from that origin), so a timed hold is the only lever. */
+const SKELETON_HOLD_MS = 700;
+const SKELETON_FADE_MS = 500;
+
 export default function Footer() {
   const [bookingLoaded, setBookingLoaded] = useState(false);
+  const [skeletonFading, setSkeletonFading] = useState(false);
+  const [skeletonGone, setSkeletonGone] = useState(false);
+
+  /* Hold opaque, THEN fade, THEN unmount - in that order, and the order is the
+   * whole point. Fading from the moment load fires would start dissolving the
+   * placeholder while the calendar behind it is still blank, which shows the
+   * empty box this exists to cover. */
+  useEffect(() => {
+    if (!bookingLoaded) return;
+    const fade = setTimeout(() => setSkeletonFading(true), SKELETON_HOLD_MS);
+    const drop = setTimeout(() => setSkeletonGone(true), SKELETON_HOLD_MS + SKELETON_FADE_MS);
+    return () => { clearTimeout(fade); clearTimeout(drop); };
+  }, [bookingLoaded]);
 
   return (
     <>
@@ -188,38 +216,64 @@ export default function Footer() {
 
               {/* The calendar itself. */}
               <div className="md:col-span-3 relative min-h-[520px]">
-                {/* A quiet skeleton, not a four-step icon carousel on a 700ms
-                    loop behind an artificial 2.5s delay. It shows the shape of
-                    what is coming and then gets out of the way. */}
-                {!bookingLoaded && (
-                  <div className="absolute inset-0 z-10 bg-white p-8" aria-hidden="true">
-                    <div className="h-4 w-40 rounded" style={{ background: BORDER }} />
-                    <div className="mt-8 grid grid-cols-7 gap-2">
-                      {Array.from({ length: 28 }).map((_, i) => (
-                        <div key={i} className="aspect-square rounded" style={{ background: TILE }} />
-                      ))}
+                {/* Built to the shape of the thing it is standing in for - a
+                    Today pill, a month title between two arrows, the weekday
+                    row, then five weeks of round day cells - so the handover is
+                    a placeholder resolving rather than one layout replaced by a
+                    different one. It fades rather than cutting, and it holds
+                    for SKELETON_HOLD_MS past the load event because the load
+                    event is not when the calendar appears.
+                    Kept mounted through the fade so the opacity transition has
+                    something to run on. */}
+                {!skeletonGone && (
+                  <div
+                    className="absolute inset-0 z-10 bg-white px-7 pt-7 transition-opacity ease-out"
+                    style={{ opacity: skeletonFading ? 0 : 1, transitionDuration: `${SKELETON_FADE_MS}ms` }}
+                    aria-hidden="true"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="h-8 w-20 rounded-full" style={{ background: TILE }} />
+                      <div className="h-4 w-32 rounded" style={{ background: BORDER }} />
+                      <div className="flex gap-3">
+                        <div className="h-4 w-4 rounded" style={{ background: TILE }} />
+                        <div className="h-4 w-4 rounded" style={{ background: TILE }} />
+                      </div>
                     </div>
-                    <div className="mt-8 space-y-2">
-                      {[0, 1, 2].map((i) => (
-                        <div key={i} className="h-9 rounded-lg" style={{ background: TILE }} />
+                    <div className="mt-5 h-px w-full" style={{ background: BORDER }} />
+                    <div className="mt-6 grid grid-cols-7 gap-y-4 justify-items-center">
+                      {Array.from({ length: 7 }).map((_, i) => (
+                        <div key={`d${i}`} className="h-2.5 w-7 rounded" style={{ background: BORDER }} />
+                      ))}
+                      {Array.from({ length: 35 }).map((_, i) => (
+                        <div key={i} className="h-9 w-9 rounded-full" style={{ background: TILE }} />
                       ))}
                     </div>
                     <span className="sr-only">Loading the calendar</span>
                   </div>
                 )}
 
-                {/* Not cropped. The old markup pulled the frame up and down by
-                    40 to cut the vendor's chrome off, and it is tempting to do
-                    the same to the "Powered by" bar - but that bar is their
-                    attribution, the URL already asks for it to be dropped with
-                    their own skipHeaderFooter flag, and the height to cut is a
-                    guess while the booking page is offline. Hiding a vendor's
-                    attribution on a hunch is not a styling decision. */}
+                {/* The dark strip at the top of the embed is CROPPED, not
+                    styled away: the frame is a cross-origin document, so no
+                    stylesheet of ours can reach inside it. (Worth knowing that
+                    the youcanbook rules already sitting in globals.css cannot
+                    work either, for the same reason.) The only lever from this
+                    side is to make the window smaller than the page and slide
+                    the page up inside it.
+                    Checked before doing it: with the booking page online, the
+                    frame carries no "Powered by YouCanBookMe" text at any
+                    width, so what is being cut is decorative chrome and not the
+                    vendor's attribution.
+                    CROP is measured off the rendered embed rather than the DOM,
+                    which is unreachable, so it is deliberately a few units more
+                    than the strip: the calendar's own top padding is about 23,
+                    and overshooting eats a little of that where undershooting
+                    would leave a visible dark sliver. */}
                 <div className="absolute inset-0 overflow-hidden">
                   <iframe
                     src={`${BOOKING_URL}?noframe=true&skipHeaderFooter=true`}
                     title="Book a discovery call with MartechDevs"
-                    className="absolute inset-0 w-full h-full border-0"
+                    className="absolute left-0 w-full border-0"
+                    style={{ top: -CROP, height: `calc(100% + ${CROP}px)` }}
                     onLoad={() => setBookingLoaded(true)}
                   />
                 </div>
