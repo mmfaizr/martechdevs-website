@@ -46,7 +46,11 @@ export default function MartechChat({
   theme = 'light',
   autoOpen = true,
   autoOpenDelay = 3000,
-  calLink = 'https://cal.com/faizur-rahman-vvsm0e/15min'
+  // The team's 30-minute Discovery Call, the same event the booking section
+  // embeds. This defaulted to a personal 15-minute meeting, so the widget was
+  // offering a different call, of a different length, on a different calendar
+  // from the one the rest of the page sells.
+  calLink = 'https://cal.com/team/martechdevs/discovery'
 }: Props) {
   const chatRef = useRef<MartechChatInstance | null>(null);
   const loadedRef = useRef(false);
