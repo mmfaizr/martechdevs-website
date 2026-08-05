@@ -1,0 +1,221 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ill-cdp" width="350" height="330" viewBox="0 0 350 330" fill="none">
+<style>
+  /* Motion is CSS so it runs with this file referenced as an img src, where
+     script never executes and hover never fires. Keep angle brackets out of this
+     block: it is parsed as XML and a tag-looking string kills the document.
+     Four sources reach the junction together, then one merged profile goes in.
+     One 4.0s cycle drives everything. A delay is the moment the sweep
+     actually arrives, so the artwork answers the flow rather than blinking on
+     its own clock. */
+  #ill-cdp { --cyc:4.0s; }
+  #ill-cdp text { letter-spacing:-.01em; }
+
+  /* Hover. Only reachable because these are inlined into the page rather than
+     referenced with an img src: an img is an isolated document and never sees a
+     pointer event. Kept to a lift, not a jump - the beats spent this whole build
+     being stripped of anything that moves geometry. */
+  #ill-cdp .hit { cursor:default; }
+  #ill-cdp .hit rect, #ill-cdp .hit circle { transition:fill .18s ease; }
+  #ill-cdp .hit g { transition:stroke .18s ease; }
+  /* !important is doing real work here rather than being laziness: these
+     surfaces already carry a running arrival animation, and an animation
+     outranks a normal declaration, so without it the hover never showed. */
+  #ill-cdp .hit:hover rect:not(.hitbox) { fill:var(--hot,#CFEDDF) !important; }
+  #ill-cdp .hit:hover circle { fill:#C4EBD8 !important; }
+  #ill-cdp .hit:hover g { stroke:#2A9E73 !important; }
+  /* touch reports itself as hovering whatever was last tapped, and it sticks */
+  @media (hover: none) {
+    #ill-cdp .hit:hover rect:not(.hitbox) { fill:var(--base,#F2F6F4) !important; }
+    #ill-cdp .hit:hover circle { fill:#E4F5EC !important; }
+    #ill-cdp .hit:hover g { stroke:#7B9188 !important; }
+  }
+
+  /* the pointer. linear, always: it is meant to read as something being carried
+     at a steady rate, and easing makes two of them on different lines drift
+     apart even when their speeds match. */
+  /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-cdp .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-cdp .brand, #ill-cdp .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-cdp .bead {
+    offset-rotate:0deg;
+    animation-duration:var(--cyc); animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+
+  /* Beats change colour and nothing else. Every scale here used to displace the
+     thing it was drawing attention to: an icon left its tile, a node's ring swept
+     hundreds of pixels across the canvas. A surface that lights up reads as
+     "this responded" just as well and cannot drift. The one survivor is .grow,
+     which wipes a bar inside its own box and so has nowhere to go. */
+  #ill-cdp .tint, #ill-cdp .pulse, #ill-cdp .lit,
+  #ill-cdp .pop, #ill-cdp .grow, #ill-cdp .grow-c {
+    animation-duration:var(--cyc); animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  #ill-cdp .tint  { animation-name:tint; }
+  #ill-cdp .pulse { animation-name:pulse; }
+  #ill-cdp .lit   { animation-name:lit; }
+  #ill-cdp .pop   { animation-name:pop; }
+  #ill-cdp .grow   { animation-name:grow; transform-box:fill-box; transform-origin:0% 50%; }
+  #ill-cdp .grow-c { animation-name:grow; transform-box:fill-box; transform-origin:50% 50%; }
+
+  /* The reaction has to be seen, or the pointer arrives somewhere that appears
+     not to care. It fires on arrival, holds long enough to register, and is back
+     to rest before the next pointer lands. */
+  @keyframes tint  { 0% { fill:var(--base,#F2F6F4); } 10% { fill:var(--hot,#DFF2E8); } 34% { fill:var(--hot,#DFF2E8); } 82%,100% { fill:var(--base,#F2F6F4); } }
+  @keyframes pulse { 0% { fill:#E4F5EC; } 8% { fill:#B6E6CE; } 30% { fill:#B6E6CE; } 70%,100% { fill:#E4F5EC; } }
+  @keyframes lit   { 0% { fill:var(--base,#D3E8DD); } 8% { fill:var(--hot,#2A9E73); } 34% { fill:var(--hot,#2A9E73); } 74%,100% { fill:var(--base,#D3E8DD); } }
+  @keyframes pop   { 0% { stroke:var(--base,#7B9188); } 8% { stroke:var(--hot,#2A9E73); } 30% { stroke:var(--hot,#2A9E73); } 70%,100% { stroke:var(--base,#7B9188); } }
+  @keyframes grow  { 0% { scale:0 1; } 26%,100% { scale:1 1; } }
+  @keyframes ill-cdp-fl1 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-cdp-fl2 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-cdp-fl3 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-cdp-fl4 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-cdp-fl5 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-cdp-br6 { 0%,0% { opacity:0;  } 8% { opacity:1;  } 42% { opacity:1;  } 50%,100% { opacity:0;  } }
+  @keyframes ill-cdp-br7 { 0%,50% { opacity:0;  } 58% { opacity:1;  } 92% { opacity:1;  } 100%,100% { opacity:0;  } }
+  @keyframes ill-cdp-br8 { 0%,0% { opacity:0; translate:0 6px; } 5.333% { opacity:1; translate:0 0; } 28% { opacity:1; translate:0 0; } 33.33%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-cdp-br9 { 0%,33.33% { opacity:0; translate:0 6px; } 38.67% { opacity:1; translate:0 0; } 61.33% { opacity:1; translate:0 0; } 66.67%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-cdp-br10 { 0%,66.67% { opacity:0; translate:0 6px; } 72% { opacity:1; translate:0 0; } 94.67% { opacity:1; translate:0 0; } 100%,100% { opacity:0; translate:0 -6px; } }
+
+  /* One blanket rule, so a beat added later cannot be forgotten here and keep
+     moving for someone who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-cdp .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-cdp .brand, #ill-cdp .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-cdp .bead { display:none; }
+    #ill-cdp * { animation:none !important; }
+  }
+</style><defs><filter id="ill-cdp-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#2B3B31" flood-opacity="0.07"/></filter><pattern id="ill-cdp-l0-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-cdp-l0-b" transform="scale(0.01 0.011)"/></pattern><image id="ill-cdp-l0-b" width="96" height="89" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-cdp-l1-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-cdp-l1-b" transform="scale(0.01 0.01)"/></pattern><image id="ill-cdp-l1-b" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,UklGRh4DAABXRUJQVlA4IBIDAAAwFgCdASpgAGAAPikShkIhoQrmdkIMAUJQBqCPM/YNU45h+DH5Acln2ayi/mY/H/lH/Se0B4j/+A6gHmA/U3/Se2B6GPQA/abrAPQA/Y70sP2q+CT9rv2u9njVlkza5r+q5kfGRtIQ04nnff43mG+W/YD/UT/P9IB7IH6ckjHbPEGZ/5GyrDCie/REdZSZMIvb15LxVdudg97t/7OD+PANnWnJTJzUVdOlK2pUNW1t3+x30OtcGhgF3AAA/vynN37f8S/64N3Zg/Tag7/V6T138udP9d4+u8fXeP993y+u8prvevBYy4i07So5+Xn/89zXG0W1f1731+JeuOjT12vXNaj/bex/05P/3/FYqlnX279tWHIS8ghU5kWkzBz2susdMUNafduSN/ivF+imhGv/4lXaQf7+VxPnQn9IiOrqszzhSc1iD/zBpe0qwDj2N9kKtGs9bZKf71tCGLPOXf7MHF1Yb3Ur3+1ThhOt6KBf9n7x+Y+MPveF8QzK+/zG8C/BGfpfU/cEvF+Kb048we++I8q6pKycT98tCj1O+ILja0ddpIdi00n//8lSD8cZ+J9Vg7ev3sCtqN60Q1qRET3//st995cybGWv2uBzqxqTGhLmMDSvnhsqO3pI6vmdNqgAoTF20w+JyY1VI8s6M4a0AUA7PyXVS2oXMQP/W4I3KUKqbbirZ7epiSOf0VqSEo5+mIhagbspLQOYtjPgsDV7k6n5tAbs9Jtv2PqmwQeVOEFXIn9z3Xz/++9RdtHULFngWBAJ2PiCbeKOQO5EcXwevOeiTyeDvHEoy2/Ll8Q6rFwBt8tax9kHjpE+JpGK5hxhmpv10aOSj49tW2dUgNfIG8l+ydQbFEzjvqMh8+wue49/YVgttyr5VLbtBBwKMISEw8FPSn7iUb9up1FcMNyBYzYeNCkvBvAOV31vn+Cx1egEdddIM2Vy8pF8FA3vsW3eXuXySqFsHL7NbiU7kyHYk70cibg0CF/sipGFUbIu0Z90cy6EQAQf6B5lvMr80XH2ibhDTBq/+BqVMgb7BLXUAAA="/></defs>
+<path d="M14 19h.01 M28 19h.01 M42 19h.01 M56 19h.01 M70 19h.01 M84 19h.01 M98 19h.01 M112 19h.01 M126 19h.01 M140 19h.01 M154 19h.01 M168 19h.01 M182 19h.01 M196 19h.01 M210 19h.01 M224 19h.01 M238 19h.01 M252 19h.01 M266 19h.01 M280 19h.01 M294 19h.01 M308 19h.01 M322 19h.01 M336 19h.01 M14 33h.01 M28 33h.01 M42 33h.01 M56 33h.01 M70 33h.01 M84 33h.01 M98 33h.01 M112 33h.01 M126 33h.01 M140 33h.01 M154 33h.01 M168 33h.01 M182 33h.01 M196 33h.01 M210 33h.01 M224 33h.01 M238 33h.01 M252 33h.01 M266 33h.01 M280 33h.01 M294 33h.01 M308 33h.01 M322 33h.01 M336 33h.01 M14 47h.01 M28 47h.01 M42 47h.01 M56 47h.01 M70 47h.01 M84 47h.01 M98 47h.01 M112 47h.01 M126 47h.01 M140 47h.01 M154 47h.01 M168 47h.01 M182 47h.01 M196 47h.01 M210 47h.01 M224 47h.01 M238 47h.01 M252 47h.01 M266 47h.01 M280 47h.01 M294 47h.01 M308 47h.01 M322 47h.01 M336 47h.01 M14 61h.01 M28 61h.01 M42 61h.01 M56 61h.01 M70 61h.01 M84 61h.01 M98 61h.01 M112 61h.01 M126 61h.01 M140 61h.01 M154 61h.01 M168 61h.01 M182 61h.01 M196 61h.01 M210 61h.01 M224 61h.01 M238 61h.01 M252 61h.01 M266 61h.01 M280 61h.01 M294 61h.01 M308 61h.01 M322 61h.01 M336 61h.01 M14 75h.01 M28 75h.01 M42 75h.01 M56 75h.01 M70 75h.01 M84 75h.01 M98 75h.01 M112 75h.01 M126 75h.01 M140 75h.01 M154 75h.01 M168 75h.01 M182 75h.01 M196 75h.01 M210 75h.01 M224 75h.01 M238 75h.01 M252 75h.01 M266 75h.01 M280 75h.01 M294 75h.01 M308 75h.01 M322 75h.01 M336 75h.01 M14 89h.01 M28 89h.01 M42 89h.01 M56 89h.01 M70 89h.01 M84 89h.01 M98 89h.01 M112 89h.01 M126 89h.01 M140 89h.01 M154 89h.01 M168 89h.01 M182 89h.01 M196 89h.01 M210 89h.01 M224 89h.01 M238 89h.01 M252 89h.01 M266 89h.01 M280 89h.01 M294 89h.01 M308 89h.01 M322 89h.01 M336 89h.01 M14 103h.01 M28 103h.01 M42 103h.01 M56 103h.01 M70 103h.01 M84 103h.01 M98 103h.01 M112 103h.01 M126 103h.01 M140 103h.01 M154 103h.01 M168 103h.01 M182 103h.01 M196 103h.01 M210 103h.01 M224 103h.01 M238 103h.01 M252 103h.01 M266 103h.01 M280 103h.01 M294 103h.01 M308 103h.01 M322 103h.01 M336 103h.01 M14 117h.01 M28 117h.01 M42 117h.01 M56 117h.01 M70 117h.01 M84 117h.01 M98 117h.01 M112 117h.01 M126 117h.01 M140 117h.01 M154 117h.01 M168 117h.01 M182 117h.01 M196 117h.01 M210 117h.01 M224 117h.01 M238 117h.01 M252 117h.01 M266 117h.01 M280 117h.01 M294 117h.01 M308 117h.01 M322 117h.01 M336 117h.01 M14 131h.01 M28 131h.01 M42 131h.01 M56 131h.01 M70 131h.01 M84 131h.01 M98 131h.01 M112 131h.01 M126 131h.01 M140 131h.01 M154 131h.01 M168 131h.01 M182 131h.01 M196 131h.01 M210 131h.01 M224 131h.01 M238 131h.01 M252 131h.01 M266 131h.01 M280 131h.01 M294 131h.01 M308 131h.01 M322 131h.01 M336 131h.01 M14 145h.01 M28 145h.01 M42 145h.01 M56 145h.01 M70 145h.01 M84 145h.01 M98 145h.01 M112 145h.01 M126 145h.01 M140 145h.01 M154 145h.01 M168 145h.01 M182 145h.01 M196 145h.01 M210 145h.01 M224 145h.01 M238 145h.01 M252 145h.01 M266 145h.01 M280 145h.01 M294 145h.01 M308 145h.01 M322 145h.01 M336 145h.01" stroke="#E4E9E6" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+<rect x="22" y="144" width="306" height="168" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<rect x="19" y="147" width="312" height="168" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<path d="M52 80 V94 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M134 80 V94 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M216 80 V94 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M298 80 V94 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 114 V148" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M52 80 V94 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10');animation-name:ill-cdp-fl1"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M134 80 V94 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10');animation-name:ill-cdp-fl2"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M216 80 V94 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10');animation-name:ill-cdp-fl3"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M298 80 V94 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10');animation-name:ill-cdp-fl4"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 114 V148');animation-name:ill-cdp-fl5"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="122.88" y="119" width="104.2" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="brand" style="animation-name:ill-cdp-br6;animation-duration:6.4s">
+<g transform="translate(129.42 122.08) scale(0.3771)"><path fill="url(#ill-cdp-l0-a)" d="M9.007 9.884h24v22.25H9.007z"/></g>
+<text x="145.5" y="133.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Segment</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-cdp-br7;animation-duration:6.4s">
+<g transform="translate(129.42 122.08) scale(0.3771)"><path fill="url(#ill-cdp-l1-a)" d="M9 9h24v24H9z"/></g>
+<text x="145.5" y="133.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">RudderStack</text>
+</g>
+<g class="hit">
+<rect x="30" y="10" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(42.50 16.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 4l12 6.2-5.1 1.6L11 18z"/></g></g>
+<rect x="39.0" y="42.4" width="4.6" height="5.6" rx="1.5" fill="#D3DCD7"/>
+<rect x="46.1" y="41.3" width="4.6" height="6.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="53.2" y="41.9" width="4.6" height="6.1" rx="1.5" fill="#D3DCD7"/>
+<rect x="60.4" y="40.0" width="4.6" height="8.0" rx="1.5" fill="#D3DCD7"/>
+<text x="52" y="68" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2B3B31"><tspan font-weight="500" fill-opacity=".55">Web</tspan><tspan dx="5" font-size="9.5" font-weight="400" fill-opacity=".5">2.4M</tspan></text>
+<g class="hit">
+<rect x="112" y="10" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(124.50 16.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3M10.5 18h3"/></g></g>
+<rect x="121.0" y="44.0" width="4.6" height="4.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="128.1" y="43.0" width="4.6" height="5.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="135.2" y="43.7" width="4.6" height="4.3" rx="1.5" fill="#D3DCD7"/>
+<rect x="142.4" y="42.2" width="4.6" height="5.8" rx="1.5" fill="#D3DCD7"/>
+<text x="134" y="68" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2B3B31"><tspan font-weight="500" fill-opacity=".55">App</tspan><tspan dx="5" font-size="9.5" font-weight="400" fill-opacity=".5">1.1M</tspan></text>
+<g class="hit">
+<rect x="194" y="10" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(206.50 16.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 4.5h16v6H4zM4 13.5h16v6H4zM7.5 7.5h.01M7.5 16.5h.01"/></g></g>
+<rect x="203.0" y="44.0" width="4.6" height="4.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="210.1" y="44.6" width="4.6" height="3.4" rx="1.5" fill="#D3DCD7"/>
+<rect x="217.2" y="43.7" width="4.6" height="4.3" rx="1.5" fill="#D3DCD7"/>
+<rect x="224.4" y="43.2" width="4.6" height="4.8" rx="1.5" fill="#D3DCD7"/>
+<text x="216" y="68" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2B3B31"><tspan font-weight="500" fill-opacity=".55">Server</tspan><tspan dx="5" font-size="9.5" font-weight="400" fill-opacity=".5">860k</tspan></text>
+<g class="hit">
+<rect x="276" y="10" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(288.50 16.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3.5 5h2.2l2.1 9.2h9l1.9-6.7H7M9.5 19a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4M16.5 19a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4"/></g></g>
+<rect x="285.0" y="45.9" width="4.6" height="2.1" rx="1.5" fill="#D3DCD7"/>
+<rect x="292.1" y="45.3" width="4.6" height="2.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="299.2" y="45.8" width="4.6" height="2.2" rx="1.5" fill="#D3DCD7"/>
+<rect x="306.4" y="44.6" width="4.6" height="3.4" rx="1.5" fill="#D3DCD7"/>
+<text x="298" y="68" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2B3B31"><tspan font-weight="500" fill-opacity=".55">Billing</tspan><tspan dx="5" font-size="9.5" font-weight="400" fill-opacity=".5">240k</tspan></text>
+<rect x="16" y="150" width="318" height="168" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-cdp-sh)"/>
+<circle cx="44" cy="182" r="12" fill="#3FBE8C" fill-opacity=".14"/>
+<g transform="translate(37.00 175.00) scale(0.5833)"><g stroke="#7B9188" stroke-width="2.40" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4.5 20a7.5 7.5 0 0 1 15 0"/></g></g>
+<g class="card" style="animation-name:ill-cdp-br8;animation-duration:13.5s">
+<text x="63.0" y="178.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Amara Osei</text>
+<text x="63.0" y="192.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">one profile, four sources</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-cdp-br9;animation-duration:13.5s">
+<text x="63.0" y="178.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Dan Whitfield</text>
+<text x="63.0" y="192.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">merged from 3 devices</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-cdp-br10;animation-duration:13.5s">
+<text x="63.0" y="178.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Rui Almeida</text>
+<text x="63.0" y="192.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">web, app and billing</text>
+</g>
+<rect x="246.76" y="171" width="71.2" height="22" rx="11.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0s"/>
+<g transform="translate(255.72 176.50) scale(0.4583)"><g stroke="#FFFFFF" stroke-width="3.05" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12.5l4.5 4.5L19 7"/></g></g>
+<text x="269.4" y="185.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Merged</text>
+<rect x="63" y="201" width="52" height="5" rx="2.5" fill="#D3DCD7"/>
+<rect x="118" y="201" width="24" height="5" rx="2.5" fill="#D3DCD7"/>
+<rect x="145" y="201" width="18" height="5" rx="2.5" fill="#D3DCD7"/>
+<rect x="166" y="201" width="9" height="5" rx="2.5" fill="#D3DCD7"/>
+<g class="hit">
+<rect class="hitbox" x="24" y="206" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="222" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 215.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3.5 5h2.2l2.1 9.2h9l1.9-6.7H7M9.5 19a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4M16.5 19a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4"/></g></g>
+<text x="63.0" y="220.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Lifetime value</text>
+<text x="63.0" y="230.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">$4,280</text>
+</g>
+<rect x="32" y="238" width="286" height="1" fill="#E4E9E6"/>
+<g class="hit">
+<rect class="hitbox" x="24" y="241" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="257" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 250.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 7.5V12l3 2"/></g></g>
+<text x="63.0" y="255.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Last seen</text>
+<text x="63.0" y="265.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">2 min ago</text>
+</g>
+<rect x="32" y="273" width="286" height="1" fill="#E4E9E6"/>
+<g class="hit">
+<rect class="hitbox" x="24" y="276" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="292" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 285.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 13.2a1.2 1.2 0 1 0 0-2.4 1.2 1.2 0 0 0 0 2.4"/></g></g>
+<text x="63.0" y="290.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Propensity to buy</text>
+<text x="63.0" y="300.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">78%</text>
+</g>
+<polyline points="266.0,227.9 273.1,225.9 280.3,226.5 287.4,223.7 294.6,222.6 301.7,220.6 308.9,218.6 316.0,215.0" fill="none" stroke="#D3DCD7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="306" cy="292" r="10" fill="none" stroke="#F2F6F4" stroke-width="3.5"/>
+<path d="M306 282 A10 10 0 1 1 296.18 290.13" fill="none" stroke="#D3DCD7" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

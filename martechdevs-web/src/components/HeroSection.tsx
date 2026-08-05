@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
-export default function HeroSection() {
+export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -22,16 +22,25 @@ export default function HeroSection() {
         <div className="px-6 md:px-10">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
-              <Image
-                src="/assets/martechdevs_logo.svg"
-                alt="MartechDevs"
-                width={140}
-                height={35}
-                className="h-8 w-auto"
-                style={{ width: 'auto' }}
-                loading="eager"
-                priority
-              />
+              <a
+                href="#"
+                aria-label="Back to top"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <Image
+                  src="/assets/martechdevs_logo.svg"
+                  alt="MartechDevs"
+                  width={140}
+                  height={35}
+                  className="h-8 w-auto"
+                  style={{ width: 'auto' }}
+                  loading="eager"
+                  priority
+                />
+              </a>
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
@@ -153,15 +162,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ left: '-160px', top: '-30px' }}
+                className="absolute hidden xl:block z-10 top-[-30px] xl:left-[-120px] 2xl:left-[-160px]"
               >
                 <Image
                   src="/assets/hero section logo icons/snowflake_hero_icon.svg"
                   alt="Snowflake"
                   width={72}
                   height={72}
-                  className="w-18 h-18 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-18 h-18 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -169,15 +177,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ left: '-260px', top: '70px' }}
+                className="absolute hidden xl:block z-10 top-[70px] xl:left-[-190px] 2xl:left-[-260px]"
               >
                 <Image
                   src="/assets/hero section logo icons/segment_hero_icon.svg"
                   alt="Segment"
                   width={64}
                   height={64}
-                  className="w-16 h-16 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -185,15 +192,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ left: '-180px', bottom: '-20px' }}
+                className="absolute hidden xl:block z-10 bottom-[-20px] xl:left-[-135px] 2xl:left-[-180px]"
               >
                 <Image
                   src="/assets/hero section logo icons/mixpanel_hero_icon.svg"
                   alt="Mixpanel"
                   width={64}
                   height={64}
-                  className="w-16 h-16 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -202,15 +208,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ right: '-200px', top: '-40px' }}
+                className="absolute hidden xl:block z-10 top-[-40px] xl:right-[-150px] 2xl:right-[-200px]"
               >
                 <Image
                   src="/assets/hero section logo icons/hubspot hero icon.svg"
                   alt="HubSpot"
                   width={64}
                   height={64}
-                  className="w-16 h-16 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -218,15 +223,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.7, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ right: '-280px', top: '60px' }}
+                className="absolute hidden xl:block z-10 top-[60px] xl:right-[-200px] 2xl:right-[-280px]"
               >
                 <Image
                   src="/assets/hero section logo icons/intercom hero icon.svg"
                   alt="Intercom"
                   width={72}
                   height={72}
-                  className="w-18 h-18 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-18 h-18 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -234,15 +238,14 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8, duration: 0.4 }}
-                className="absolute hidden xl:block z-10"
-                style={{ right: '-190px', bottom: '-10px' }}
+                className="absolute hidden xl:block z-10 bottom-[-10px] xl:right-[-145px] 2xl:right-[-190px]"
               >
                 <Image
                   src="/assets/hero section logo icons/braze hero icon.svg"
                   alt="Braze"
                   width={64}
                   height={64}
-                  className="w-16 h-16 hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
+                  className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-300 ease-in-out cursor-default"
                 />
               </motion.div>
 
@@ -266,7 +269,7 @@ export default function HeroSection() {
                 </span>
                 <span className="text-gray-900">your</span>
                 <br className="hidden md:block" />
-                <span className="text-gray-900 block mt-2">Martech + Analytics tools.</span>
+                <span className="text-gray-900 block mt-2">Martech + Analytics + GTM + Agentic tools.</span>
                 <span className="text-gray-900 block mt-2">Lightning fast.</span>
               </motion.h1>
             </div>
@@ -321,7 +324,7 @@ export default function HeroSection() {
                   Get regulations compliant,{' '}
                   <span className="font-bold text-gray-900">hands-on MarTech implementation</span>{' '}
                   <span className="text-gray-400">from specialists who understand marketing nuances & make your tools actually talk to each other</span>
-                  —live in <span className="font-bold text-gray-900">WEEKS</span>, not quarters.
+                  , live in <span className="font-bold text-gray-900">WEEKS</span>, not quarters.
                 </p>
               </motion.div>
 
@@ -367,14 +370,16 @@ export default function HeroSection() {
               transition={{ duration: 0.5 }}
               className="relative pr-4 md:pr-10 lg:pr-20"
             >
-              <Image
-                src="/assets/main hero image.svg"
-                alt="MarTech Architecture Diagram"
-                width={800}
-                height={1400}
-                className="w-full h-auto"
-                priority
-              />
+              {diagram ?? (
+                <Image
+                  src="/assets/main hero image.svg"
+                  alt="MarTech Architecture Diagram"
+                  width={800}
+                  height={1400}
+                  className="w-full h-auto"
+                  priority
+                />
+              )}
             </motion.div>
           </div>
         </div>

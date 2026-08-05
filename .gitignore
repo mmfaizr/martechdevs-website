@@ -1,0 +1,16 @@
+# Repo root. The two projects underneath carry their own .gitignore files
+# (martechdevs-web/.gitignore, chatwoot-livechat-integration/.gitignore); this
+# only covers what sits at the workspace level.
+
+# macOS finder droppings, committed by accident otherwise
+.DS_Store
+**/.DS_Store
+
+# local agent/editor workspace state, not project source
+.claude/
+**/.claude/
+
+# the salvaged shell of the previous repository. Its object store was empty -
+# no commits, refs or reflog survived - so there is nothing in it to recover.
+# Kept on disk until the new history is safely pushed, then it can be deleted.
+.git.broken/

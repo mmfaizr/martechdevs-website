@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { motion, useMotionValue, useAnimationFrame, animate } from 'framer-motion';
 import Image from 'next/image';
 
 interface VideoTestimonial {
   id: number;
   video: string;
+  poster: string;
   name: string;
   role: string;
   company: string;
@@ -20,6 +21,7 @@ const testimonials: VideoTestimonial[] = [
   {
     id: 1,
     video: '/assets/video testimonials/testimonial 1.mp4',
+    poster: '/assets/video testimonials/testimonial 1 poster.webp',
     name: 'JB Jaquenzel',
     role: 'Founder and CEO',
     company: 'Evaboot',
@@ -35,6 +37,7 @@ const testimonials: VideoTestimonial[] = [
   {
     id: 2,
     video: '/assets/video testimonials/testimonial 2.mp4',
+    poster: '/assets/video testimonials/testimonial 2 poster.webp',
     name: 'Elie',
     role: 'CMO',
     company: 'Submagic',
@@ -50,6 +53,7 @@ const testimonials: VideoTestimonial[] = [
   {
     id: 3,
     video: '/assets/video testimonials/testimonial 3.mp4',
+    poster: '/assets/video testimonials/testimonial 3 poster.webp',
     name: 'Arman Assadi',
     role: 'CEO',
     company: 'Steno.ai',
@@ -64,6 +68,7 @@ const testimonials: VideoTestimonial[] = [
   {
     id: 4,
     video: '/assets/video testimonials/testimonial 4.mp4',
+    poster: '/assets/video testimonials/testimonial 4 poster.webp',
     name: 'Gabriel',
     role: 'Operations',
     company: 'MKTV',
@@ -90,15 +95,71 @@ interface VideoCardProps extends React.HTMLAttributes<HTMLDivElement> {
   testimonial: VideoTestimonial;
 }
 
-function VideoCard({ testimonial, className, ...props }: VideoCardProps) {
+// memo matters here: the marquee cycles cards past the activeId observer, and
+// every setActiveId re-rendered all twelve copies (and their <video> elements).
+const VideoCard = memo(function VideoCard({ testimonial, className, ...props }: VideoCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [visible, setVisible] = useState(false);
+  // Only attach the mp4 source once the card is near the viewport. The carousel
+  // renders three copies of every testimonial, so eager loading would pull down
+  // all four videos twelve times over on first paint.
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {});
-    }
+    const el = wrapperRef.current;
+    if (!el) return;
+
+    // Loading and playing are deliberately separate.
+    //
+    // The marquee renders three copies of every testimonial, so twelve <video>
+    // elements exist for four clips. Attaching and playing every copy within
+    // 200px of the viewport meant decoding the same video up to three times at
+    // once, and that was the whole cost of the jank where this section meets
+    // the section above it: neutralising these videos took the long frames
+    // there from 16 to 0.
+    //
+    // Attach metadata only after the carousel reaches the upper half of the
+    // viewport. Loading five video copies while the last service card is still
+    // exiting makes Chrome decode media and move the sticky stack in the same
+    // frame, which is the remaining last-card flicker.
+    const loader = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setShouldLoad(true);
+      },
+      { rootMargin: '0px 0px -50% 0px' }
+    );
+
+    // The negative bottom margin delays playback until the card has risen well
+    // clear of the viewport's bottom edge. A playing video locks the
+    // compositor to the clip's frame rate (~30fps, measured), so starting at
+    // the first 40% of visibility meant the tail of the service stack above
+    // was still on screen and its exit suddenly ran at half rate - which read
+    // as a flicker on the last card. Bottom-heavy on purpose: entry from below
+    // is where that collision happens. Horizontal margins stay 0 so cards
+    // clipped by the marquee edges behave as before.
+    const player = new IntersectionObserver(
+      ([entry]) => setVisible(entry.intersectionRatio >= 0.4),
+      { threshold: [0, 0.4, 0.75], rootMargin: '-10% 0px -30% 0px' }
+    );
+
+    loader.observe(el);
+    player.observe(el);
+    return () => {
+      loader.disconnect();
+      player.disconnect();
+    };
   }, []);
+
+  // Runs after the src is attached, so the first play() isn't fired at an
+  // empty <video>. Keeps only the visible cards decoding frames.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !shouldLoad) return;
+    if (visible) video.play().catch(() => {});
+    else video.pause();
+  }, [shouldLoad, visible]);
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -112,7 +173,8 @@ function VideoCard({ testimonial, className, ...props }: VideoCardProps) {
   };
 
   return (
-    <div 
+    <div
+      ref={wrapperRef}
       className={`bg-white rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0 w-[85vw] sm:w-[500px] md:w-full md:max-w-[800px] ${className || ''}`}
       {...props}
     >
@@ -121,8 +183,15 @@ function VideoCard({ testimonial, className, ...props }: VideoCardProps) {
         <div className="relative aspect-[9/16] bg-gray-900 cursor-pointer" onClick={togglePlay}>
           <video
             ref={videoRef}
-            src={testimonial.video}
+            src={shouldLoad ? testimonial.video : undefined}
+            poster={testimonial.poster}
             className="w-full h-full object-cover"
+            // metadata, not none: the src attaches 300px before the section is
+            // visible, while the pinned card above holds a static screen - the
+            // cheapest possible moment to open the file and spin up the
+            // decoder. With none, that cost landed at first play(), right in
+            // the middle of the card-to-testimonials transition.
+            preload="metadata"
             loop
             muted
             playsInline
@@ -175,19 +244,37 @@ function VideoCard({ testimonial, className, ...props }: VideoCardProps) {
       </div>
     </div>
   );
-}
+});
 
 export default function Testimonials() {
   const [activeId, setActiveId] = useState<number>(1);
+  const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
   const [contentWidth, setContentWidth] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
-  
+
   // Speed in px per frame
-  const speed = 0.5; 
+  const speed = 0.5;
+
+  // Freeze both marquees until Testimonials reaches the top fifth of the
+  // viewport. A default threshold fires at the first visible pixel; at that
+  // point the last service card still occupies almost the whole screen. The
+  // shrunken observer root keeps all carousel motion dormant until that card
+  // has cleared.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setOnScreen(entry.isIntersecting),
+      { rootMargin: '0px 0px -80% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Measure content width (single set)
   useEffect(() => {
@@ -208,7 +295,7 @@ export default function Testimonials() {
   }, []);
 
   useAnimationFrame((t, delta) => {
-    if (!isPaused && contentWidth > 0) {
+    if (onScreen && !isPaused && contentWidth > 0) {
       const moveBy = (speed * 60) * (delta / 1000); 
       let newX = x.get() - moveBy;
       
@@ -222,7 +309,7 @@ export default function Testimonials() {
 
   // Intersection Observer for active state
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!onScreen || !containerRef.current) return;
     
     const options = {
       root: containerRef.current,
@@ -242,7 +329,7 @@ export default function Testimonials() {
     cards.forEach(card => observerRef.current?.observe(card));
 
     return () => observerRef.current?.disconnect();
-  }, [contentWidth]); // Re-run if content refreshes
+  }, [contentWidth, onScreen]); // Only observe moving cards while visible
 
   const handleLogoClick = (targetId: number) => {
     if (!contentRef.current || !containerRef.current) return;
@@ -289,7 +376,7 @@ export default function Testimonials() {
   };
 
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-white">
+    <section ref={sectionRef} id="testimonials" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -301,12 +388,9 @@ export default function Testimonials() {
           <span className="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
             Testimonials
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-            It&apos;s not enough to <span className="text-emerald-500">just be</span>
-            <br />
-            competent. You need to
-            <br />
-            <span className="text-emerald-500">prove it too.</span>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-snug max-w-3xl mx-auto md:mx-0 text-balance">
+            Don&apos;t take our word for it. Hear it from the{' '}
+            <span className="text-emerald-500">founders who handed us their stack.</span>
           </h2>
         </motion.div>
 
@@ -368,14 +452,27 @@ export default function Testimonials() {
           </div>
           
           <div className="marquee-mask overflow-hidden">
-            <div className="animate-marquee-slow flex gap-6" style={{ width: 'max-content' }}>
+            {/* items-start, or the row stretches every box to match the tallest.
+                These load lazily, and an unloaded one still occupies its full
+                reserved height - so a single straggler was dragging all six up
+                with it and leaving white space under the ones already in. */}
+            <div
+              className={`${onScreen ? 'animate-marquee-slow' : ''} flex items-start gap-6`}
+              style={{ width: 'max-content' }}
+            >
               {[...upworkReviews, ...upworkReviews, ...upworkReviews].map((review, idx) => (
                 <div key={idx} className="flex-shrink-0 w-[80vw] sm:w-[400px] md:w-[500px] bg-white rounded-lg border border-gray-200/50 overflow-hidden">
                   <Image
                     src={review}
                     alt={`Upwork Review ${(idx % upworkReviews.length) + 1}`}
-                    width={500}
-                    height={300}
+                    // The screenshots are 1292x498. Declaring 500x300 reserved a
+                    // 5:3 box, so each review came in 107px too tall and then
+                    // snapped down to its real 2.6:1 shape on load. Passing the
+                    // true dimensions makes the reserved box the final box, and
+                    // gives Next a sensible srcset to pick retina sizes from.
+                    width={1292}
+                    height={498}
+                    sizes="(max-width: 640px) 80vw, (max-width: 768px) 400px, 500px"
                     className="w-full h-auto"
                   />
                 </div>

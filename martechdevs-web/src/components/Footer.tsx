@@ -213,14 +213,24 @@ export default function Footer() {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             {/* Brand */}
             <div className="md:col-span-2">
-              <Image
-                src="/assets/martechdevs_logo.svg"
-                alt="MartechDevs"
-                width={140}
-                height={36}
-                className="h-8 w-auto brightness-0 invert mb-4"
-                style={{ width: 'auto' }}
-              />
+              <a
+                href="#"
+                aria-label="Back to top"
+                className="inline-block"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <Image
+                  src="/assets/martechdevs_logo.svg"
+                  alt="MartechDevs"
+                  width={140}
+                  height={36}
+                  className="h-8 w-auto brightness-0 invert mb-4"
+                  style={{ width: 'auto' }}
+                />
+              </a>
               <p className="text-gray-400 text-sm max-w-sm mb-5">
                 We integrate your Martech + Analytics tools. Lightning fast. Get accurate data, automated messaging, and unified customer views.
               </p>

@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ill-act" width="350" height="330" viewBox="0 0 350 330" fill="none">
+<style>
+  /* Motion is CSS so it runs with this file referenced as an img src, where
+     script never executes and hover never fires. Keep angle brackets out of this
+     block: it is parsed as XML and a tag-looking string kills the document.
+     The segment computes, Hightouch picks it up, then all three tools receive together.
+     One 4.0s cycle drives everything. A delay is the moment the sweep
+     actually arrives, so the artwork answers the flow rather than blinking on
+     its own clock. */
+  #ill-act { --cyc:4.0s; }
+  #ill-act text { letter-spacing:-.01em; }
+
+  /* Hover. Only reachable because these are inlined into the page rather than
+     referenced with an img src: an img is an isolated document and never sees a
+     pointer event. Kept to a lift, not a jump - the beats spent this whole build
+     being stripped of anything that moves geometry. */
+  #ill-act .hit { cursor:default; }
+  #ill-act .hit rect, #ill-act .hit circle { transition:fill .18s ease; }
+  #ill-act .hit g { transition:stroke .18s ease; }
+  /* !important is doing real work here rather than being laziness: these
+     surfaces already carry a running arrival animation, and an animation
+     outranks a normal declaration, so without it the hover never showed. */
+  #ill-act .hit:hover rect:not(.hitbox) { fill:var(--hot,#CFEDDF) !important; }
+  #ill-act .hit:hover circle { fill:#C4EBD8 !important; }
+  #ill-act .hit:hover g { stroke:#2A9E73 !important; }
+  /* touch reports itself as hovering whatever was last tapped, and it sticks */
+  @media (hover: none) {
+    #ill-act .hit:hover rect:not(.hitbox) { fill:var(--base,#F2F6F4) !important; }
+    #ill-act .hit:hover circle { fill:#E4F5EC !important; }
+    #ill-act .hit:hover g { stroke:#7B9188 !important; }
+  }
+
+  /* the pointer. linear, always: it is meant to read as something being carried
+     at a steady rate, and easing makes two of them on different lines drift
+     apart even when their speeds match. */
+  /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-act .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-act .brand, #ill-act .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-act .bead {
+    offset-rotate:0deg;
+    animation-duration:var(--cyc); animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+
+  /* Beats change colour and nothing else. Every scale here used to displace the
+     thing it was drawing attention to: an icon left its tile, a node's ring swept
+     hundreds of pixels across the canvas. A surface that lights up reads as
+     "this responded" just as well and cannot drift. The one survivor is .grow,
+     which wipes a bar inside its own box and so has nowhere to go. */
+  #ill-act .tint, #ill-act .pulse, #ill-act .lit,
+  #ill-act .pop, #ill-act .grow, #ill-act .grow-c {
+    animation-duration:var(--cyc); animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  #ill-act .tint  { animation-name:tint; }
+  #ill-act .pulse { animation-name:pulse; }
+  #ill-act .lit   { animation-name:lit; }
+  #ill-act .pop   { animation-name:pop; }
+  #ill-act .grow   { animation-name:grow; transform-box:fill-box; transform-origin:0% 50%; }
+  #ill-act .grow-c { animation-name:grow; transform-box:fill-box; transform-origin:50% 50%; }
+
+  /* The reaction has to be seen, or the pointer arrives somewhere that appears
+     not to care. It fires on arrival, holds long enough to register, and is back
+     to rest before the next pointer lands. */
+  @keyframes tint  { 0% { fill:var(--base,#F2F6F4); } 10% { fill:var(--hot,#DFF2E8); } 34% { fill:var(--hot,#DFF2E8); } 82%,100% { fill:var(--base,#F2F6F4); } }
+  @keyframes pulse { 0% { fill:#E4F5EC; } 8% { fill:#B6E6CE; } 30% { fill:#B6E6CE; } 70%,100% { fill:#E4F5EC; } }
+  @keyframes lit   { 0% { fill:var(--base,#D3E8DD); } 8% { fill:var(--hot,#2A9E73); } 34% { fill:var(--hot,#2A9E73); } 74%,100% { fill:var(--base,#D3E8DD); } }
+  @keyframes pop   { 0% { stroke:var(--base,#7B9188); } 8% { stroke:var(--hot,#2A9E73); } 30% { stroke:var(--hot,#2A9E73); } 70%,100% { stroke:var(--base,#7B9188); } }
+  @keyframes grow  { 0% { scale:0 1; } 26%,100% { scale:1 1; } }
+  @keyframes ill-act-fl1 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-act-fl2 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-act-fl3 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-act-fl4 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-act-br5 { 0%,0% { opacity:0;  } 8% { opacity:1;  } 42% { opacity:1;  } 50%,100% { opacity:0;  } }
+  @keyframes ill-act-br6 { 0%,50% { opacity:0;  } 58% { opacity:1;  } 92% { opacity:1;  } 100%,100% { opacity:0;  } }
+
+  /* One blanket rule, so a beat added later cannot be forgotten here and keep
+     moving for someone who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-act .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-act .brand, #ill-act .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-act .bead { display:none; }
+    #ill-act * { animation:none !important; }
+  }
+</style><defs><filter id="ill-act-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#2B3B31" flood-opacity="0.07"/></filter><pattern id="ill-act-l0-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-act-l0-b" transform="scale(0.01 0.011)"/></pattern><image id="ill-act-l0-b" width="96" height="93" preserveAspectRatio="none" xlink:href="data:image/webp;base64,UklGRrICAABXRUJQVlA4WAoAAAAQAAAAXwAAXAAAQUxQSKcAAAABgFPbturqvGBNCjgxwawgruKAqWWGKiJAAn5oH+32nnFe+SEiJoBYXdSEDck2XjUWF0XusETBxIQp/YYty8KcKSnOZEt9yFv8++/nnzm5GD2UfsG0RBtYacTootQHbIg20fJnqmXllXxjftztJe9O40QfFpRbuAZJI+ngdATNZTsckfPh1zub5xJwAMsw1eu4hckl7hs2lJs4u0gTV5+vlyv1eXKReABWUDgg5AEAADAOAJ0BKmAAXQA+KRKIQqGhIRTkKBgChLGAakSAH4Z6CriVzgXxj8Zv6B5gGKZ/rd7QH8l6TPrgPQA/Rb0gPYg/Zz0S9W0WCcsSuVJxOgwSj+zwqWr6YRqWer8eCvyQIvxaMjLiGGw564j/BdEYCiO+z4YJm2M7wnWAAP7/DZu//+RKdlvvkj44mxEROqe6qG1MF59P5oGW06i/+2DJ9JSl257s3H1J8SqAitzCDuAkk4oM6Uw9mCZ7ag7fBXpXPAZc+zy/G8sLxo5IScMVYroH3LvMzvJicJ9TJt/DXnhaank+P/vg154Wmp5O3J67f+c/bOPf5y0b40L9yopc3SLpMdnZQi0vf2kpf0HKA71Kl/BWkfvnn26wTV3pVy++cPr4nX4ELVb9Und6DoZ7xt5w8ASElWQM/I98H5iWhNFJUxui9ZVURJfaOvvX+l1///KUK7MqrusrGeVf5Fa4hf9YfIgYH//2St/tA/TTN7/+zbLAvnBid2wDu5fkjLNsbt3CR1ied+LloLjhDrRhqJ1WDNH15osduxrkT8VinwPwilw3+tNi/gbGiYgu7pr4bcn2n1j//HP/+Jp//0fbHZk5R4xmv7dA35vIb9XzfD/FZxPQ+IjcNqntVUQYVdB9FBWAAAA="/><pattern id="ill-act-l1-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-act-l1-b" transform="scale(0.01 0.012)"/></pattern><image id="ill-act-l1-b" width="96" height="84" preserveAspectRatio="none" xlink:href="data:image/webp;base64,UklGRjIIAABXRUJQVlA4WAoAAAAQAAAAXwAAUwAAQUxQSPcDAAABoLZtkyHJ3tAbEYM9tm3btm37k23btm3btm3bxszVXZnxHvRWV0VXREwAqlbB6HNsud/e+4Tce42pBiCC0IpRdng9MarzrzuXhUokw/TP0UMzHW+QOIr5vmCRGNiLxPMDCcZ8gQWDe8HdYVH6cCDbDO/8bRZIDMEUP9HjMfFqaAzFeWzn0J2cxbKwCIbVMp29mHiHIKRe8v5LrwZ+7eV3cic6t4KFGGF9kQdxKFOnzA8nhgYILpj1D3onFjymeRTXMnGkzuEFoc1iWCO5j4yJV8KaBfYCM0s603KwJjFsw8zSmc8papXghkk+7IaZO8BqEARXnMDErr6cGlrd4CQThZ547GWH6d0w8bzqFEf98dW3ob/+kxU6h+aCVqNYtEVncK+ABW+AShWCvofZysGdVbpzbVgVhjWY2IiZb44BqQD2EnMzMHF/WHeGXZjZkM5vpoB2o5jmGyaPXAsTL6viArZz6Hqcfy8CLWdYoaCzORPvNUgpwdTLLrFk4KUWXf0neh3M3BxaKrxhR2bW9MnEkHJqkfsx52/0eph4IKxcbMP1TKzZ+fcM0F4xLPo3vS4mXgbrEYHdx8Tana1lYL1h2IqZATOfGoQAEAvej0k/jcHMXWD/Q3DD0SwY5PMpoYLJz7rikksjX3zVED0GCx4CU5zBgsGdUZ2/zwbM38qtdvA4TLwZuIaJje3ONdZI9Oai88Ptmdhs+gBTgyWujwVz0WoH9ziJT/QrzmHB4IHIFaCY+awzY592ZREm8WIoIAguOJdFjMwvp+7QH3wQM3xLD7I3DL1oOIwpQuZbo0N6QjDGK8whNkIferMPa9K9tsR7IdIjUNzMXJdzaB4oyqpF7se8bXpNBU+FoncVhzPXk/nlxJAyglmWW3zJwEsvuPGf9FoSD4ahrGLtRGdkZ72Jz40GKQXFTWznyDW5+5owdDPfELNHrifzBii6VZzGgg3p/GnmCgQTfUJviIJHog/dG7ZiaobMryaDVCAYeIztHNyrSdwVhioNK2c6Y1eT+NQokEoguOy3r78N/fVQFc720lBUPTjJRKEnGXPtooLEyyCoXBBccANTN85fZ4VWBwlumOVH5i4Sj0IfmtOwfzfOD8aHNIhgjDeZy3jmxjA0qWFjpjKJ9wukUUTsAaYS9IWgaFbFEokjT7wGgvplwPoiD+Aipk6Z38wArU3Qf/W7L78a+LWX33V2TtwfhvoN2zGzJzNfHR0SQID72c6hOzl9DRgiKhYcpjN+4m0wxDSczHY897Q4NIhisg9ZhGvxBBiiKhb9g4WHygUfHQ0SBobVv6XH5vXjQBBYMelpP9AZ980t+iAIrYKJtr7m2pjXXX7ACiOggooBAFZQOCAUBAAAkBgAnQEqYABUAD4pEIZCIaEKdudwDAFCWoNy+oAB/5rT+V/jN3cG1OY/jv+4H+Q6qfYztx+x/3/sAfKz+A/Kr+wfAD+QewDzBv0T/vP9H/cDtPeYD9Mf+Z/QPe4/pP9m9gHoAfpR1gH7Aewf+qHo9f7r/M/BL+zH7W/AT/KP5z/w/z55Az+AOwDukb84rgFjLBWYwm8P9p/SXJnLeZ030s7ONNTpWiXoANZNvLlrIe1LMJ0OrFHmjl/z+zh8ZwYjds5VpOP3tFFv7hKsAAD+/2AcZmzXyEN/G1CK8qUtiQr4zzGtwfEx5MsVWi10gZnSiDjgez89AYDTQd3tHDGO5ALFbKM6p5jO9HyGfUzQGmkt53LEHPxhpB6TupLL8ErA7YcXmMGvT3MoZ0KusDANWMo/0CBqKMzjNV7RCOcqxSHXnSi/km0F88gNzXraHYJX24d/9yVVztVBigv7f/12Ccvfm/B5FoJUtDWUMmcTmwv/9zZ//euv//3kEi+RdpE0N4cPk7Knld6vSbSqHvH158uZsp8+7IETsNyYrogrKBPUT+/DF9/gCbM8r6U6hJwJAhnRRRNeEeX4thftC6VudvnfijrGBSl312VGH8NWu+NVY3G0XEiT3/NwLQpw7ER5f0i2Z+kkWTQ9Lar4XhGGi1U4lPt1TXYLtWZGlx7pCD2KMyCRYTjQQhe8niUPwhZxokcrTz78ZOG/wf2mOmaxxCFtT99ufApeIq3YGk5/2hNpvvb39PhQQNk5EXLsKB/HioH2JD91UX/8tQAG8dpnvw57dHiPDEUs07IHDVd7xrhHti3kFe7WFwJvawGal8seDIpP9C/vgNCnwNXAYodRxdMhEgFuY774iexNNPcslc02zg/X4CSPHctGnMJ4GTA9MXRBQ4R8vTUd6T1TZSDmsX9I5gdCA3M8Rzzk62HveAfVYBy61zd0/ejgrp2bOY2x73gauzCXQYBvBbWHPKngVx1qt4wMY0aq1/ssIU5cnsDSXa8VMri4kCEZ2pDO61ktTBbnv/746ipT0ftd7AIyLyAs0WFT7cg5CTtlazSr7ZCMScFCAU6Q2AQkoQD0lklI2j2Qkr+cHT/zXdlzVZcRs7S6wGBYE3UB1GBd7WcgA2afvKl5oxuSLQHhz4xE+C953Ro7WzJZbjsODYYXDjAfx8ul+MD7HYWYd4vn+mGIndcjL06jsPRwP/ovfvt///OSbb85rwXStDPMSj7/lP8jPQZJHyYPeyIN+a2cpJeDdG4j5RItCdwXrgDVd18qFNB7ZNRze9rVwTcBe9YdpZ5CbA9EhsZAoYdMQwRQC4gnc379QBpX9jfU+ogd1yLeEw+0D3o71z7lBhqQr/EzdazaZaAGv47sIOHN5KLKxf85SWfNkAAA"/><pattern id="ill-act-l2-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-act-l2-b" transform="scale(0.01 0.011)"/></pattern><image id="ill-act-l2-b" width="96" height="88" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-act-l3-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-act-l3-b" transform="scale(0.011 0.01)"/></pattern><image id="ill-act-l3-b" width="92" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-act-l4-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-act-l4-b" transform="scale(0.01 0.01)"/></pattern><image id="ill-act-l4-b" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/></defs>
+<path d="M46.0 96 V220" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46.0 220 a10 10 0 0 0 10 10 H76" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46.0 220 V254 a10 10 0 0 0 10 10 H76" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46.0 220 V288 a10 10 0 0 0 10 10 H76" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M46.0 96 V220');animation-name:ill-act-fl1"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M46.0 220 a10 10 0 0 0 10 10 H76');animation-name:ill-act-fl2"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M46.0 220 V254 a10 10 0 0 0 10 10 H76');animation-name:ill-act-fl3"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M46.0 220 V288 a10 10 0 0 0 10 10 H76');animation-name:ill-act-fl4"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="16" y="18" width="318" height="106" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-act-sh)"/>
+<circle cx="46.0" cy="41" r="14.0" fill="#E4F5EC"/>
+<g transform="translate(38.50 33.50) scale(0.6250)"><g stroke="#7B9188" stroke-width="2.24" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 5.5h16M7 12h10M10 18.5h4"/></g></g>
+<text x="72.0" y="37.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">High LTV, at risk</text>
+<text x="72.0" y="51.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Warehouse segment</text>
+<rect x="220.8" y="30" width="97.2" height="22" rx="11.0" fill="#3FBE8C" stroke="none"/>
+<text x="229.8" y="44.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">4,182 people</text>
+<rect x="32" y="64" width="286" height="1" fill="#E4E9E6"/>
+<circle class="lit" cx="46.0" cy="79" r="4" fill="#7B9188" style="--base:#7B9188;--hot:#2A9E73;animation-delay:0s"/>
+<text x="72.0" y="83.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Lifetime value</text>
+<text x="318.0" y="83.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">Top 10%</text>
+<rect x="196.0" y="84.0" width="6.2" height="2.0" rx="1.5" fill="#E8EDEA"/>
+<rect x="205.2" y="82.9" width="6.2" height="3.1" rx="1.5" fill="#E8EDEA"/>
+<rect x="214.3" y="81.8" width="6.2" height="4.2" rx="1.5" fill="#E8EDEA"/>
+<rect x="223.5" y="79.8" width="6.2" height="6.2" rx="1.5" fill="#E8EDEA"/>
+<rect x="232.7" y="77.3" width="6.2" height="8.7" rx="1.5" fill="#E8EDEA"/>
+<rect x="241.8" y="72.0" width="6.2" height="14.0" rx="1.5" fill="#E8EDEA"/>
+<rect x="241.8" y="72.0" width="6.2" height="14" rx="1.5" fill="#D3DCD7"/>
+<rect x="32" y="94" width="286" height="1" fill="#E4E9E6"/>
+<circle class="lit" cx="46.0" cy="109" r="4" fill="#7B9188" style="--base:#7B9188;--hot:#2A9E73;animation-delay:0s"/>
+<text x="72.0" y="113.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Churn score</text>
+<text x="318.0" y="113.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">0.71</text>
+<circle cx="240" cy="109" r="7" fill="none" stroke="#F2F6F4" stroke-width="3.5"/>
+<path d="M240 102 A7 7 0 1 1 233.22 110.74" fill="none" stroke="#D3DCD7" stroke-width="3.5" stroke-linecap="round"/>
+<rect x="16" y="156" width="318" height="46" rx="12" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#E4F5EC;animation-delay:0.967742s"/>
+<rect x="32" y="165.0" width="28" height="28" rx="9" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="brand" style="animation-name:ill-act-br5;animation-duration:6.4s">
+<g transform="translate(32.00 165.00) scale(0.6667)"><path fill="url(#ill-act-l0-a)" d="M7.347 11.051h24v23.25H7.347z"/></g>
+<text x="72.0" y="177.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Hightouch</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-act-br6;animation-duration:6.4s">
+<g transform="translate(32.00 165.00) scale(0.6667)"><path fill="url(#ill-act-l1-a)" d="M7.532 10.469h24v21H7.532z"/></g>
+<text x="72.0" y="177.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Census</text>
+</g>
+<text x="72.0" y="189.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Reverse ETL sync</text>
+<text x="318.0" y="183.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">Every hour</text>
+<rect x="196.0" y="179.0" width="4.9" height="7.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="203.9" y="177.3" width="4.9" height="8.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="211.7" y="178.3" width="4.9" height="7.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="219.6" y="175.9" width="4.9" height="10.1" rx="1.5" fill="#D3DCD7"/>
+<rect x="227.4" y="177.6" width="4.9" height="8.4" rx="1.5" fill="#D3DCD7"/>
+<rect x="235.3" y="174.8" width="4.9" height="11.2" rx="1.5" fill="#D3DCD7"/>
+<rect x="243.1" y="172.7" width="4.9" height="13.3" rx="1.5" fill="#D3DCD7"/>
+<rect class="lit" x="243.1" y="172.7" width="4.9" height="13.3" rx="1.5" fill="#D3DCD7" style="--base:#D3DCD7;--hot:#2A9E73;animation-delay:0.967742s"/>
+<rect x="78" y="216.0" width="256" height="28" rx="14.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="hit">
+<rect x="94" y="219.0" width="22" height="22" rx="7" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(94.00 219.00) scale(0.5238)"><path fill="url(#ill-act-l2-a)" d="M9.003 8.695h24v22H9.003z"/></g>
+<text x="128.0" y="234.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Google Ads</text>
+<rect x="196" y="227.5" width="44" height="5" rx="2.5" fill="#E8EDEA"/>
+<text x="318.0" y="234.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">4,182 synced</text>
+<rect x="78" y="250.0" width="256" height="28" rx="14.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="hit">
+<rect x="94" y="253.0" width="22" height="22" rx="7" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(94.00 253.00) scale(0.5238)"><path fill="url(#ill-act-l3-a)" d="M7.693 9.494h23v24H7.693z"/></g>
+<text x="128.0" y="268.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">HubSpot</text>
+<rect x="196" y="261.5" width="44" height="5" rx="2.5" fill="#E8EDEA"/>
+<text x="318.0" y="268.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">4,182 synced</text>
+<rect x="78" y="284.0" width="256" height="28" rx="14.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="hit">
+<rect x="94" y="287.0" width="22" height="22" rx="7" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+</g>
+<g transform="translate(94.00 287.00) scale(0.5238)"><path fill="url(#ill-act-l4-a)" d="M9.001 9.001h24v24H9.001z"/></g>
+<text x="128.0" y="302.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Zendesk</text>
+<rect x="196" y="295.5" width="44" height="5" rx="2.5" fill="#E8EDEA"/>
+<text x="318.0" y="302.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">4,182 synced</text>
+</svg>

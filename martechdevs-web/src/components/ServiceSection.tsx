@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type MotionStyle } from 'framer-motion';
 import Image from 'next/image';
+import { ILLUSTRATIONS } from './illustrations.generated';
 
 interface ServiceItem {
   iconFile: string;
@@ -15,12 +16,26 @@ interface ServiceSectionProps {
   title: string;
   titleGray: string;
   description: string;
+  /** Key into ILLUSTRATIONS, e.g. "cdp". The markup is inlined rather than
+   *  loaded from /assets: an img is an isolated document, so CSS :hover inside
+   *  it never fires and the artwork can never respond to the pointer. Inlining
+   *  also removes the mid-scroll reflow the old lazy fetch caused, since there
+   *  is nothing left to arrive late. */
   illustration: string;
   bgColor: string;
   textColor?: string;
   accentColor?: string;
   whatWeDo: ServiceItem[];
   whatYouGet: ServiceItem[];
+  /** Clearance for the floating header + services nav when the card is pinned
+   *  at the top of the viewport. The tint runs full-bleed behind both; this
+   *  just keeps the content out from under them. */
+  topInset?: number;
+  /** Applied to the <section> itself. The rounded corners live here rather than
+   *  on a wrapper with overflow:hidden - a background clips to its own radius
+   *  for free, whereas eight stacked full-viewport rounded masks broke
+   *  rasterisation and tore the cards apart. */
+  style?: MotionStyle;
 }
 
 export default function ServiceSection({
@@ -32,36 +47,26 @@ export default function ServiceSection({
   bgColor,
   whatWeDo,
   whatYouGet,
+  topInset,
+  style,
 }: ServiceSectionProps) {
-  const [activeTab, setActiveTab] = useState<'whatWeDo' | 'whatYouGet'>('whatWeDo');
+  // Opens on the outcome, not the method. Someone scanning the page wants to know
+  // what they end up with before how it gets done.
+  const [activeTab, setActiveTab] = useState<'whatWeDo' | 'whatYouGet'>('whatYouGet');
   const currentItems = activeTab === 'whatWeDo' ? whatWeDo : whatYouGet;
 
   return (
-    <section className={`${bgColor} py-12 md:py-16 lg:py-20`}>
+    <motion.section
+      // min-height matters for the stack: a pinned card has to reach the bottom
+      // of the viewport, or the incoming card's inset edges reveal the white
+      // page in the bottom corners instead of the card behind.
+      className={`${bgColor} py-12 md:py-16 lg:py-20 ${topInset ? 'min-h-[100svh]' : ''}`}
+      style={{ ...(topInset ? { paddingTop: topInset } : null), ...style }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* TOP HEADER: Logos + Title */}
-        <div className="mb-8 md:mb-10">
-          {/* Tool Logos Row */}
-          <div className="flex items-center gap-4 mb-4 flex-wrap">
-            {toolLogos.map((tool, idx) => (
-              <div key={idx} className="flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-100/50 shadow-sm">
-                <Image
-                  src={`/assets/tool logos icons/${tool.icon}`}
-                  alt={tool.name}
-                  width={28}
-                  height={28}
-                  className="w-5 h-5 md:w-7 md:h-7 object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <span className="text-base font-semibold text-gray-700">{tool.name}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Title */}
+        {/* TOP HEADER: Title */}
+        <div className="mt-4 md:mt-8 mb-8 md:mb-10">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium leading-tight">
             <span className="text-gray-900">{title} </span>
             <span className="text-gray-400">{titleGray}</span>
@@ -79,12 +84,14 @@ export default function ServiceSection({
             className="lg:sticky lg:top-24 lg:self-start w-full lg:max-w-[400px]"
           >
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-5 md:p-6 shadow-sm border border-white/50 w-full">
-              <Image
-                src={illustration}
-                alt={title}
-                width={600}
-                height={500}
-                className="w-full h-auto"
+              {/* The SVG carries its own viewBox, so the box is reserved before
+                  paint and nothing reflows. [&>svg]:w-full overrides the width
+                  attribute the file ships with. */}
+              <div
+                role="img"
+                aria-label={`${title} ${titleGray}`}
+                className="w-full [&>svg]:w-full [&>svg]:h-auto"
+                dangerouslySetInnerHTML={{ __html: ILLUSTRATIONS[illustration] ?? '' }}
               />
             </div>
           </motion.div>
@@ -102,28 +109,50 @@ export default function ServiceSection({
               {description}
             </p>
 
-            {/* Tab Buttons */}
-            <div className="inline-flex flex-col sm:flex-row bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-full p-1 shadow-inner border border-gray-100/50 w-full sm:w-auto gap-1">
-              <button
-                onClick={() => setActiveTab('whatWeDo')}
-                className={`px-4 md:px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-semibold transition-all duration-300 w-full sm:w-auto ${
-                  activeTab === 'whatWeDo'
-                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
-                }`}
-              >
-                What we&apos;ll do
-              </button>
-              <button
-                onClick={() => setActiveTab('whatYouGet')}
-                className={`px-4 md:px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-semibold transition-all duration-300 w-full sm:w-auto ${
-                  activeTab === 'whatYouGet'
-                    ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
-                }`}
-              >
-                What you&apos;ll get
-              </button>
+            {/* Tab switcher, with the tool logos sitting alongside it */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <div className="inline-flex flex-col sm:flex-row bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-full p-1 shadow-inner border border-gray-100/50 w-full sm:w-auto gap-1">
+                <button
+                  onClick={() => setActiveTab('whatWeDo')}
+                  className={`px-4 md:px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-semibold transition-all duration-300 w-full sm:w-auto ${
+                    activeTab === 'whatWeDo'
+                      ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
+                  }`}
+                >
+                  What we&apos;ll do
+                </button>
+                <button
+                  onClick={() => setActiveTab('whatYouGet')}
+                  className={`px-4 md:px-6 py-2.5 rounded-lg sm:rounded-full text-sm font-semibold transition-all duration-300 w-full sm:w-auto ${
+                    activeTab === 'whatYouGet'
+                      ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-100'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-white/50'
+                  }`}
+                >
+                  What you&apos;ll get
+                </button>
+              </div>
+
+              {/* sized to sit level with the tab switcher above */}
+              {toolLogos.map((tool, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-2.5 py-1.5 rounded-full border border-gray-100/50 shadow-sm"
+                >
+                  <Image
+                    src={`/assets/tool logos icons/${tool.icon}`}
+                    alt={tool.name}
+                    width={20}
+                    height={20}
+                    className="w-4 h-4 md:w-[18px] md:h-[18px] object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <span className="text-xs md:text-sm font-semibold text-gray-600">{tool.name}</span>
+                </div>
+              ))}
             </div>
 
             {/* Tab Content - List */}
@@ -167,6 +196,6 @@ export default function ServiceSection({
           </motion.div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

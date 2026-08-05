@@ -1,0 +1,217 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ill-cx" width="350" height="330" viewBox="0 0 350 330" fill="none">
+<style>
+  /* Motion is CSS so it runs with this file referenced as an img src, where
+     script never executes and hover never fires. Keep angle brackets out of this
+     block: it is parsed as XML and a tag-looking string kills the document.
+     Two facts leave the record and the reply writes itself.
+     One 2.0s cycle drives everything. A delay is the moment the sweep
+     actually arrives, so the artwork answers the flow rather than blinking on
+     its own clock. */
+  #ill-cx { --cyc:2.0s; }
+  #ill-cx text { letter-spacing:-.01em; }
+
+  /* Hover. Only reachable because these are inlined into the page rather than
+     referenced with an img src: an img is an isolated document and never sees a
+     pointer event. Kept to a lift, not a jump - the beats spent this whole build
+     being stripped of anything that moves geometry. */
+  #ill-cx .hit { cursor:default; }
+  #ill-cx .hit rect, #ill-cx .hit circle { transition:fill .18s ease; }
+  #ill-cx .hit g { transition:stroke .18s ease; }
+  /* !important is doing real work here rather than being laziness: these
+     surfaces already carry a running arrival animation, and an animation
+     outranks a normal declaration, so without it the hover never showed. */
+  #ill-cx .hit:hover rect:not(.hitbox) { fill:var(--hot,#CFEDDF) !important; }
+  #ill-cx .hit:hover circle { fill:#C4EBD8 !important; }
+  #ill-cx .hit:hover g { stroke:#2A9E73 !important; }
+  /* touch reports itself as hovering whatever was last tapped, and it sticks */
+  @media (hover: none) {
+    #ill-cx .hit:hover rect:not(.hitbox) { fill:var(--base,#F2F6F4) !important; }
+    #ill-cx .hit:hover circle { fill:#E4F5EC !important; }
+    #ill-cx .hit:hover g { stroke:#7B9188 !important; }
+  }
+
+  /* the pointer. linear, always: it is meant to read as something being carried
+     at a steady rate, and easing makes two of them on different lines drift
+     apart even when their speeds match. */
+  /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-cx .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-cx .brand, #ill-cx .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-cx .bead {
+    offset-rotate:0deg;
+    animation-duration:var(--cyc); animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+
+  /* Beats change colour and nothing else. Every scale here used to displace the
+     thing it was drawing attention to: an icon left its tile, a node's ring swept
+     hundreds of pixels across the canvas. A surface that lights up reads as
+     "this responded" just as well and cannot drift. The one survivor is .grow,
+     which wipes a bar inside its own box and so has nowhere to go. */
+  #ill-cx .tint, #ill-cx .pulse, #ill-cx .lit,
+  #ill-cx .pop, #ill-cx .grow, #ill-cx .grow-c {
+    animation-duration:var(--cyc); animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  #ill-cx .tint  { animation-name:tint; }
+  #ill-cx .pulse { animation-name:pulse; }
+  #ill-cx .lit   { animation-name:lit; }
+  #ill-cx .pop   { animation-name:pop; }
+  #ill-cx .grow   { animation-name:grow; transform-box:fill-box; transform-origin:0% 50%; }
+  #ill-cx .grow-c { animation-name:grow; transform-box:fill-box; transform-origin:50% 50%; }
+
+  /* The reaction has to be seen, or the pointer arrives somewhere that appears
+     not to care. It fires on arrival, holds long enough to register, and is back
+     to rest before the next pointer lands. */
+  @keyframes tint  { 0% { fill:var(--base,#F2F6F4); } 10% { fill:var(--hot,#DFF2E8); } 34% { fill:var(--hot,#DFF2E8); } 82%,100% { fill:var(--base,#F2F6F4); } }
+  @keyframes pulse { 0% { fill:#E4F5EC; } 8% { fill:#B6E6CE; } 30% { fill:#B6E6CE; } 70%,100% { fill:#E4F5EC; } }
+  @keyframes lit   { 0% { fill:var(--base,#D3E8DD); } 8% { fill:var(--hot,#2A9E73); } 34% { fill:var(--hot,#2A9E73); } 74%,100% { fill:var(--base,#D3E8DD); } }
+  @keyframes pop   { 0% { stroke:var(--base,#7B9188); } 8% { stroke:var(--hot,#2A9E73); } 30% { stroke:var(--hot,#2A9E73); } 70%,100% { stroke:var(--base,#7B9188); } }
+  @keyframes grow  { 0% { scale:0 1; } 26%,100% { scale:1 1; } }
+  @keyframes ill-cx-fl1 { from { offset-distance:0%; } to { offset-distance:100%; } }
+  @keyframes ill-cx-fl2 { from { offset-distance:0%; } to { offset-distance:100%; } }
+  @keyframes ill-cx-br3 { 0%,0% { opacity:0;  } 8% { opacity:1;  } 42% { opacity:1;  } 50%,100% { opacity:0;  } }
+  @keyframes ill-cx-br4 { 0%,50% { opacity:0;  } 58% { opacity:1;  } 92% { opacity:1;  } 100%,100% { opacity:0;  } }
+  @keyframes ill-cx-br5 { 0%,0% { opacity:0; translate:0 6px; } 5.333% { opacity:1; translate:0 0; } 28% { opacity:1; translate:0 0; } 33.33%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-cx-br6 { 0%,33.33% { opacity:0; translate:0 6px; } 38.67% { opacity:1; translate:0 0; } 61.33% { opacity:1; translate:0 0; } 66.67%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-cx-br7 { 0%,66.67% { opacity:0; translate:0 6px; } 72% { opacity:1; translate:0 0; } 94.67% { opacity:1; translate:0 0; } 100%,100% { opacity:0; translate:0 -6px; } }
+
+  /* One blanket rule, so a beat added later cannot be forgotten here and keep
+     moving for someone who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-cx .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-cx .brand, #ill-cx .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-cx .bead { display:none; }
+    #ill-cx * { animation:none !important; }
+  }
+</style><defs><filter id="ill-cx-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#2B3B31" flood-opacity="0.07"/></filter><pattern id="ill-cx-l0-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-cx-l0-b" transform="scale(0.01 0.011)"/></pattern><image id="ill-cx-l0-b" width="96" height="95" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-cx-l1-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-cx-l1-b" transform="scale(0.01 0.01)"/></pattern><image id="ill-cx-l1-b" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,UklGRjYKAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQUxQSKMDAAABoCRtexpJ+iS5ubP3zHgKZt4ldC+nMKqOUtPbgu3wTEath2d2zczMzNxt6f8i0k470/4PEBEOJUmpI1ZrkaCV3FOBL0C3sJEF4OZuHBxpHr7x4rPIlxc3DzdHBjfOjdpuq1Q4C5iF9bFj7ynMxftjo42FpmVwpYlxBlg8/OdbtiD+qw9BhBSR0LqJ5A749s/hxakbLMfDYNruybcUhthLByziU7fzdnL39EQpY53ZPWdI8V7YMdrv6kxPpfBlrMO0nmuU0G7pzhCE13umwdliZ20/RfGeBSFxP70NpjCjcZj/A+kDC0Tw5A/zUdCS1qL+lFkexTnwSR3WFuGG2ROUmMVDYuFEBd17RVh9gnFgKQgxT6zuujlsfMxYWBZiPtmEqEu9/omeJcLzc70r1aEnhMBSEUL4BlE3nWV3UgJ7Om4RGm162arUO2wOmz+x1RU0+bS5owkWax8lq6lofLQG+V9wg8pRLZ30PFKByecxxlSDmGO55HAwretRD8Dl6IsfMGiSwPuLYbLlu7RNk+k72EzbbgZpiS51T4bJYNoxBqqTY9Ng2rm/fY6uKf1tZFC5lLA+ulSBSXNvwnrJYOqJhDXSiakwCe9Nus62PyGLZjLWOWy2LBbL31J0ivDNCliH4YS10hCcwe+a5U8YLH6TjLUOXy0FGslsvVQDRhlrljG4o/Sa5aid/y59Re2iCzdSFAsD1w8mY83DwRHGmiXmt0163fLrYQbdg/9uUKja5cwL7XLzM1VD+FKoHF6/qB+8eqnd5Zb+hfR/r/X/Lun/XR3Q/r8wsIEiqhdaN0/9/7L+fYX6fZH6fV0dWKJ9X6p/X63/XKD/XKP/XAaHfarPlbrPxSenweg+1/fBKY9LzIEBUtSnNq6iOy50dDpMVlxLo+yG0x2X+x5Wd1zxwWIY9XFR9XFd/XHpzuLqQV9cPcdni568wBY4oKPWED15DfV5GdV5JemmAxGqpefFPtW6TLw5bHrMmAryel2pq46VmZc8vgpObV6VPnBiNlwxeeHa43Lywo9rsLawvPaPLFgJnvxxAZwpMC+/43SqpKDIvPx2GFdwXUHvjaLqCuLcuoICjbN6z7Jr95C6q7M9s8uoHjFZdR0+7uySpG/n7eSeqSVVjqRvdsnQ36/Tr1Ac+xCElJC+h9TG+a+hJam6lHLrahbXxo91sLUXvj0+XlucrqspFTb1cYkWrB889Ot/Z26+9P7VrTP//3pocN2CqO22ugQAAFZQOCBsBgAAsCMAnQEqYABgAD4pEIdCIaELVd7aDAFCUAZoTaf6TsTrjdw/LLnGOgvQDmpjndRk4DzAP1F6RXmA8FX3O+gB/RP9v1lXoH/sz6Z/sVfuB+63wAfsxqr3jv+zfhX4Tf2n6juoWPevzH5AflHqKftL9lj1Lsba6d7r/S6R1/ovyq5nagB/IP65/mPZJ/i/+H+pv7d+zj8y/v//f/yPwB/zD+nf8r+7fu58VXsb/Zn2Mf1mQk1uMA5+7dsT3/K91fIx4rIgVeDmHj2AJSGNY9p++L/VwJnkv0GIDqgyY+Jf/Pq2HgghXcd2kHDqoH8ZR5lvLLgWIBcVRqm7Y3jofH732sNit1PR4OygU+UNUo7Xo1ww7fQi0JNY1OrmdtCnwFwaVu4FdUAAAP7/WtLqQ1RLH3ho3Z+HFMlfkH2njEvgTdc0Jgq9JiJc1pZo5C2wVbseLECOqT9jO+g5djfou0kSxFY3fd2UtwjzjRDpTlWiaaUmB78pc23UEi0zp0I50VK3CBqJvBvZy3s9bINONR2V1vyWa6rwgI7r+ykeoE2GZE6VM0kJE0pLNV0A4KXv2/M7ju/NpxulTkALZodku9Kw0n5/2hfS4cpsc4FxzkIq12dWFGh7f+igpQa4C0J0OOg21REk6LFxUO3ezAbYC93WUgxeMHhUDpJkSJOTeuFl3NbW2Xj1194Bpda4BlKzWcBeUWVKUAtObE50rmpR9AQ/gHz6UJrThceUHUzkBH9mrrFQ6uAqVY0Rr6vGyDTg2DujcLPKuV3eno/dT6MPVfysF/jYvuPMMlrLC4VxndRyKwDKQTcuCGxZexBUAPfJzC0SpBhkCSOo0r3DrDOF/uP7ar6NeIMTnN2wmu5Ybrs6WwaY9M3AiPlxUQsBGtzuWypQ6pa50I1c5meUBM8/x4r9C83NExY7+yCMAtH1witwxxU8WAv8F6//xpWJdJLKY4QZ5tP/CnT2ADf+DB8EFXLDYjRjfwUb1HcbeZGcZF+/y7dRtaix4IQf/KxBLptighe+A7RyoZD1OsfhtRGDCS2CnPEN4bdB/5JfLb1lD8xfhcKKvd0OaMG6i6LEg6ixGHgG0eUvkeTDiB17Fl3j0RpggzLw4D68iMeGXPR6r7uDveYfaBQGx8Sl5OmiCfx86qL+cEwyf3Q8nnTuD+2AjrjsW4s6T0NAiYihPr6dv1G5RIj7lIqN9CYnhrTTN7E2hqiieDly/ST6AKKpYfnKvv00u5iOEskVjE9ci5rKzO+0z9B8UyhVJUFyqatVqrPj9r6iYHTQajR3eJ0SJ8puL5Xx4BmMf6A/hL8eA0GVWmb29SkCY6Nms1GVkiAJGf94aIr/9gVb+1gEjc/T3NgBEXoafRTqIWPx8+Ce4pD7X4vXxBMhQIAMRD8ZSGsTIF0tIjvGHzzHZG09VxtIALP1dyOzxNGtyUjNufXUAylFu/vKBy78Qe53dYEV1lM3OdvXl/n6ExXJXYFaoE83UgnBh/GoB3dp/7+IeJsaKreGZG4o2rizXerkV+Pg7YNzd29mxtwke3Lxg3WvrjttgVKQh2LINttPItFu3Z+ad71+AFUX7ARNHVWr5BjFCZySH41gIKAWJ601HugdADQZsp+Z2ZpIGFSK93QmFJ5FvAxjxVSgWHa9kMvmpbpHUQc2sEbTZKPA5MbwaKW3jy/NC5V3JnG3QiD6PKP5hkOnj9X6amHLxIAlNxJyvTD0dKPk08ioGYAQltST8Acvj5Ft/5KOgkWGsek54cWS36av+jtIZKRRJtPZwYVmN4P1JaidEQLxIQaW47uq/fWaoee8+zKdo3pqXktoTO1XkFC88bcS/3kFDOn7S//XbZoeqcsnHgOTUit/PdSrbyBtergNKoqNYLiratbkKXg704QdwTgE+F4YE4z1EJtrYCn+S5rwJMCaIKMM0ydYQmdCCMO507aX5bfl+x8Zl/PzN6Y1NK6XHnE1ramVB2Cb9naxzZm2uSPZIn9+lTUiXCUZOwKfIZxc5Siy1Bhed5BLH5zVNk4Q4K9M9sOfe78v6VVpoZbSaVSU6/NYG4a98MtHOV7NdtWYFMAtkQ79S2vAcezC0VGZz7r94lfbMSbmHE9sw++uUoowecBSLgl9OCsJOITm26BA/A4Mbqhr7/KUT2eRjwdrw1r+BMw4qzTJ6dF3cTwjwAxaRD+ZUZU8nP6bzvIgAAAA"/></defs>
+<path d="M21 136h.01 M35 136h.01 M49 136h.01 M63 136h.01 M77 136h.01 M91 136h.01 M105 136h.01 M119 136h.01 M133 136h.01 M147 136h.01 M161 136h.01 M175 136h.01 M189 136h.01 M203 136h.01 M217 136h.01 M231 136h.01 M245 136h.01 M259 136h.01 M273 136h.01 M287 136h.01 M301 136h.01 M315 136h.01 M329 136h.01" stroke="#E4E9E6" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+<rect x="16" y="14" width="318" height="110" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-cx-sh)"/>
+<text x="32.0" y="30.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Customer record</text>
+<text x="318.0" y="30.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">live</text>
+<g class="hit">
+<rect class="hitbox" x="24" y="32" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="48" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 41.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4.5 20a7.5 7.5 0 0 1 15 0"/></g></g>
+<text x="63.0" y="46.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start"> </text>
+<text x="63.0" y="56.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start"> </text>
+</g>
+<g class="hit">
+<rect class="hitbox" x="24" y="60" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="76" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 69.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M11.2 3.5H20v8.8l-8.6 8.6-8.8-8.8zM16 8.2h.01"/></g></g>
+<text x="63.0" y="74.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start"> </text>
+<text x="63.0" y="84.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start"> </text>
+</g>
+<g class="hit">
+<rect class="hitbox" x="24" y="90" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="106" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 99.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 5.5h16v11H9l-4 3.5v-3.5H4z"/></g></g>
+<text x="63.0" y="104.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start"> </text>
+<text x="63.0" y="114.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start"> </text>
+</g>
+<rect x="32" y="60" width="286" height="1" fill="#E4E9E6"/>
+<rect x="32" y="94" width="286" height="1" fill="#E4E9E6"/>
+<rect x="22" y="152" width="306" height="158" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<rect x="19" y="155" width="312" height="158" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<path d="M90 124 V132 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10 V158" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M260 124 V132 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10 V158" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M90 124 V132 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10 V158');animation-name:ill-cx-fl1"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M260 124 V132 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10 V158');animation-name:ill-cx-fl2"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="16" y="158" width="318" height="158" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-cx-sh)"/>
+<rect x="32" y="168" width="84.4" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="brand" style="animation-name:ill-cx-br3;animation-duration:6.4s">
+<g transform="translate(38.54 171.08) scale(0.3771)"><path fill="url(#ill-cx-l0-a)" d="M9.028 9.144h24v23.75H9.028z"/></g>
+<text x="54.6" y="182.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Intercom</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-cx-br4;animation-duration:6.4s">
+<g transform="translate(38.54 171.08) scale(0.3771)"><path fill="url(#ill-cx-l1-a)" d="M9.001 9.001h24v24H9.001z"/></g>
+<text x="54.6" y="182.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Zendesk</text>
+</g>
+<rect x="207.16" y="168" width="110.8" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6" class="tint" style="--base:#FFFFFF;--hot:#E4F5EC;animation-delay:0s"/>
+<g transform="translate(216.12 173.50) scale(0.4583)"><g stroke="#3FBE8C" stroke-width="3.05" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 12.5l4.5 4.5L19 7"/></g></g>
+<text x="229.8" y="182.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Full context</text>
+<circle cx="44" cy="216" r="13" fill="#E4F5EC"/>
+<g transform="translate(37.00 209.00) scale(0.5833)"><g stroke="#3FBE8C" stroke-width="2.40" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4.5 20a7.5 7.5 0 0 1 15 0"/></g></g>
+<rect x="66" y="200" width="196" height="32" rx="12" fill="#F4F6F5" stroke="#E4E9E6"/>
+<text x="272.0" y="220.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">10:42</text>
+<rect x="98" y="242" width="186" height="32" rx="12" fill="#FFFFFF" stroke="#D3E8DD" class="tint" style="--base:#FFFFFF;--hot:#F2FAF6;animation-delay:0s"/>
+<text x="90.0" y="262.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">10:42 · seen</text>
+<circle cx="306" cy="258" r="13" fill="#E4F5EC"/>
+<g transform="translate(299.00 251.00) scale(0.5833)"><g stroke="#3FBE8C" stroke-width="2.40" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 3.5l2.2 5.3 5.3 2.2-5.3 2.2L12 18.5l-2.2-5.3L4.5 11l5.3-2.2zM18.5 16.5l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9z"/></g></g>
+<g class="card" style="animation-name:ill-cx-br5;animation-duration:13.5s">
+<text x="63.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Mia Chen</text>
+<text x="318.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Pro plan</text>
+<text x="63.0" y="74.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Order #2481</text>
+<text x="63.0" y="84.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">shipped 2 Aug, DHL</text>
+<text x="318.0" y="80.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">In transit</text>
+<text x="63.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">4 past tickets</text>
+<text x="318.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">0 open</text>
+<text x="80.0" y="220.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Where is my order?</text>
+<text x="112.0" y="262.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Arrives Friday, DHL</text>
+<rect x="32" y="284" width="97.2" height="22" rx="11.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0s"/>
+<text x="41.0" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Track parcel</text>
+<rect x="137.2" y="284" width="57.6" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="146.2" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Resend</text>
+<rect x="202.79999999999998" y="284" width="57.6" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="211.8" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Refund</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-cx-br6;animation-duration:13.5s">
+<text x="63.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Tomas Reyes</text>
+<text x="318.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Pro plan</text>
+<text x="63.0" y="74.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Invoice #4482</text>
+<text x="63.0" y="84.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">charged twice, 1 Aug</text>
+<text x="318.0" y="80.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Refund sent</text>
+<text x="63.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">2 past tickets</text>
+<text x="318.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">1 open</text>
+<text x="80.0" y="220.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Was I billed twice?</text>
+<text x="112.0" y="262.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Refunded, 2-3 days</text>
+<rect x="32" y="284" width="57.6" height="22" rx="11.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0s"/>
+<text x="41.0" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Refund</text>
+<rect x="97.6" y="284" width="90.6" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="106.6" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Credit note</text>
+<rect x="196.2" y="284" width="70.8" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="205.2" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Escalate</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-cx-br7;animation-duration:13.5s">
+<text x="63.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Nadia Haddad</text>
+<text x="318.0" y="52.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Team plan</text>
+<text x="63.0" y="74.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Subscription</text>
+<text x="63.0" y="84.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">annual, 12 seats</text>
+<text x="318.0" y="80.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Renews 14 Sep</text>
+<text x="63.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">9 past tickets</text>
+<text x="318.0" y="110.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">0 open</text>
+<text x="80.0" y="220.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Can I add 5 seats?</text>
+<text x="112.0" y="262.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Added, $58 prorated</text>
+<rect x="32" y="284" width="77.4" height="22" rx="11.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0s"/>
+<text x="41.0" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Add seats</text>
+<rect x="117.4" y="284" width="51.0" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="126.4" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Quote</text>
+<rect x="176.4" y="284" width="51.0" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<text x="185.4" y="298.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Renew</text>
+</g>
+</svg>

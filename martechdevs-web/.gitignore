@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pre-optimisation copies of public/assets (kept as a local backup, not shipped)
+/_asset-originals
+
+# generated preview stills for the service illustrations
+scripts/illustrations/.preview/
+
+# dev-only illustration lab, never shipped
+public/_lab.html
+# one illustration at 2x with each deck variant pinned, for judging spacing
+public/_zoom.html
+# the spacing and alignment audit, run from the console against the real page
+public/_audit.js

@@ -1,0 +1,34 @@
+# What NOT to upload when deploying with the Vercel CLI.
+#
+# This exists as well as .gitignore because this directory is not a git
+# repository, so the CLI's usual fallback to .gitignore cannot be relied on.
+# Without it the upload carries 30MB of pre-optimisation art and three dev-only
+# pages that would then be live on the deployed site.
+
+# installed and built locally; Vercel installs and builds its own
+node_modules
+.next
+out
+build
+
+# pre-optimisation copies of public/assets, kept as a local backup
+_asset-originals
+
+# dev-only illustration pages, never shipped
+public/_lab.html
+public/_zoom.html
+public/_audit.js
+
+# the illustration build scripts. The SVGs they generate are committed into
+# public/assets and src/components/illustrations.generated.ts, and nothing at
+# runtime reads the Python, so the site does not need it deployed.
+scripts
+
+# local noise
+.DS_Store
+*.pem
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

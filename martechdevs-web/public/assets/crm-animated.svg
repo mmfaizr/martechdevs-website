@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ill-crm" width="350" height="330" viewBox="0 0 350 330" fill="none">
+<style>
+  /* Motion is CSS so it runs with this file referenced as an img src, where
+     script never executes and hover never fires. Keep angle brackets out of this
+     block: it is parsed as XML and a tag-looking string kills the document.
+     Three signals score the lead, then the lead moves stage to stage.
+     One 10.0s cycle drives everything. A delay is the moment the sweep
+     actually arrives, so the artwork answers the flow rather than blinking on
+     its own clock. */
+  #ill-crm { --cyc:10.0s; }
+  #ill-crm text { letter-spacing:-.01em; }
+
+  /* Hover. Only reachable because these are inlined into the page rather than
+     referenced with an img src: an img is an isolated document and never sees a
+     pointer event. Kept to a lift, not a jump - the beats spent this whole build
+     being stripped of anything that moves geometry. */
+  #ill-crm .hit { cursor:default; }
+  #ill-crm .hit rect, #ill-crm .hit circle { transition:fill .18s ease; }
+  #ill-crm .hit g { transition:stroke .18s ease; }
+  /* !important is doing real work here rather than being laziness: these
+     surfaces already carry a running arrival animation, and an animation
+     outranks a normal declaration, so without it the hover never showed. */
+  #ill-crm .hit:hover rect:not(.hitbox) { fill:var(--hot,#CFEDDF) !important; }
+  #ill-crm .hit:hover circle { fill:#C4EBD8 !important; }
+  #ill-crm .hit:hover g { stroke:#2A9E73 !important; }
+  /* touch reports itself as hovering whatever was last tapped, and it sticks */
+  @media (hover: none) {
+    #ill-crm .hit:hover rect:not(.hitbox) { fill:var(--base,#F2F6F4) !important; }
+    #ill-crm .hit:hover circle { fill:#E4F5EC !important; }
+    #ill-crm .hit:hover g { stroke:#7B9188 !important; }
+  }
+
+  /* the pointer. linear, always: it is meant to read as something being carried
+     at a steady rate, and easing makes two of them on different lines drift
+     apart even when their speeds match. */
+  /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-crm .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-crm .brand, #ill-crm .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-crm .bead {
+    offset-rotate:0deg;
+    animation-duration:var(--cyc); animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+
+  /* Beats change colour and nothing else. Every scale here used to displace the
+     thing it was drawing attention to: an icon left its tile, a node's ring swept
+     hundreds of pixels across the canvas. A surface that lights up reads as
+     "this responded" just as well and cannot drift. The one survivor is .grow,
+     which wipes a bar inside its own box and so has nowhere to go. */
+  #ill-crm .tint, #ill-crm .pulse, #ill-crm .lit,
+  #ill-crm .pop, #ill-crm .grow, #ill-crm .grow-c {
+    animation-duration:var(--cyc); animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  #ill-crm .tint  { animation-name:tint; }
+  #ill-crm .pulse { animation-name:pulse; }
+  #ill-crm .lit   { animation-name:lit; }
+  #ill-crm .pop   { animation-name:pop; }
+  #ill-crm .grow   { animation-name:grow; transform-box:fill-box; transform-origin:0% 50%; }
+  #ill-crm .grow-c { animation-name:grow; transform-box:fill-box; transform-origin:50% 50%; }
+
+  /* The reaction has to be seen, or the pointer arrives somewhere that appears
+     not to care. It fires on arrival, holds long enough to register, and is back
+     to rest before the next pointer lands. */
+  @keyframes tint  { 0% { fill:var(--base,#F2F6F4); } 10% { fill:var(--hot,#DFF2E8); } 34% { fill:var(--hot,#DFF2E8); } 82%,100% { fill:var(--base,#F2F6F4); } }
+  @keyframes pulse { 0% { fill:#E4F5EC; } 8% { fill:#B6E6CE; } 30% { fill:#B6E6CE; } 70%,100% { fill:#E4F5EC; } }
+  @keyframes lit   { 0% { fill:var(--base,#D3E8DD); } 8% { fill:var(--hot,#2A9E73); } 34% { fill:var(--hot,#2A9E73); } 74%,100% { fill:var(--base,#D3E8DD); } }
+  @keyframes pop   { 0% { stroke:var(--base,#7B9188); } 8% { stroke:var(--hot,#2A9E73); } 30% { stroke:var(--hot,#2A9E73); } 70%,100% { stroke:var(--base,#7B9188); } }
+  @keyframes grow  { 0% { scale:0 1; } 26%,100% { scale:1 1; } }
+  @keyframes ill-crm-fl1 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 20% { offset-distance:100%; opacity:1; } 20.5%,100% { opacity:0; } }
+  @keyframes ill-crm-fl2 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 20% { offset-distance:100%; opacity:1; } 20.5%,100% { opacity:0; } }
+  @keyframes ill-crm-fl3 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 20% { offset-distance:100%; opacity:1; } 20.5%,100% { opacity:0; } }
+  @keyframes ill-crm-fl4 { 0%,20% { offset-distance:0%; opacity:0; } 20.5% { opacity:1; } 40% { offset-distance:100%; opacity:1; } 40.5%,100% { opacity:0; } }
+  @keyframes ill-crm-br5 { 0%,0% { opacity:0;  } 8% { opacity:1;  } 42% { opacity:1;  } 50%,100% { opacity:0;  } }
+  @keyframes ill-crm-br6 { 0%,50% { opacity:0;  } 58% { opacity:1;  } 92% { opacity:1;  } 100%,100% { opacity:0;  } }
+  @keyframes ill-crm-br7 { 0%,0% { opacity:0; translate:0 6px; } 5.333% { opacity:1; translate:0 0; } 28% { opacity:1; translate:0 0; } 33.33%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-crm-br8 { 0%,33.33% { opacity:0; translate:0 6px; } 38.67% { opacity:1; translate:0 0; } 61.33% { opacity:1; translate:0 0; } 66.67%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-crm-br9 { 0%,66.67% { opacity:0; translate:0 6px; } 72% { opacity:1; translate:0 0; } 94.67% { opacity:1; translate:0 0; } 100%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-crm-fl10 { 0%,40% { offset-distance:0%; opacity:0; } 40.5% { opacity:1; } 60% { offset-distance:100%; opacity:1; } 60.5%,100% { opacity:0; } }
+  @keyframes ill-crm-fl11 { 0%,60% { offset-distance:0%; opacity:0; } 60.5% { opacity:1; } 80% { offset-distance:100%; opacity:1; } 80.5%,100% { opacity:0; } }
+  @keyframes ill-crm-fl12 { 0%,80% { offset-distance:0%; opacity:0; } 80.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+
+  /* One blanket rule, so a beat added later cannot be forgotten here and keep
+     moving for someone who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-crm .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-crm .brand, #ill-crm .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-crm .bead { display:none; }
+    #ill-crm * { animation:none !important; }
+  }
+</style><defs><filter id="ill-crm-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#2B3B31" flood-opacity="0.07"/></filter><pattern id="ill-crm-l0-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-crm-l0-b" transform="scale(0.011 0.01)"/></pattern><image id="ill-crm-l0-b" width="92" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-crm-l1-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-crm-l1-b" transform="scale(0.01 0.015)"/></pattern><image id="ill-crm-l1-b" width="96" height="67" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/></defs>
+<g class="hit">
+<rect x="32" y="14" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0.1s"/>
+</g>
+<g transform="translate(44.50 20.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 4l12 6.2-5.1 1.6L11 18z"/></g></g>
+<rect x="41.0" y="49.3" width="4.2" height="2.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="48.2" y="48.0" width="4.2" height="4.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="55.5" y="46.6" width="4.2" height="5.4" rx="1.5" fill="#D3DCD7"/>
+<rect x="62.8" y="44.0" width="4.2" height="8.0" rx="1.5" fill="#D3DCD7"/>
+<text x="54.0" y="72.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">Site visits</text>
+<g class="hit">
+<rect x="153" y="14" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0.8s"/>
+</g>
+<g transform="translate(165.50 20.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3.5 6.5h17v11h-17zM3.5 7.2 12 13l8.5-5.8"/></g></g>
+<rect x="162.0" y="47.5" width="4.2" height="4.5" rx="1.5" fill="#D3DCD7"/>
+<rect x="169.2" y="49.3" width="4.2" height="2.7" rx="1.5" fill="#D3DCD7"/>
+<rect x="176.5" y="45.6" width="4.2" height="6.4" rx="1.5" fill="#D3DCD7"/>
+<rect x="183.8" y="47.0" width="4.2" height="5.0" rx="1.5" fill="#D3DCD7"/>
+<text x="175.0" y="72.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">Email opens</text>
+<g class="hit">
+<rect x="274" y="14" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:1.5s"/>
+</g>
+<g transform="translate(286.50 20.50) scale(0.7917)"><g stroke="#7B9188" stroke-width="1.77" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></g></g>
+<rect x="283.0" y="50.0" width="4.2" height="2.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="290.2" y="49.0" width="4.2" height="3.0" rx="1.5" fill="#D3DCD7"/>
+<rect x="297.5" y="47.7" width="4.2" height="4.3" rx="1.5" fill="#D3DCD7"/>
+<rect x="304.8" y="44.0" width="4.2" height="8.0" rx="1.5" fill="#D3DCD7"/>
+<text x="296.0" y="72.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">Pricing views</text>
+<rect x="21" y="109" width="308" height="120" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<path d="M54 85 V88 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10 V120" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 85 V120" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M296 85 V88 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10 V120" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M54 85 V88 a10 10 0 0 0 10 10 H165 a10 10 0 0 1 10 10 V120');animation-name:ill-crm-fl1"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 85 V120');animation-name:ill-crm-fl2"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M296 85 V88 a10 10 0 0 1 -10 10 H185 a10 10 0 0 0 -10 10 V120');animation-name:ill-crm-fl3"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<path d="M50.9 234 V268" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M50.9 234 V268');animation-name:ill-crm-fl4"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="16" y="114" width="318" height="120" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-crm-sh)"/>
+<circle cx="46" cy="142" r="15" fill="#3FBE8C" fill-opacity=".14"/>
+<g transform="translate(37.50 133.50) scale(0.7083)"><g stroke="#7B9188" stroke-width="1.98" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4.5 20a7.5 7.5 0 0 1 15 0"/></g></g>
+<rect x="220.36" y="131" width="97.6" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="brand" style="animation-name:ill-crm-br5;animation-duration:6.4s">
+<g transform="translate(226.90 134.08) scale(0.3771)"><path fill="url(#ill-crm-l0-a)" d="M7.693 9.494h23v24H7.693z"/></g>
+<text x="243.0" y="145.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">HubSpot</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-crm-br6;animation-duration:6.4s">
+<g transform="translate(226.90 134.08) scale(0.3771)"><path fill="url(#ill-crm-l1-a)" d="M9.622 13.003h24v16.75H9.622z"/></g>
+<text x="243.0" y="145.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Salesforce</text>
+</g>
+<rect x="32" y="168" width="286" height="1" fill="#E4E9E6"/>
+<text x="32.0" y="186.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Lead score</text>
+<polyline points="212.0,188.3 222.6,187.2 233.1,187.8 243.7,185.2 254.3,184.0 264.9,181.9 275.4,180.2 286.0,176.0" fill="none" stroke="#D3DCD7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="286.0" cy="176.0" r="2.6" fill="#2A9E73"/>
+<rect x="32" y="194" width="286" height="7" rx="3.5" fill="#E8EDEA"/>
+<rect x="32.0" y="194" width="93.92292682926828" height="7" rx="3.5" fill="#3FBE8C"/>
+<rect x="129.92292682926828" y="194" width="71.82341463414633" height="7" rx="3.5" fill="#3FBE8C"/>
+<rect x="205.7463414634146" y="194" width="60.773658536585366" height="7" rx="3.5" fill="#3FBE8C"/>
+<g class="card" style="animation-name:ill-crm-br7;animation-duration:13.5s">
+<text x="70.0" y="138.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Priya Raman</text>
+<text x="70.0" y="152.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Northwind Labs · Inbound</text>
+<text x="318.0" y="186.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#3FBE8C" fill-opacity="1" text-anchor="end">82</text>
+<text x="32.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Visits +34</text>
+<text x="129.9" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Opens +26</text>
+<text x="205.7" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Pricing +22</text>
+<text x="318.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">18 left</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-crm-br8;animation-duration:13.5s">
+<text x="70.0" y="138.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Marcus Hale</text>
+<text x="70.0" y="152.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Halcyon Freight · Trial</text>
+<text x="318.0" y="186.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#3FBE8C" fill-opacity="1" text-anchor="end">74</text>
+<text x="32.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Visits +30</text>
+<text x="129.9" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Opens +26</text>
+<text x="205.7" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Pricing +18</text>
+<text x="318.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">26 left</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-crm-br9;animation-duration:13.5s">
+<text x="70.0" y="138.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Ana Beltran</text>
+<text x="70.0" y="152.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Kestrel Health · Partner</text>
+<text x="318.0" y="186.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#3FBE8C" fill-opacity="1" text-anchor="end">67</text>
+<text x="32.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Visits +27</text>
+<text x="129.9" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Opens +23</text>
+<text x="205.7" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Pricing +17</text>
+<text x="318.0" y="218.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="end">33 left</text>
+</g>
+<path d="M67.8 280.0 H100.8" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M134.6 280.0 H167.5" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M207.9 280.0 H240.9" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M67.8 280.0 H100.8');animation-name:ill-crm-fl10"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M134.6 280.0 H167.5');animation-name:ill-crm-fl11"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M207.9 280.0 H240.9');animation-name:ill-crm-fl12"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="32.0" y="268" width="37.8" height="24" rx="12.0" fill="#FFFFFF" stroke="#E4E9E6" class="tint" style="--base:#FFFFFF;--hot:#E4F5EC;animation-delay:4s"/>
+<text x="41.0" y="283.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">New</text>
+<rect x="98.77333333333334" y="268" width="37.8" height="24" rx="12.0" fill="#FFFFFF" stroke="#E4E9E6" class="tint" style="--base:#FFFFFF;--hot:#E4F5EC;animation-delay:6s"/>
+<text x="107.8" y="283.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">MQL</text>
+<rect x="165.54666666666668" y="268" width="44.4" height="24" rx="12.0" fill="#FFFFFF" stroke="#E4E9E6" class="tint" style="--base:#FFFFFF;--hot:#E4F5EC;animation-delay:8s"/>
+<text x="174.5" y="283.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Demo</text>
+<rect x="238.92000000000002" y="268" width="79.1" height="24" rx="12.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0s"/>
+<g transform="translate(247.87 274.00) scale(0.5000)"><g stroke="#FFFFFF" stroke-width="2.80" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 12.5a4 4 0 1 0 0-8 4 4 0 0 0 0 8M4.5 20a7.5 7.5 0 0 1 15 0"/></g></g>
+<text x="262.8" y="283.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Dana R.</text>
+<text x="278.5" y="308.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="middle">Rep assigned</text>
+</svg>

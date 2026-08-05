@@ -1,14 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, memo } from 'react';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from 'framer-motion';
 import Image from 'next/image';
 import ServiceSection from './ServiceSection';
 
 const services = [
   {
     id: 'cdp-data',
-    navTitle: 'Single View',
+    navTitle: 'Data Collection',
     toolLogos: [
       { icon: 'segment logo icon.svg', name: 'Segment' },
       { icon: 'server logo icon.svg', name: 'ssGTM' },
@@ -17,8 +22,8 @@ const services = [
     ],
     title: 'Finally get a single, trustworthy view',
     titleGray: 'of your customer',
-    description: 'No more data chaos. We build a single, reliable hub for all customer data—web, app, sales, support, payments—creating accurate, unified profiles you can trust.',
-    illustration: '/assets/Finally Get a Single, Trustworthy View of Your Customer.svg',
+    description: 'No more data chaos. We build a single, reliable hub for all customer data: web, app, sales, support, payments. Creating accurate, unified profiles you can trust.',
+    illustration: 'cdp',
     bgColor: 'bg-emerald-50',
     textColor: 'text-gray-900',
     accentColor: 'text-emerald-600',
@@ -31,7 +36,7 @@ const services = [
       { iconFile: 'Ensure Auditable Data Flows-  .svg', title: 'Ensure Auditable Data Flows:', description: 'For quality, compliance, and clear data lineage.' },
     ],
     whatYouGet: [
-      { iconFile: 'Complete Customer History-   .svg', title: 'Complete Customer History:', description: 'Ad click, feature use, support, purchase—one profile.' },
+      { iconFile: 'Complete Customer History-   .svg', title: 'Complete Customer History:', description: 'Ad click, feature use, support, purchase, all in one profile.' },
       { iconFile: 'Powerful Audience Building-   .svg', title: 'Powerful Audience Building:', description: '"High LTV, unused Feature X" lists for all tools.' },
       { iconFile: 'Cross-Team Alignment-  .svg', title: 'Cross-Team Alignment:', description: 'Stop conflicting messages; ensure unified, informed action.' },
       { iconFile: 'Trusted Core Metrics-   .svg', title: 'Trusted Core Metrics:', description: 'LTV, churn, funnels based on complete, unified data.' },
@@ -51,7 +56,7 @@ const services = [
     title: 'Send Smarter Messages',
     titleGray: 'Customers Love, Automatically',
     description: 'We connect your systems to deliver hyper-personalized messages automatically, based on real customer behavior. This means timely, relevant communication that drives action, not annoyance.',
-    illustration: '/assets/Send Smarter Messages Customers Love, Automatically.svg',
+    illustration: 'messaging',
     bgColor: 'bg-purple-50',
     textColor: 'text-gray-900',
     accentColor: 'text-purple-600',
@@ -84,7 +89,7 @@ const services = [
     title: 'Understand What Really Drives',
     titleGray: 'Growth & Marketing ROI',
     description: 'Go beyond surface metrics to understand why users act, what drives value, and which marketing efforts truly pay off. We unify your data for full-funnel clarity and true ROI calculation.',
-    illustration: '/assets/Understand What Really Drives Growth & Marketing ROI.svg',
+    illustration: 'analytics',
     bgColor: 'bg-blue-50',
     textColor: 'text-gray-900',
     accentColor: 'text-blue-600',
@@ -115,7 +120,7 @@ const services = [
     title: 'Streamline Support:',
     titleGray: 'Data-Driven CX & AI Automation',
     description: 'Empower your support team with instant access to complete customer context, enabling faster, personalized resolutions. We integrate your tools and leverage AI for peak efficiency.',
-    illustration: '/assets/Streamline Support_ Data-Driven CX & AI Automation.svg',
+    illustration: 'support',
     bgColor: 'bg-cyan-50',
     textColor: 'text-gray-900',
     accentColor: 'text-cyan-600',
@@ -147,7 +152,7 @@ const services = [
     title: 'Reliable Conversion Tracking &',
     titleGray: 'Compliant, Data-Rich Audiences',
     description: 'Get accurate ad performance data despite privacy shifts, and use your rich customer insights for precise, compliant audience targeting. We build robust, server-side tracking for reliable results.',
-    illustration: '/assets/Reliable Conversion Tracking & Compliant, Data-Rich Audiences.svg',
+    illustration: 'conversion',
     bgColor: 'bg-orange-50',
     textColor: 'text-gray-900',
     accentColor: 'text-orange-600',
@@ -179,8 +184,8 @@ const services = [
     ],
     title: "Build Your Company's Single Source",
     titleGray: 'of Truth for All Data',
-    description: 'Establish one trusted, central repository for all business data—marketing, sales, product, finance, support. We build and organize this hub for consistent, actionable intelligence.',
-    illustration: '/assets/Build Your Company\'s Single Source of Truth for All Data.svg',
+    description: 'Establish one trusted, central repository for all business data: marketing, sales, product, finance, support. We build and organize this hub for consistent, actionable intelligence.',
+    illustration: 'warehouse',
     bgColor: 'bg-indigo-50',
     textColor: 'text-gray-900',
     accentColor: 'text-indigo-600',
@@ -211,7 +216,7 @@ const services = [
     title: 'CRM Configured with',
     titleGray: 'Your Sales Workflow',
     description: 'We tailor your CRM to mirror and automate your sales process, enriching it with holistic customer data for smarter lead scoring, routing, and actionable pipeline insights.',
-    illustration: '/assets/CRM Configured with Your Sales Workflow.svg',
+    illustration: 'crm',
     bgColor: 'bg-rose-50',
     textColor: 'text-gray-900',
     accentColor: 'text-rose-600',
@@ -243,7 +248,7 @@ const services = [
     title: 'Use Your Smartest Data Insights to',
     titleGray: 'Power Everyday Tools',
     description: "Don't let valuable warehouse insights stay siloed. We connect this intelligence to your everyday marketing, sales, and support tools, automating actions and personalizing experiences.",
-    illustration: '/assets/Use Your Smartest Data Insights to Power Everyday Tools.svg',
+    illustration: 'activation',
     bgColor: 'bg-teal-50',
     textColor: 'text-gray-900',
     accentColor: 'text-teal-600',
@@ -270,6 +275,146 @@ export default function AllServiceSections() {
   const [activeSection, setActiveSection] = useState<string>('');
   const [showNav, setShowNav] = useState(false);
 
+  // Equalise every card to the tallest one. A sticky card unpins when its
+  // bottom reaches the container's end, so cards of different heights unpin at
+  // slightly different scroll positions - and at the end of the stack the
+  // taller cards' rounded tops poked out above the top card in staggered
+  // strips, all sliding at once. That seam was the shake/flicker on the last
+  // card. With equal heights every card unpins at the same instant and the
+  // stack leaves as one clean edge.
+  //
+  // Done with direct DOM styles rather than state: nothing else needs to
+  // re-render, and the per-card ResizeObservers already pick up the height
+  // change and re-derive their scroll ranges.
+  useEffect(() => {
+    const sections = () =>
+      Array.from(document.querySelectorAll<HTMLElement>('#services div.sticky section'));
+    let applied = 0;
+
+    // Clear, read, reapply - all in one synchronous task, so the browser never
+    // paints a frame with the natural (unequal) heights. Deferring the reapply
+    // to a rAF left a one-frame window where the whole stack's geometry
+    // reverted mid-scroll.
+    const measure = () => {
+      const els = sections();
+      if (!els.length) return;
+      els.forEach((s) => { s.style.minHeight = ''; });
+      applied = Math.max(...els.map((s) => s.offsetHeight));
+      els.forEach((s) => { s.style.minHeight = `${applied}px`; });
+    };
+
+    measure();
+    window.addEventListener('load', measure);
+    window.addEventListener('resize', measure);
+
+    // Re-run if content later outgrows the applied height (tab switch, late
+    // imagery). Guarded so applying the max itself doesn't loop.
+    const ro = new ResizeObserver((entries) => {
+      if (entries.some((e) => e.target instanceof HTMLElement && e.target.offsetHeight > applied)) {
+        measure();
+      }
+    });
+    sections().forEach((s) => ro.observe(s));
+
+    return () => {
+      window.removeEventListener('load', measure);
+      window.removeEventListener('resize', measure);
+      ro.disconnect();
+    };
+  }, []);
+
+  // Let go of cards that are buried under a later one.
+  //
+  // Equal heights (above) mean every card reaches its sticky limit on the exact
+  // same frame at the bottom of the container, so Chrome un-sticks and repaints
+  // all eight viewport-sized layers at once. Measured, that single frame costs
+  // 40-124ms against an 8ms baseline, in both scroll directions - the stutter on
+  // the last card. Dropping the covered cards to position:static leaves only the
+  // top one still sticky when the stack releases, which measures clean.
+  //
+  // Static and sticky occupy the same space in normal flow, so nothing moves and
+  // the page height is unchanged; the card just stops being a compositor layer
+  // while it is invisible anyway. The swap happens well after the card above has
+  // fully covered it, with a dead band so it cannot chatter at the boundary, and
+  // it only ever runs on a card that actually crossed.
+  useEffect(() => {
+    // The card above covers the viewport the moment it pins, so these are pure
+    // safety margin against measurement error. Keep them well under the run-out
+    // below, or the last card would still be waiting to shed its neighbour when
+    // the stack releases - which is the frame this whole effect exists to keep
+    // cheap.
+    const DETACH = 80; // px past the next card pinning before we drop this one
+    const ATTACH = 40; // ...and back to sticky this far past it, coming up
+
+    let cards: HTMLElement[] = [];
+    let coveredAt: number[] = [];
+    let detached: boolean[] = [];
+
+    const measure = () => {
+      cards = Array.from(document.querySelectorAll<HTMLElement>('#services > div.sticky'));
+      cards.forEach((c) => { c.style.position = ''; });
+      detached = cards.map(() => false);
+
+      // Document position of each card's zero-height marker, which is the scroll
+      // offset at which that card pins. Same walk the cards use themselves - the
+      // card's own rect is useless once it is stuck.
+      const pins = cards.map((c) => {
+        let top = 0;
+        let el: HTMLElement | null =
+          document.querySelector<HTMLElement>(`[data-pin-marker="${c.id}"]`);
+        while (el) { top += el.offsetTop; el = el.offsetParent as HTMLElement | null; }
+        return top;
+      });
+
+      // Only hand a card off to one that will actually cover the whole viewport,
+      // so a short card can never leave a strip of a detached one showing.
+      coveredAt = cards.map((_, i) => {
+        const next = cards[i + 1];
+        if (!next || next.getBoundingClientRect().height < window.innerHeight) return Infinity;
+        return pins[i + 1];
+      });
+    };
+
+    const apply = () => {
+      const y = window.scrollY;
+      for (let i = 0; i < cards.length; i++) {
+        const want = y > coveredAt[i] + (detached[i] ? ATTACH : DETACH);
+        if (want !== detached[i]) {
+          detached[i] = want;
+          cards[i].style.position = want ? 'static' : '';
+        }
+      }
+    };
+
+    const remeasure = () => { measure(); apply(); };
+    remeasure();
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => { apply(); ticking = false; });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+
+    // The equaliser rewrites every card's height, which moves every pin offset.
+    // Watching the container picks that up whichever way it was triggered.
+    const container = document.getElementById('services');
+    const ro = new ResizeObserver(remeasure);
+    if (container) ro.observe(container);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', remeasure);
+      window.removeEventListener('load', remeasure);
+      ro.disconnect();
+      cards.forEach((c) => { c.style.position = ''; });
+    };
+  }, []);
+
   // Use scroll listener for more precise "sticky" state detection
   useEffect(() => {
     const handleScroll = () => {
@@ -279,11 +424,17 @@ export default function AllServiceSections() {
       const rect = container.getBoundingClientRect();
       const headerHeight = 84; // Approximately the height of the fixed header
 
-      // Show if the top of the services container has reached (or passed) the header
-      // AND the bottom of the container is still below the header (haven't scrolled past)
-      const isSticky = rect.top <= headerHeight && rect.bottom > headerHeight;
-      
-      setShowNav(isSticky);
+      // Hysteresis, not a single threshold. The show/hide line sits exactly at
+      // the top of the first card and the bottom of the last one, so a bare
+      // comparison lets the smallest scroll jitter flip it - and each flip
+      // remounts the nav through a 0.3s AnimatePresence transition. The dead
+      // band means it can only change once you have clearly crossed.
+      const BAND = 90;
+      setShowNav((wasShowing) =>
+        wasShowing
+          ? rect.top <= headerHeight + BAND && rect.bottom > headerHeight
+          : rect.top <= headerHeight && rect.bottom > headerHeight + BAND
+      );
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -304,17 +455,18 @@ export default function AllServiceSections() {
       // Or the last section that has passed the trigger point but hasn't finished
       
       let currentId = '';
-      
-      // Iterate through services to find the active one
+
+      // The cards are a sticky stack, so every pinned card sits at top: 0 and
+      // matches this test at once. Keep going rather than breaking on the first
+      // hit: later cards are painted over earlier ones, so the last match in
+      // DOM order is the one actually on screen.
       for (const service of services) {
         const element = document.getElementById(service.id);
         if (element) {
           const rect = element.getBoundingClientRect();
-          
-          // Check if the section is active (top is above trigger, bottom is below trigger)
+
           if (rect.top <= triggerPoint && rect.bottom > triggerPoint) {
             currentId = service.id;
-            break; // Found the active section, stop looking
           }
         }
       }
@@ -352,31 +504,38 @@ export default function AllServiceSections() {
   }, []);
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      // Offset for fixed headers (84px main header + ~60px sub header + padding)
-      const offset = 150; 
-      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({
-        top: elementPosition - offset,
-        behavior: 'smooth'
-      });
-      setActiveSection(id);
-    }
+    // Never measure the card itself: it is position:sticky, so once pinned its
+    // rect reads top 0 wherever the page actually is - measuring it made every
+    // backward click scroll a fixed 150px and stop. The zero-height marker
+    // before each card stays in normal flow, so its document position IS the
+    // scroll offset at which that card sits pinned and full-bleed. No header
+    // offset either: the stack pins at the very top of the viewport with the
+    // card's tint running behind the floating bars, so any offset just leaves
+    // a strip of the previous card showing under the header.
+    const marker = document.querySelector<HTMLElement>(`[data-pin-marker="${id}"]`);
+    if (!marker) return;
+    const top = marker.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: 'smooth' });
+    setActiveSection(id);
   };
 
   return (
     <div className="relative min-h-screen" id="services">
-      
-      {/* Sticky Navigation - Merged seamlessly with main header */}
+
+      {/* Section navigation - overlays the stack, merged with the main header.
+          Fixed rather than sticky on purpose: a sticky element still occupies
+          its place in normal flow, so mounting this one added ~51px to the top
+          of the stack and shoved every card down as it appeared - that was the
+          shake, and its white panel was landing in that reserved strip above
+          the first card. Fixed takes no layout space, so nothing moves. */}
       <AnimatePresence>
         {showNav && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="sticky top-[84px] z-30 w-full pointer-events-none flex justify-center"
+            className="fixed top-[84px] inset-x-0 z-30 w-full pointer-events-none flex justify-center"
           >
             <div className="pointer-events-auto w-[95%] md:w-[90%] max-w-[1150px] relative">
               <div className="bg-white/95 backdrop-blur-md border-x border-b border-gray-200 shadow-sm rounded-b-2xl px-2 py-1.5 md:px-4 md:py-2.5 mx-auto w-full origin-top">
@@ -413,22 +572,219 @@ export default function AllServiceSections() {
       </AnimatePresence>
 
       {services.map((service, index) => (
-        <motion.div
-          id={service.id}
-          key={index}
-          initial={{ opacity: 0, y: 100, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{
-            duration: 0.7,
-            ease: [0.25, 0.46, 0.45, 0.94]
-          }}
-          style={{ zIndex: services.length - index }}
-          className="relative"
-        >
-          <ServiceSection {...service} />
-        </motion.div>
+        <StackedService
+          key={service.id}
+          service={service}
+          index={index}
+          isLast={index === services.length - 1}
+        />
       ))}
+
+      {/* Run-out for the last card.
+          A sticky element can only travel as far as its containing block
+          allows, and the last card's flow position already sits at the bottom
+          of this container - so it had virtually no travel and scrolled
+          straight past instead of pinning like the rest. This tail gives it a
+          pinned stretch of its own; it is consumed by the card holding
+          position, so it never shows as empty space.
+
+          This length is exactly how long the last card sits frozen, and it is
+          the only card with a hold at all - every other one has the next card
+          climbing over it the whole time, so nothing is ever still. At 70vh
+          that was 630px of screen where scrolling did nothing, and because you
+          also cross it on the way back it made returning to the previous card
+          cost 1.67x a normal card-to-card move. 20vh keeps a visible beat on
+          the final card and brings that down to 1.16x. Shorten it further for
+          less hold, but not to zero or the card stops pinning. */}
+      <div aria-hidden className="h-[20vh]" />
     </div>
   );
 }
+
+/**
+ * The stack pins flush with the top of the viewport so each card's tint runs
+ * full-bleed behind the floating header (20-86) and the services nav (84-135) -
+ * both of which stay above it on z-index. Pinning lower left a hard horizontal
+ * seam across the page instead.
+ */
+const STACK_TOP = 0;
+
+/** Clearance so pinned content clears those two floating bars. */
+const CONTENT_INSET = 152;
+
+/**
+ * One card in the scroll stack.
+ *
+ * The cards are siblings inside a tall container and each is `sticky`, so a
+ * card pins in place and the next one scrolls up over it - z-index ascends, so
+ * later cards cover earlier ones. Nothing fades, which is what removes the
+ * white flash: the outgoing card stays put until it is physically covered,
+ * instead of the incoming one fading up from opacity 0 over the page.
+ *
+ * The recede range is measured rather than expressed with useScroll's `offset`
+ * shorthand: the sticky element's own rect freezes once it pins, and the
+ * shorthand collapsed to a constant here, leaving every card stuck at its fully
+ * receded scale. The zero-height marker stays in normal flow, so its document
+ * position gives an honest "scroll position at which this card pins", and the
+ * card's own height is exactly how far the next one has to travel to cover it.
+ */
+const StackedService = memo(function StackedService({
+  service,
+  index,
+  isLast,
+}: {
+  service: (typeof services)[number];
+  index: number;
+  isLast: boolean;
+}) {
+  const marker = useRef<HTMLDivElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+  const [recede, setRecede] = useState<[number, number]>([0, 1]);
+  const [enter, setEnter] = useState<[number, number]>([0, 1]);
+
+  useEffect(() => {
+    const measure = () => {
+      if (!marker.current || !card.current) return;
+      let top = 0;
+      let el: HTMLElement | null = marker.current;
+      while (el) {
+        top += el.offsetTop;
+        el = el.offsetParent as HTMLElement | null;
+      }
+      const pinsAt = top - STACK_TOP;                              // scrollY when this card pins
+      const covered = card.current.getBoundingClientRect().height; // next card's run-up
+      setEnter([pinsAt - window.innerHeight * 0.85, pinsAt]);
+      setRecede([pinsAt, pinsAt + covered]);
+    };
+    measure();
+
+    // Cards grow after mount as their imagery lands. Measuring only once left
+    // the range ~160px short, so the recede finished while the card was still
+    // a third visible - which is what looked like the overlay snapping on.
+    const ro = new ResizeObserver(measure);
+    if (card.current) ro.observe(card.current);
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('load', measure);
+    };
+  }, []);
+
+  const { scrollY } = useScroll();
+
+  // Climbing in: starts well inset and grows to full bleed as it reaches the
+  // top. This only works because the card behind is itself full bleed - the
+  // inset edges reveal the previous card, not the page. The first card has
+  // nothing but white behind it, so it arrives at full size.
+  const scale = useTransform(scrollY, enter, [0.86, 1]);
+  // Rounded while it is climbing - that is what makes it read as a card sliding
+  // over the one below - then square by the time it lands. Stopping short of 0
+  // left an 18px notch at each top corner of every pinned card, and since they
+  // all pin in the same place the notches lined up into one hole punched
+  // through the whole stack, showing whatever was furthest back. Landing at 0
+  // means the top card covers the viewport edge to edge with nothing behind it
+  // showing through.
+  const radius = useTransform(scrollY, enter, [56, 0]);
+
+  // The shadow rides the scaled element so it hugs the card's actual edges,
+  // and fades out as the card reaches full bleed, where there is no longer an
+  // edge to describe. It lives on its own layer with a FIXED box-shadow and an
+  // animated opacity: animating the shadow colour itself re-rasterised the
+  // whole wrapper every frame of the entry, while opacity composites for free.
+  const shadowOpacity = useTransform(scrollY, enter, [1, 0]);
+
+  // Receding: dims back as the next card climbs over. No scale here - shrinking
+  // the pinned card pulls its edges in and exposes white down both sides.
+  //
+  // This is a plain overlay whose opacity animates, not filter: brightness().
+  // Deep in the stack seven cards recede at once, and seven full-width filter
+  // layers re-rasterising every frame is what made the tail flicker. Opacity on
+  // a solid layer composites without a repaint.
+  // Held off until the next card is genuinely overlapping, then eased in. If it
+  // starts the moment this card pins, the card you are actually reading greys
+  // out under you and the next one arrives clean, which reads as a jump.
+  const dim = useTransform(
+    scrollY,
+    [recede[0] + (recede[1] - recede[0]) * 0.45, recede[1]],
+    [0, 0.07]
+  );
+
+  // No visibility toggling here. Hiding covered cards saved nothing measurable
+  // and, because it keyed off a height measured before the imagery settled, it
+  // dropped the outgoing card while the incoming one was still ~120px short of
+  // the top - the card simply vanished behind the subheader.
+
+  const isFirst = index === 0;
+
+  return (
+    <>
+      <div ref={marker} aria-hidden data-pin-marker={service.id} className="h-0" />
+      <div
+        id={service.id}
+        ref={card}
+        className="sticky"
+        style={{ top: STACK_TOP, zIndex: index + 1 }}
+      >
+        <motion.div
+          style={{
+            position: 'relative',
+            // No overflow:hidden and no will-change here. Either one turns each
+            // card into a full-viewport compositor layer with a rounded mask,
+            // and eight of those stacked tore the cards apart mid-scroll. The
+            // radius lives on the section's own background instead, which
+            // clips for free.
+            // The last card remains an ordinary painted surface. It is fully
+            // exposed while the next section enters, so transforming it forces
+            // Chrome to composite a viewport-sized layer at the exact stack
+            // exit. Earlier cards can keep the scale treatment because the next
+            // opaque card covers their transition.
+            ...(isFirst || isLast ? {} : { scale, transformOrigin: 'center top' }),
+          }}
+        >
+          {/* Fixed shadow, animated opacity - zIndex -1 keeps it painted under
+              the section while still above the cards behind this one. Its own
+              radius matches the card's so the halo follows the rounded corners. */}
+          {!isFirst && !isLast && (
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                zIndex: -1,
+                opacity: shadowOpacity,
+                boxShadow: '0 -6px 48px -12px rgba(43,59,49,0.2)',
+                borderTopLeftRadius: radius,
+                borderTopRightRadius: radius,
+              }}
+            />
+          )}
+          <ServiceSection
+            {...service}
+            topInset={CONTENT_INSET}
+            style={
+              // Both ends of the stack are square: the first card has nothing
+              // behind it to slide over, and the last one is deliberately left
+              // as a plain painted surface (see above), so it gets the landed
+              // value directly rather than an animated one.
+              isFirst || isLast
+                ? undefined
+                : { borderTopLeftRadius: radius, borderTopRightRadius: radius }
+            }
+          />
+          {!isLast && (
+            <motion.div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[#2B3B31]"
+              style={{
+                opacity: dim,
+                borderTopLeftRadius: radius,
+                borderTopRightRadius: radius,
+              }}
+            />
+          )}
+        </motion.div>
+      </div>
+    </>
+  );
+});

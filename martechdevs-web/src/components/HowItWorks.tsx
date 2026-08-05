@@ -72,7 +72,7 @@ export default function HowItWorks() {
             <span className="text-emerald-500">data-nourishing workflows</span>
           </h2>
           <p className="text-gray-600 text-base max-w-xl mx-auto">
-            We don&apos;t just connect tools—we build intelligent systems that transform your data into growth.
+            We don&apos;t just connect tools. We build intelligent systems that transform your data into growth.
           </p>
         </motion.div>
 

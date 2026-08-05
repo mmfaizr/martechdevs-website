@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="ill-msg" width="350" height="330" viewBox="0 0 350 330" fill="none">
+<style>
+  /* Motion is CSS so it runs with this file referenced as an img src, where
+     script never executes and hover never fires. Keep angle brackets out of this
+     block: it is parsed as XML and a tag-looking string kills the document.
+     The trigger leaves the panel, then all four channels go together.
+     One 4.0s cycle drives everything. A delay is the moment the sweep
+     actually arrives, so the artwork answers the flow rather than blinking on
+     its own clock. */
+  #ill-msg { --cyc:4.0s; }
+  #ill-msg text { letter-spacing:-.01em; }
+
+  /* Hover. Only reachable because these are inlined into the page rather than
+     referenced with an img src: an img is an isolated document and never sees a
+     pointer event. Kept to a lift, not a jump - the beats spent this whole build
+     being stripped of anything that moves geometry. */
+  #ill-msg .hit { cursor:default; }
+  #ill-msg .hit rect, #ill-msg .hit circle { transition:fill .18s ease; }
+  #ill-msg .hit g { transition:stroke .18s ease; }
+  /* !important is doing real work here rather than being laziness: these
+     surfaces already carry a running arrival animation, and an animation
+     outranks a normal declaration, so without it the hover never showed. */
+  #ill-msg .hit:hover rect:not(.hitbox) { fill:var(--hot,#CFEDDF) !important; }
+  #ill-msg .hit:hover circle { fill:#C4EBD8 !important; }
+  #ill-msg .hit:hover g { stroke:#2A9E73 !important; }
+  /* touch reports itself as hovering whatever was last tapped, and it sticks */
+  @media (hover: none) {
+    #ill-msg .hit:hover rect:not(.hitbox) { fill:var(--base,#F2F6F4) !important; }
+    #ill-msg .hit:hover circle { fill:#E4F5EC !important; }
+    #ill-msg .hit:hover g { stroke:#7B9188 !important; }
+  }
+
+  /* the pointer. linear, always: it is meant to read as something being carried
+     at a steady rate, and easing makes two of them on different lines drift
+     apart even when their speeds match. */
+  /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-msg .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-msg .brand, #ill-msg .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-msg .bead {
+    offset-rotate:0deg;
+    animation-duration:var(--cyc); animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+
+  /* Beats change colour and nothing else. Every scale here used to displace the
+     thing it was drawing attention to: an icon left its tile, a node's ring swept
+     hundreds of pixels across the canvas. A surface that lights up reads as
+     "this responded" just as well and cannot drift. The one survivor is .grow,
+     which wipes a bar inside its own box and so has nowhere to go. */
+  #ill-msg .tint, #ill-msg .pulse, #ill-msg .lit,
+  #ill-msg .pop, #ill-msg .grow, #ill-msg .grow-c {
+    animation-duration:var(--cyc); animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  #ill-msg .tint  { animation-name:tint; }
+  #ill-msg .pulse { animation-name:pulse; }
+  #ill-msg .lit   { animation-name:lit; }
+  #ill-msg .pop   { animation-name:pop; }
+  #ill-msg .grow   { animation-name:grow; transform-box:fill-box; transform-origin:0% 50%; }
+  #ill-msg .grow-c { animation-name:grow; transform-box:fill-box; transform-origin:50% 50%; }
+
+  /* The reaction has to be seen, or the pointer arrives somewhere that appears
+     not to care. It fires on arrival, holds long enough to register, and is back
+     to rest before the next pointer lands. */
+  @keyframes tint  { 0% { fill:var(--base,#F2F6F4); } 10% { fill:var(--hot,#DFF2E8); } 34% { fill:var(--hot,#DFF2E8); } 82%,100% { fill:var(--base,#F2F6F4); } }
+  @keyframes pulse { 0% { fill:#E4F5EC; } 8% { fill:#B6E6CE; } 30% { fill:#B6E6CE; } 70%,100% { fill:#E4F5EC; } }
+  @keyframes lit   { 0% { fill:var(--base,#D3E8DD); } 8% { fill:var(--hot,#2A9E73); } 34% { fill:var(--hot,#2A9E73); } 74%,100% { fill:var(--base,#D3E8DD); } }
+  @keyframes pop   { 0% { stroke:var(--base,#7B9188); } 8% { stroke:var(--hot,#2A9E73); } 30% { stroke:var(--hot,#2A9E73); } 70%,100% { stroke:var(--base,#7B9188); } }
+  @keyframes grow  { 0% { scale:0 1; } 26%,100% { scale:1 1; } }
+  @keyframes ill-msg-fl1 { 0%,0% { offset-distance:0%; opacity:0; } 0.5% { opacity:1; } 50% { offset-distance:100%; opacity:1; } 50.5%,100% { opacity:0; } }
+  @keyframes ill-msg-fl2 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-msg-fl3 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-msg-fl4 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-msg-fl5 { 0%,50% { offset-distance:0%; opacity:0; } 50.5% { opacity:1; } 100% { offset-distance:100%; opacity:1; } 100.5%,100% { opacity:0; } }
+  @keyframes ill-msg-br6 { 0%,0% { opacity:0;  } 5.333% { opacity:1;  } 28% { opacity:1;  } 33.33%,100% { opacity:0;  } }
+  @keyframes ill-msg-br7 { 0%,33.33% { opacity:0;  } 38.67% { opacity:1;  } 61.33% { opacity:1;  } 66.67%,100% { opacity:0;  } }
+  @keyframes ill-msg-br8 { 0%,66.67% { opacity:0;  } 72% { opacity:1;  } 94.67% { opacity:1;  } 100%,100% { opacity:0;  } }
+  @keyframes ill-msg-br9 { 0%,0% { opacity:0; translate:0 6px; } 5.333% { opacity:1; translate:0 0; } 28% { opacity:1; translate:0 0; } 33.33%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-msg-br10 { 0%,33.33% { opacity:0; translate:0 6px; } 38.67% { opacity:1; translate:0 0; } 61.33% { opacity:1; translate:0 0; } 66.67%,100% { opacity:0; translate:0 -6px; } }
+  @keyframes ill-msg-br11 { 0%,66.67% { opacity:0; translate:0 6px; } 72% { opacity:1; translate:0 0; } 94.67% { opacity:1; translate:0 0; } 100%,100% { opacity:0; translate:0 -6px; } }
+
+  /* One blanket rule, so a beat added later cannot be forgotten here and keep
+     moving for someone who asked it not to. */
+  @media (prefers-reduced-motion: reduce) {
+    /* the brand cycle runs on its own clock, deliberately unrelated to the motion
+     beat, so the two never look like they are failing to line up */
+  /* settles in place rather than stretching. A width wipe on a funnel bar
+     reads as the bar being squeezed, which is the one thing a funnel row must
+     not look like: its width IS the number. */
+  #ill-msg .rise {
+    animation-name:rise; animation-iteration-count:infinite;
+    animation-timing-function:cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes rise { 0% { opacity:0; translate:0 -7px; } 5% { opacity:1; translate:0 0; } 100% { opacity:1; translate:0 0; } }
+
+  #ill-msg .brand, #ill-msg .card {
+    animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+
+  #ill-msg .bead { display:none; }
+    #ill-msg * { animation:none !important; }
+  }
+</style><defs><filter id="ill-msg-sh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#2B3B31" flood-opacity="0.07"/></filter><pattern id="ill-msg-l0-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-msg-l0-b" transform="scale(0.01 0.01)"/></pattern><image id="ill-msg-l0-b" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-msg-l1-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-msg-l1-b" transform="scale(0.01 0.015)"/></pattern><image id="ill-msg-l1-b" width="96" height="67" preserveAspectRatio="none" xlink:href="data:image/webp;base64,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"/><pattern id="ill-msg-l2-a" width="1" height="1" patternContentUnits="objectBoundingBox"><use xlink:href="#ill-msg-l2-b" transform="scale(0.01 0.01)"/></pattern><image id="ill-msg-l2-b" width="96" height="96" preserveAspectRatio="none" xlink:href="data:image/webp;base64,UklGRjwLAABXRUJQVlA4WAoAAAAQAAAAXwAAXwAAQUxQSLEDAAABoLRtmyHJeiMix17b/BdzbOzGVuPwb3A5XNqzP7ZtrjhmKyK+97oqo5AR3+wjgoEkqVFY4hK8bwVegKYwlQHg5tw/8Nr5T/66OioycvWvT8+9Nnj/bJdslkVJGGcBzNu8/8s77AF3vty/aT4A60w5ywCLXnxziC2IH/MhipAiMYYxL2xh6K0XFyUbWMqa8MSFIQqDDyLdWST6SOHQhScnFDGcxfS9P1IkBGEDSAgU/tg/HdZl9lpM3P0XJXphY4iPwj/3ToK1Ob0Gj3yXHJRMCEH47aMw2dRUmHucDJEZEQJ5fA4yLdJarLvIdIrMxv9r80zlMPUwJTA/JAgPT4NrLBWWf04fWQTR8/PljdXhnov0LAbP/+9B1bCtG2ZgQQQOr22kFXZKjCyKKLITTnEjY2xp1XNbJ1FIBbq+R9PhviG2bAXKoft6UouV/9VNh/67Gt1vcIPpnzBQCQI/mw7TnQ/RUw08D3Ylhw0tW49I4Ea4LvaCv9sn0jLNPws7uwyOtrOeaY7AdvQ9mdq6zCfgOtiTvtAoX0yEaee+1KfN1ddGBjN/qVkf/TITJuXBmjVSf0IGE7+pWSN9k4x2eFpno0Q+XZPBubqvs3u25bFYeotCncQby2ArvFizVnq+7r6uVyLfBLDgdt1X210EbKrn1tvdCOyj1yue+1B9oXkQ+RXmJEvVO+L6/PspmkV4/0C9VM0j+l6l1y0vndU9CDz1CaNmiXz/T4pu+fmqbhFeHKVyjIh2Ef2ivjOsfxL9C9J/X5/T/lw6qf+5qv+9oP+9pv+9XH2u+7via/3fReq/6zYAC1V/l95cBNXf1YFvAvr/C/T/18DgLINWPncX/Fc6/f/Fuv/rB+CAmmb9qjQuMQMGSKifQWlYQnlcaBIM0EZPaZQn4e6euBwsFv6jMa6oOC7KyI1w6uO6PcSlP9UWl9YdV18FqzovMHwfnOK8hoish1Odl+EOVEADlfJ5paQ10PUjZdfjObIOFdBI11ykF715PcBhxZcl85JfLofLk1eNXgrlVafCZcwLS/688MX1uXLnxmFOmbz2XOSrLrBpXt7nmiApPfjuURiXu67gz5x1BX/tmQhnM9dFGEzt+4HJ5NJoek/yx75pMLZIXcf4Jy7codD7EHus6wgkb194fHy5yhEAi194+3Z6+H0IMUqyvBD8WGTtefv5xUisQkjP5YIN+7650cvgxtf7Ni5Id78obFIXZOY90Pfy6Q9+uTQsHL74y/unX+57YF6SNGo+PQAAVlA4IGQHAABQIgCdASpgAGAAPikSh0IhoQrlOrIMAUJagDQED5HZ6X+Rv7Y/ENZH6B93P2O6Uc2fpr7Afcfye/z3aA8wD9Kf7N/Sf2o/vXcW8wH6q/9L+9dgj0AP51/bPRy9gj0AP1z9VT/V/8H/LfBL+z//O/wvwD/qP9/XIAfwDsXP7h25/5jlRvZTKmfn+FPaq3bGA2kgx0f7z1Fc8z5p/k//D7gf62/8zsG+jr+uxzdWItGfbX2UnbtRYTbCpVrR6dPMPyZOM0TsDnTTHjpf/B5ruVfamG1U1p2PX3KLjvggdLFQyZRcwsLSKpp5BkoaoV2Kf2+RbgrpnmGI91dfxt3uOiFXkn524NZNhu/08DFwkhchu3amWulOjfra4rAAAP7/1rOo/+JuBaPg1meXi5S1zGSj8J6oKsDyBtzX/zIZfhvs7NUAa7vzuXllI/2nJ1r+rS64KoRqB82/lx0DKbIb0ub3H43xFXval81V+yysFmXA2aYly1af24HqlI4MwdTjpqaYeR0MXhrxQkjk0wSqBAEMwf2lvgxbg1etV0ZpA/0jV7dMN4XC4s6raX8xAwRim+uPi0wA+u5+5U7OaAzF9pYv1fPMY2msyd0DctvLVeZbO68vVfXpNm8nh5UELAOPxQ00HJdSNh1t51YCBILjaeim4s9G/0L0qmHNaS7omDraOjQXxSY+4ox8h8AVv/gT2OgzoEjDBQzSVeSAExDUwtBalzBs+Vjo02pS6ybT7bCtJILR5+Ioz74wLbpsq46m+zChmfigL5PtX/LkaIoATEVpffnzET39CUWAgxhT2/d2yJqvsPWIaxJTZVO+FyWlm1A6B7syptBVOWh7Mn8c/+vH3PsTfwT8/c7ttfz0AiTa1ZVPJJEClbMhwI+5iLp3XK6zUKbTZA/yLKC+f3MpXiyLSZzEwLMZQgkKjJ1ZA6UbDC5j/8f1Xi7Ock3idrn/jn9JfEYEVvZTaFiXNJ8Oc2RjPKSMSjVM4KUeEv/c/E6Y8ziN92ZzlhXxltzzo7H5qHZBtOOy6X29+ZCGGvjtau4rZNSX9T/gG0ATUV3S1yUikgNAZyNpLaDXI310UOUOtlvhtR5Y6ECNWB6RkANzRP//neq/kemL5Ut9aDBcq6yIV09D8vYepTIhtYvjXBqpxQuCFGzDf3MYjvqx7oxFtiR6tJ6dFRW6GNdAdq75GkXQzP3nWXRjARorbCR9uVvt8n/P7GAUnbKU52eRilDOAMnp3oo6XezraWRncB4yoUgPcc9VoOMxIZNGEQhF5n7nxh7+OlQcT2DW8emgw82niRGxNeD0HxZZFbc4Yy39hZJLS2e9vCq1JRPZsz3+892QjQFydTNlxfxAQAboyWqVpeuSnBR0DHhAwKH9JzwHgDNCMtj9LunnEfDX++D0kWty5o1dEkQEQckax/DvhzQI4vLIhpDlEgMDarMwVa+OellpDElRFz5oFbUEI/tJGKoju+BTPqTKWbAAQbI3cSwBzSA1xFUEbmyuNy+bbTPX/Yr5kOR6D2yfW/HHdegZqP2ccPYRLbPQp3Db3mnEOOsbhTCxMnu0wf5AJZ8DYsvatjRaClT3LslfpX06xoNeZbn8C6zCIWNbhfYEl5y2FqYm6v9Nay7Gnf3B2oU7s0vo/7/TBKSJtdXVdHqX6jAlXTl481+CIpcCgZTqv8P4GhJklqoS7yf1KA9D82Sg0t+9mgNBxzwJjRK/yV4vFCK07GXdql/IuH38BqYTTczTCWI+Gj3EcFXPGuScsRep+k+EvQW1ps4QQ8fLqXD/2+b0i0bMVrRr4M8iINrpA+bDP/GA+AsuSGfX+yGNGU8b8Bb4U2Fp2JTF5isNiN9yFnLyiRhJuAHIfoCJMG2sqtDZpeXbm/jlGBfIYGSD7ggxY9bC/T0kKY4yKUq3OaduAxrf+NxNKWwZ/Lo4+02btv4Lr0d/9/Gh6wKXygd00CoAzypXsHlJnmT/N/GAXspmv+fKiyJe0d8DdJJpuwtvKLrfLooHKPHeGuCMM3Z1cslfrVQcJ33Q+i5jJbpU7lyWnD0KsM0wJgx/ZuJZqoEYRXeeEtxLsPDtuTmCmpucWvaDDAV+9hsjCD5Uw/2I1uV7D60vd0Rq769jIguIrX9yfwOBdEg8pGx/aJO/iDo62860SxAm4L/0cY/+PSLQ5hlDnVR9L8RvbTx/MpVpkEoDlvN6ChH13wVuVx1DEmfz3fjimBfrXEwY3Ewe3Zryufma92cFl19pd8ngTMz4xwB478vZV9iR+gq/MTKoXd3TZQ5OzPrWAnItolXvX0UOMUQa5cSj7A0I9FSJ3vTQSARAOkUhsqMkmvoefwW4zacymFBqpwWbxcp0IKlXzi0uDqbwP5HRDivzoHayt6Try2C1PX9ayTO+xCQDuZaDe7HnbPe1qGfMeCgpbZhS6k0M/53/VouJKAdjPzgf2Myhmh3Ag/dpyw6K/VBWWSXX19bwbqrGQ78VXqmvtBtSpkn6W9oQwLUaF2f6B8vc/hiQyfFPCE76YCP0XvzG9iAAAA=="/></defs>
+<path d="M28 166h.01 M42 166h.01 M56 166h.01 M70 166h.01 M84 166h.01 M98 166h.01 M112 166h.01 M126 166h.01 M140 166h.01 M154 166h.01 M168 166h.01 M182 166h.01 M196 166h.01 M210 166h.01 M224 166h.01 M238 166h.01 M252 166h.01 M266 166h.01 M280 166h.01 M294 166h.01 M308 166h.01 M322 166h.01 M28 180h.01 M42 180h.01 M56 180h.01 M70 180h.01 M84 180h.01 M98 180h.01 M112 180h.01 M126 180h.01 M140 180h.01 M154 180h.01 M168 180h.01 M182 180h.01 M196 180h.01 M210 180h.01 M224 180h.01 M238 180h.01 M252 180h.01 M266 180h.01 M280 180h.01 M294 180h.01 M308 180h.01 M322 180h.01 M28 194h.01 M42 194h.01 M56 194h.01 M70 194h.01 M84 194h.01 M98 194h.01 M112 194h.01 M126 194h.01 M140 194h.01 M154 194h.01 M168 194h.01 M182 194h.01 M196 194h.01 M210 194h.01 M224 194h.01 M238 194h.01 M252 194h.01 M266 194h.01 M280 194h.01 M294 194h.01 M308 194h.01 M322 194h.01 M28 208h.01 M42 208h.01 M56 208h.01 M70 208h.01 M84 208h.01 M98 208h.01 M112 208h.01 M126 208h.01 M140 208h.01 M154 208h.01 M168 208h.01 M182 208h.01 M196 208h.01 M210 208h.01 M224 208h.01 M238 208h.01 M252 208h.01 M266 208h.01 M280 208h.01 M294 208h.01 M308 208h.01 M322 208h.01 M28 222h.01 M42 222h.01 M56 222h.01 M70 222h.01 M84 222h.01 M98 222h.01 M112 222h.01 M126 222h.01 M140 222h.01 M154 222h.01 M168 222h.01 M182 222h.01 M196 222h.01 M210 222h.01 M224 222h.01 M238 222h.01 M252 222h.01 M266 222h.01 M280 222h.01 M294 222h.01 M308 222h.01 M322 222h.01 M28 236h.01 M42 236h.01 M56 236h.01 M70 236h.01 M84 236h.01 M98 236h.01 M112 236h.01 M126 236h.01 M140 236h.01 M154 236h.01 M168 236h.01 M182 236h.01 M196 236h.01 M210 236h.01 M224 236h.01 M238 236h.01 M252 236h.01 M266 236h.01 M280 236h.01 M294 236h.01 M308 236h.01 M322 236h.01 M28 250h.01 M42 250h.01 M56 250h.01 M70 250h.01 M84 250h.01 M98 250h.01 M112 250h.01 M126 250h.01 M140 250h.01 M154 250h.01 M168 250h.01 M182 250h.01 M196 250h.01 M210 250h.01 M224 250h.01 M238 250h.01 M252 250h.01 M266 250h.01 M280 250h.01 M294 250h.01 M308 250h.01 M322 250h.01 M28 264h.01 M42 264h.01 M56 264h.01 M70 264h.01 M84 264h.01 M98 264h.01 M112 264h.01 M126 264h.01 M140 264h.01 M154 264h.01 M168 264h.01 M182 264h.01 M196 264h.01 M210 264h.01 M224 264h.01 M238 264h.01 M252 264h.01 M266 264h.01 M280 264h.01 M294 264h.01 M308 264h.01 M322 264h.01 M28 278h.01 M42 278h.01 M56 278h.01 M70 278h.01 M84 278h.01 M98 278h.01 M112 278h.01 M126 278h.01 M140 278h.01 M154 278h.01 M168 278h.01 M182 278h.01 M196 278h.01 M210 278h.01 M224 278h.01 M238 278h.01 M252 278h.01 M266 278h.01 M280 278h.01 M294 278h.01 M308 278h.01 M322 278h.01" stroke="#E4E9E6" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+<path d="M175 145 V204" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 204 H62 a10 10 0 0 0 -10 10 V244" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 204 H144 a10 10 0 0 0 -10 10 V244" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 204 H206 a10 10 0 0 1 10 10 V244" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M175 204 H288 a10 10 0 0 1 10 10 V244" fill="none" stroke="#D3E8DD" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="bead" style="offset-path:path('M175 145 V204');animation-name:ill-msg-fl1"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 204 H62 a10 10 0 0 0 -10 10 V244');animation-name:ill-msg-fl2"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 204 H144 a10 10 0 0 0 -10 10 V244');animation-name:ill-msg-fl3"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 204 H206 a10 10 0 0 1 10 10 V244');animation-name:ill-msg-fl4"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<g class="bead" style="offset-path:path('M175 204 H288 a10 10 0 0 1 10 10 V244');animation-name:ill-msg-fl5"><circle r="6.44" fill="#FFFFFF"/><circle r="3.78" fill="#2A9E73"/></g>
+<rect x="122.88" y="155" width="104.2" height="22" rx="11.0" fill="#FFFFFF" stroke="#E4E9E6"/>
+<g class="brand" style="animation-name:ill-msg-br6;animation-duration:9.6s">
+<g transform="translate(129.42 158.08) scale(0.3771)"><path fill="url(#ill-msg-l0-a)" d="M9.23 8.729h24v24H9.23z"/></g>
+<text x="145.5" y="169.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Braze</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-msg-br7;animation-duration:9.6s">
+<g transform="translate(129.42 158.08) scale(0.3771)"><path fill="url(#ill-msg-l1-a)" d="M8.996 12.025h24v16.75H8.996z"/></g>
+<text x="145.5" y="169.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">Customer.io</text>
+</g>
+<g class="brand" style="opacity:0;animation-name:ill-msg-br8;animation-duration:9.6s">
+<g transform="translate(129.42 158.08) scale(0.3771)"><path fill="url(#ill-msg-l2-a)" d="M9 9h24v24H9z"/></g>
+<text x="145.5" y="169.8" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#2B3B31" fill-opacity="1" text-anchor="start">CleverTap</text>
+</g>
+<rect x="22" y="14" width="306" height="127" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<rect x="19" y="17" width="312" height="127" rx="14" fill="#FFFFFF" stroke="#E4E9E6"/>
+<rect x="16" y="20" width="318" height="127" rx="14" fill="#FFFFFF" stroke="#E4E9E6" filter="url(#ill-msg-sh)"/>
+<circle cx="44" cy="46" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.00 39.00) scale(0.5833)"><g stroke="#3FBE8C" stroke-width="2.40" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6 20.5v-17M6 4.5h11l-2.2 4L17 12.5H6"/></g></g>
+<rect x="226.96" y="35" width="91.0" height="22" rx="11.0" fill="#3FBE8C" stroke="none" class="tint" style="--base:#3FBE8C;--hot:#2A9E73;animation-delay:0.08s"/>
+<g transform="translate(235.92 40.50) scale(0.4583)"><g stroke="#FFFFFF" stroke-width="3.05" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M13.5 3 5.5 13.5h5.5L10.5 21l8-10.5H13z"/></g></g>
+<text x="249.6" y="49.9" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="500" fill="#FFFFFF" fill-opacity="1" text-anchor="start">Automated</text>
+<rect x="32" y="66" width="286" height="1" fill="#E4E9E6"/>
+<g class="hit">
+<rect class="hitbox" x="24" y="70" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="86" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 79.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 3.5l2.2 5.3 5.3 2.2-5.3 2.2L12 18.5l-2.2-5.3L4.5 11l5.3-2.2zM18.5 16.5l.9 2 2 .9-2 .9-.9 2-.9-2-2-.9 2-.9z"/></g></g>
+<text x="63.0" y="84.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Message picked</text>
+<text x="63.0" y="94.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start"> </text>
+</g>
+<rect x="32" y="102" width="286" height="1" fill="#E4E9E6"/>
+<g class="hit">
+<rect class="hitbox" x="24" y="105" width="302" height="32" rx="8" fill="none" pointer-events="all"/>
+<circle cx="44" cy="121" r="12" fill="#E4F5EC"/>
+<g transform="translate(37.50 114.50) scale(0.5417)"><g stroke="#3FBE8C" stroke-width="2.58" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 7.5V12l3 2"/></g></g>
+<text x="63.0" y="119.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="start">Send time</text>
+<text x="63.0" y="129.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Optimized per user</text>
+</g>
+<g class="card" style="animation-name:ill-msg-br9;animation-duration:13.5s">
+<text x="63.0" y="42.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Cart abandoned</text>
+<text x="63.0" y="56.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Amara Osei · 2 items</text>
+<text x="63.0" y="94.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Reminder · 10% off</text>
+<text x="318.0" y="90.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Variant B</text>
+<text x="318.0" y="125.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">18:40</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-msg-br10;animation-duration:13.5s">
+<text x="63.0" y="42.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Trial ending</text>
+<text x="63.0" y="56.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Priya Raman · 2 days left</text>
+<text x="63.0" y="94.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Upgrade · annual plan</text>
+<text x="318.0" y="90.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Variant A</text>
+<text x="318.0" y="125.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">09:15</text>
+</g>
+<g class="card" style="opacity:0;animation-name:ill-msg-br11;animation-duration:13.5s">
+<text x="63.0" y="42.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#2B3B31" fill-opacity="1" text-anchor="start">Back in stock</text>
+<text x="63.0" y="56.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Marcus Lund · on waitlist</text>
+<text x="63.0" y="94.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#2B3B31" fill-opacity="0.5" text-anchor="start">Restock · 4 left</text>
+<text x="318.0" y="90.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">Variant C</text>
+<text x="318.0" y="125.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="11" font-weight="600" fill="#2B3B31" fill-opacity="1" text-anchor="end">20:05</text>
+</g>
+<rect x="244.0" y="86.8" width="6.0" height="4.2" rx="1.5" fill="#E8EDEA"/>
+<rect x="253.0" y="81.0" width="6.0" height="10.0" rx="1.5" fill="#D3DCD7"/>
+<polyline points="244.0,125.5 248.9,124.9 253.7,122.9 258.6,119.2 263.4,115.0 268.3,118.3 273.1,122.7 278.0,125.1" fill="none" stroke="#D3DCD7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="hit">
+<rect x="30" y="240" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+<g transform="translate(41.44 251.44) scale(0.8800)"><g stroke="#7B9188" stroke-width="1.59" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M3.5 6.5h17v11h-17zM3.5 7.2 12 13l8.5-5.8"/></g></g>
+</g>
+<text x="52.0" y="298.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">Email</text>
+<text x="52.0" y="310.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="middle">8,240</text>
+<g class="hit">
+<rect x="112" y="240" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+<g transform="translate(123.44 251.44) scale(0.8800)"><g stroke="#7B9188" stroke-width="1.59" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5S6.5 14 6.5 10M10 18.5a2.2 2.2 0 0 0 4 0"/></g></g>
+</g>
+<text x="134.0" y="298.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">Push</text>
+<text x="134.0" y="310.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="middle">5,180</text>
+<g class="hit">
+<rect x="194" y="240" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+<g transform="translate(205.44 251.44) scale(0.8800)"><g stroke="#7B9188" stroke-width="1.59" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 5.5h16v11H9l-4 3.5v-3.5H4z"/></g></g>
+</g>
+<text x="216.0" y="298.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">In-app</text>
+<text x="216.0" y="310.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="middle">2,910</text>
+<g class="hit">
+<rect x="276" y="240" width="44" height="44" rx="10" fill="#F2F6F4" stroke="#E4E9E6" class="tint" style="--base:#F2F6F4;--hot:#DFF2E8;animation-delay:0s"/>
+<g transform="translate(287.44 251.44) scale(0.8800)"><g stroke="#7B9188" stroke-width="1.59" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3M10.5 18h3"/></g></g>
+</g>
+<text x="298.0" y="298.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="10" font-weight="500" fill="#2B3B31" fill-opacity="0.55" text-anchor="middle">SMS</text>
+<text x="298.0" y="310.0" font-family="Inter Tight, Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="9.5" font-weight="500" fill="#2B3B31" fill-opacity="0.5" text-anchor="middle">1,460</text>
+</svg>
