@@ -117,8 +117,13 @@ const LINKEDIN_PATH = 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.0
  *
  * Cal.com renders correctly in the identical frame, checked side by side before
  * this was changed. The event type behind this slug is a 30-minute Discovery
- * Call created for it, so the length matches what the panel promises. */
-const BOOKING_URL = 'https://cal.com/faizur-rahman-vvsm0e/discovery';
+ * Call, so the length matches what the panel promises.
+ *
+ * The TEAM link, not a personal one. It books against the martechdevs team, so
+ * the page shows the company rather than one person's name and avatar, and who
+ * actually takes the call is a membership question in Cal.com rather than a URL
+ * baked into this file. */
+const BOOKING_URL = 'https://cal.com/team/martechdevs/discovery';
 
 /* No crop. That existed to hide a dark strip YouCanBookMe painted at the top of
  * its embed; Cal.com has no such chrome, so cutting anything here would just
