@@ -4,6 +4,26 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
+declare global {
+  interface Window {
+    Intercom?: (command: string, ...args: unknown[]) => void;
+  }
+}
+
+/**
+ * Quote CTA. Records the intent as `quote_requested` in Intercom, then opens
+ * the messenger so the visitor lands in a conversation instead of a form.
+ *
+ * Intercom is installed through GTM rather than in this app, so it can still be
+ * absent when someone clicks early or when GTM is blocked. The guard keeps that
+ * case a no-op rather than a thrown error.
+ */
+function requestQuote() {
+  if (typeof window.Intercom !== 'function') return;
+  window.Intercom('trackEvent', 'quote_requested');
+  window.Intercom('show');
+}
+
 export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -51,7 +71,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
+                onClick={requestQuote}
                 className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors items-center gap-2 cursor-pointer"
               >
                 Get Instant Quote
@@ -120,7 +140,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
               <div className="pt-6 border-t border-gray-100 space-y-3">
                 <button
                   className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto cursor-pointer"
-                  onClick={() => { setMobileMenuOpen(false); window.dispatchEvent(new CustomEvent('openChatQuote')); }}
+                  onClick={() => { setMobileMenuOpen(false); requestQuote(); }}
                 >
                   Get Instant Quote
                 </button>
@@ -349,7 +369,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                 className="hidden lg:block"
               >
                 <button
-                  onClick={() => window.dispatchEvent(new CustomEvent('openChatQuote'))}
+                  onClick={requestQuote}
                   className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
                 >
                   Generate Instant Transparent Quote

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-import MartechChat from "@/components/MartechChat";
+// Chat widget disabled. Re-enable by uncommenting this import and the
+// <MartechChat /> mount below.
+// import MartechChat from "@/components/MartechChat";
 
 const interTight = Inter_Tight({
   subsets: ["latin"],
@@ -54,11 +56,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         {children}
+        {/* Chat widget disabled.
         <MartechChat
           apiUrl={process.env.NEXT_PUBLIC_CHAT_API_URL || "https://claychat-api.onrender.com/api"}
           autoOpen={true}
           autoOpenDelay={3000}
         />
+        */}
       </body>
     </html>
   );
