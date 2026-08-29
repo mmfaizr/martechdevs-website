@@ -44,7 +44,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             </div>
 
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#portfolio" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Portfolio</a>
+              <a href="#testimonials" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Portfolio</a>
               <a href="#services" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Services</a>
               <a href="#testimonials" className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-colors">Testimonials</a>
             </nav>
@@ -96,7 +96,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
           >
             <div className="flex flex-col gap-6 text-center">
               <a
-                href="#portfolio"
+                href="#testimonials"
                 className="text-xl font-medium text-gray-800 hover:text-emerald-600 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
