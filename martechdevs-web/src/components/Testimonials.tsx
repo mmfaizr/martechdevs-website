@@ -385,7 +385,7 @@ export default function Testimonials() {
           viewport={{ once: true }}
           className="mb-8 text-center md:text-left"
         >
-          <span className="inline-block bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+          <span className="inline-block bg-teal-100 text-teal-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
             Testimonials
           </span>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-snug max-w-3xl mx-auto md:mx-0 text-balance">
