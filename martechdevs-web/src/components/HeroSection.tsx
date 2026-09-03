@@ -11,8 +11,9 @@ declare global {
 }
 
 /**
- * Quote CTA. Records the intent as `quote_requested` in Intercom, then opens
- * the messenger so the visitor lands in a conversation instead of a form.
+ * Quote CTA. Records the intent as `quote_requested` in Intercom and stops
+ * there. Opening the messenger is Intercom's job: a rule on that event is what
+ * starts the conversation, so calling `show` here as well would fight it.
  *
  * Intercom is installed through GTM rather than in this app, so it can still be
  * absent when someone clicks early or when GTM is blocked. The guard keeps that
@@ -21,7 +22,6 @@ declare global {
 function requestQuote() {
   if (typeof window.Intercom !== 'function') return;
   window.Intercom('trackEvent', 'quote_requested');
-  window.Intercom('show');
 }
 
 export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
