@@ -1,16 +1,27 @@
 /**
- * dataLayer plumbing for GTM.
+ * Event plumbing. One call site, two destinations: the GTM dataLayer and
+ * Mixpanel.
  *
- * The container is loaded in the root layout; this is the only place the app
- * writes to the queue. Every push carries an `event` key so a single GTM
- * trigger matching any custom event picks all of them up.
+ * Mixpanel is loaded from the app rather than through GTM, so nothing here
+ * depends on a container tag existing. Every push carries an `event` key, so a
+ * single GTM trigger matching any custom event still picks all of them up.
  */
+
+type Mixpanel = {
+  track: (name: string, props?: Record<string, unknown>) => void;
+  identify: (id: string) => void;
+  init: (token: string, config?: Record<string, unknown>) => void;
+};
 
 declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
+    mixpanel?: Partial<Mixpanel>;
   }
 }
+
+/** Project token. Public by design: it ships in client JS wherever it lives. */
+export const MIXPANEL_TOKEN = '8cc0805e778be30bfa978b98aa4b65dd';
 
 export type DataLayerEvent = Record<string, unknown> & { event: string };
 
@@ -56,9 +67,83 @@ function currentUserId(): string {
   return id;
 }
 
+/* ------------------------------------------------------------- mixpanel */
+
+/** Events seen before the library finished loading, replayed in order. */
+const pending: [string, Record<string, unknown>][] = [];
+let identified: string | null = null;
+let flushTimer: ReturnType<typeof setInterval> | undefined;
+
+function mixpanelReady(): boolean {
+  return typeof window.mixpanel?.track === 'function';
+}
+
+function sendToMixpanel(name: string, props: Record<string, unknown>) {
+  const mp = window.mixpanel;
+  if (!mp?.track) return;
+
+  // The id is bound once per visitor rather than on every event. Repeating it
+  // costs a request each time and tells Mixpanel nothing new.
+  const userId = props.user_id;
+  if (typeof userId === 'string' && userId && userId !== identified) {
+    identified = userId;
+    try {
+      mp.identify?.(userId);
+    } catch {
+      // A failed identify must not take the event down with it.
+    }
+  }
+
+  try {
+    mp.track(name, props);
+  } catch {
+    // Mixpanel is a reporting side effect, never a reason to break a click.
+  }
+}
+
+function flushPending(): boolean {
+  if (!mixpanelReady()) return false;
+  while (pending.length) {
+    const next = pending.shift();
+    if (next) sendToMixpanel(next[0], next[1]);
+  }
+  return true;
+}
+
 /**
- * Push one event. The array is created if GTM has not landed yet: the snippet
- * reuses whatever `window.dataLayer` already holds, so events fired before the
+ * The library is loaded after hydration to keep it off the critical path, so
+ * an early click or the first scroll threshold can beat it. Those queue here
+ * and replay once it lands rather than being dropped.
+ */
+function trackMixpanel(name: string, props: Record<string, unknown>) {
+  if (mixpanelReady()) {
+    sendToMixpanel(name, props);
+    return;
+  }
+
+  pending.push([name, props]);
+  if (flushTimer) return;
+
+  let waited = 0;
+  flushTimer = setInterval(() => {
+    waited += 300;
+    // Give up after 20s and release the queue. A library that has not arrived
+    // by then is blocked or absent, and holding events only grows memory.
+    if (flushPending() || waited >= 20000) {
+      clearInterval(flushTimer);
+      flushTimer = undefined;
+      if (!mixpanelReady()) pending.length = 0;
+    }
+  }, 300);
+}
+
+/* ---------------------------------------------------------------- push */
+
+/**
+ * Record one event to the dataLayer and to Mixpanel.
+ *
+ * The dataLayer array is created if GTM has not landed yet: the snippet reuses
+ * whatever `window.dataLayer` already holds, so events fired before the
  * container loads are still delivered once it does.
  *
  * Every event carries `user_id` when one is known, so identity is attached in
@@ -68,8 +153,19 @@ export function pushEvent(payload: DataLayerEvent) {
   if (typeof window === 'undefined') return;
 
   const userId = currentUserId();
+  const enriched = userId ? { ...payload, user_id: userId } : payload;
+
+  // Split the Mixpanel copy off BEFORE handing the object to GTM. The container
+  // stamps its own keys onto whatever is pushed, in place, so reading the
+  // properties afterwards ships `gtm.uniqueEventId` to Mixpanel with every
+  // event. Mixpanel also takes the name as its own argument, so `event` is not
+  // repeated inside the properties.
+  const { event, ...props } = enriched;
+
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push(userId ? { ...payload, user_id: userId } : payload);
+  window.dataLayer.push(enriched);
+
+  trackMixpanel(event, props);
 }
 
 /** Scroll thresholds, in percent of page depth reached. */
