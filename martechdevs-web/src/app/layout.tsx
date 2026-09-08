@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import Analytics from "@/components/Analytics";
 // Chat widget disabled. Re-enable by uncommenting this import and the
 // <MartechChat /> mount below.
 // import MartechChat from "@/components/MartechChat";
@@ -56,6 +57,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         {children}
+        <Analytics />
         {/* Chat widget disabled.
         <MartechChat
           apiUrl={process.env.NEXT_PUBLIC_CHAT_API_URL || "https://claychat-api.onrender.com/api"}

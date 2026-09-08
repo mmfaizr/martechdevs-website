@@ -72,12 +72,14 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             <div className="flex items-center gap-3">
               <button
                 onClick={requestQuote}
+                data-track="quote_requested"
                 className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors items-center gap-2 cursor-pointer"
               >
                 Get Instant Quote
               </button>
               <a
                 href="#book-call"
+                data-track="book_call"
                 className="hidden md:flex bg-gray-50 hover:bg-gray-100 text-gray-900 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors items-center gap-2 border border-gray-200"
               >
                 Book a call
@@ -139,6 +141,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
               
               <div className="pt-6 border-t border-gray-100 space-y-3">
                 <button
+                  data-track="quote_requested"
                   className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto cursor-pointer"
                   onClick={() => { setMobileMenuOpen(false); requestQuote(); }}
                 >
@@ -146,6 +149,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                 </button>
                 <a
                   href="#book-call"
+                  data-track="book_call"
                   className="inline-flex bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-3 rounded-lg text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -370,6 +374,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
               >
                 <button
                   onClick={requestQuote}
+                  data-track="quote_requested"
                   className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
                 >
                   Generate Instant Transparent Quote
