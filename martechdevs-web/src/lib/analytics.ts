@@ -137,6 +137,11 @@ function trackMixpanel(name: string, props: Record<string, unknown>) {
   }, 300);
 }
 
+/** Called once the library has initialised, to release anything queued. */
+export function onMixpanelReady() {
+  flushPending();
+}
+
 /* ---------------------------------------------------------------- push */
 
 /**
