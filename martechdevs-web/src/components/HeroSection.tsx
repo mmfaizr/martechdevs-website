@@ -4,12 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
-declare global {
-  interface Window {
-    Intercom?: (command: string, ...args: unknown[]) => void;
-  }
-}
-
 /**
  * Quote CTA. Records the intent as `quote_requested` in Intercom and stops
  * there. Opening the messenger is Intercom's job: a rule on that event is what

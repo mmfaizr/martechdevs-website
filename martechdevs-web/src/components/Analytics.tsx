@@ -120,6 +120,37 @@ export default function Analytics() {
     return teardown;
   }, []);
 
+  /* ------------------------------------------------------------ intercom */
+  /*
+   * Messenger open and close. Intercom is installed through GTM, so it is not
+   * there when this mounts; the callbacks are registered as soon as it appears.
+   *
+   * These two hooks hold a single handler each, so registering here claims
+   * them. Anything else that needs to know the messenger opened should call
+   * through this rather than re-registering and silently replacing it.
+   */
+  useEffect(() => {
+    let waited = 0;
+
+    const register = () => {
+      if (typeof window.Intercom !== 'function') return false;
+      window.Intercom('onShow', () => pushEvent({ event: 'intercom_open' }));
+      window.Intercom('onHide', () => pushEvent({ event: 'intercom_close' }));
+      return true;
+    };
+
+    if (register()) return;
+
+    const timer = setInterval(() => {
+      waited += 300;
+      // 20s, matching the Mixpanel queue. A messenger that has not booted by
+      // then is blocked or absent, and polling forever helps nobody.
+      if (register() || waited >= 20000) clearInterval(timer);
+    }, 300);
+
+    return () => clearInterval(timer);
+  }, []);
+
   /* ------------------------------------------------------------ mixpanel */
   /*
    * The package rather than the CDN snippet. The snippet installs a stub and

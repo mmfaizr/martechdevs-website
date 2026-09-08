@@ -17,6 +17,7 @@ declare global {
   interface Window {
     dataLayer?: Record<string, unknown>[];
     mixpanel?: Partial<Mixpanel>;
+    Intercom?: (command: string, ...args: unknown[]) => void;
   }
 }
 
