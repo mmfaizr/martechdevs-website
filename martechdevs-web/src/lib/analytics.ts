@@ -21,8 +21,15 @@ declare global {
   }
 }
 
-/** Project token. Public by design: it ships in client JS wherever it lives. */
-export const MIXPANEL_TOKEN = '8cc0805e778be30bfa978b98aa4b65dd';
+/**
+ * Project token. Public by design: it ships in client JS wherever it lives.
+ *
+ * Set NEXT_PUBLIC_MIXPANEL_TOKEN to point a local or preview build at a
+ * separate project, so development traffic stays out of production reporting.
+ * Unset, it falls back to production, which is what Vercel builds use today.
+ */
+export const MIXPANEL_TOKEN =
+  process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || '8cc0805e778be30bfa978b98aa4b65dd';
 
 export type DataLayerEvent = Record<string, unknown> & { event: string };
 

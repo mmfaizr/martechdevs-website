@@ -42,14 +42,19 @@ export default function Analytics() {
       // on any custom event cannot double count a conversion.
       const named = el.dataset.track;
       const anchor = el instanceof HTMLAnchorElement ? el : null;
+      const href = anchor?.getAttribute('href') || '';
 
+      // Properties that do not apply are left out rather than sent empty. A
+      // button has no href and most elements have no id, and an empty string
+      // still creates the property in Mixpanel, so every report then has to
+      // filter it back out.
       pushEvent({
         event: named || 'element_click',
         click_text: labelFor(el),
         click_element: anchor ? 'link' : 'button',
-        click_url: anchor?.getAttribute('href') || '',
         click_section: sectionFor(el),
-        click_id: el.id || '',
+        ...(href ? { click_url: href } : {}),
+        ...(el.id ? { click_id: el.id } : {}),
       });
     };
 
@@ -170,6 +175,11 @@ export default function Analytics() {
       .then(({ default: mixpanel }) => {
         if (cancelled) return;
         mixpanel.init(MIXPANEL_TOKEN, {
+          // localStorage rather than the cookie default: it survives cookie
+          // clearing policies that shorten script-set cookies, and is not sent
+          // on every request to this domain.
+          persistence: 'localStorage',
+          debug: process.env.NODE_ENV !== 'production',
           // Pageviews only. Everything else autocapture offers duplicates what
           // this file already sends, with none of the meaning: its $mp_click
           // carries a list of CSS classes where our own click event carries the
@@ -191,6 +201,10 @@ export default function Analytics() {
           },
           record_sessions_percent: 100,
         });
+
+        // Context that belongs on every event rather than being repeated at
+        // each call site.
+        mixpanel.register({ platform: 'web' });
         // Expose it under the name the rest of the app already reads, and
         // release anything tracked while it was still downloading.
         window.mixpanel = mixpanel as unknown as Window['mixpanel'];
