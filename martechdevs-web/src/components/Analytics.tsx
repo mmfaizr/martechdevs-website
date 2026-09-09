@@ -7,6 +7,7 @@ import {
   sectionFor,
   clickEventName,
   clickDepth,
+  EVENTS,
   onMixpanelReady,
   MIXPANEL_TOKEN,
   SCROLL_THRESHOLDS,
@@ -98,7 +99,7 @@ export default function Analytics() {
       for (const threshold of SCROLL_THRESHOLDS) {
         if (reached >= threshold && !fired.has(threshold)) {
           fired.add(threshold);
-          pushEvent({ event: 'scroll_depth', percent_scrolled: threshold });
+          pushEvent({ event: EVENTS.scrolled, percent_scrolled: threshold });
         }
       }
 
@@ -145,8 +146,8 @@ export default function Analytics() {
 
     const register = () => {
       if (typeof window.Intercom !== 'function') return false;
-      window.Intercom('onShow', () => pushEvent({ event: 'intercom_open' }));
-      window.Intercom('onHide', () => pushEvent({ event: 'intercom_close' }));
+      window.Intercom('onShow', () => pushEvent({ event: EVENTS.intercomOpened }));
+      window.Intercom('onHide', () => pushEvent({ event: EVENTS.intercomClosed }));
       return true;
     };
 

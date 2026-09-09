@@ -181,6 +181,20 @@ export function pushEvent(payload: DataLayerEvent) {
   trackMixpanel(event, props);
 }
 
+/**
+ * Event names for everything that is not a click.
+ *
+ * Title Case with a past tense verb, matching the names built from click text,
+ * so Mixpanel's event list reads one way throughout. Properties stay
+ * snake_case, which is Mixpanel's own convention and what the setup guide asks
+ * for.
+ */
+export const EVENTS = {
+  scrolled: 'Page Scrolled',
+  intercomOpened: 'Intercom Opened',
+  intercomClosed: 'Intercom Closed',
+} as const;
+
 /** Scroll thresholds, in percent of page depth reached. */
 export const SCROLL_THRESHOLDS = [25, 50, 75, 100] as const;
 
@@ -208,8 +222,32 @@ export function labelFor(el: HTMLElement): string {
  * one starts from zero. Renaming a CTA is therefore a tracking change too.
  */
 export function clickEventName(el: HTMLElement): string {
-  const label = labelFor(el).replace(/\s+/g, ' ').trim().slice(0, 60);
+  const label = titleCase(labelFor(el).replace(/\s+/g, ' ').trim().slice(0, 60));
   return label ? `${label} Clicked` : 'Element Clicked';
+}
+
+/** Words that stay lowercase inside a title, unless they open it. */
+const MINOR_WORDS = new Set([
+  'a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'into', 'nor',
+  'of', 'on', 'or', 'per', 'the', 'to', 'up', 'via', 'with', 'yet',
+]);
+
+/**
+ * Title Case a button's own wording, so "Book a call" reports as "Book a Call".
+ *
+ * Buttons on this site are written in sentence case and some are shouted in
+ * caps, which would otherwise put three spellings of the same idea in the event
+ * list. Existing case is discarded rather than preserved for that reason.
+ */
+export function titleCase(text: string): string {
+  return text
+    .split(' ')
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      if (i > 0 && MINOR_WORDS.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
 }
 
 /**
