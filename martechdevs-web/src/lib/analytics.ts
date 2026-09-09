@@ -207,6 +207,7 @@ export function pushEvent(payload: DataLayerEvent) {
  * for.
  */
 export const EVENTS = {
+  pageViewed: 'Page Viewed',
   scrolled: 'Page Scrolled',
   intercomOpened: 'Intercom Opened',
   intercomClosed: 'Intercom Closed',

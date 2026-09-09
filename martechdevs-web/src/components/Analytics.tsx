@@ -31,6 +31,25 @@ import {
  * instrument it.
  */
 export default function Analytics() {
+  /* ---------------------------------------------------------- page view */
+  /*
+   * Sent by hand rather than left to autocapture, so it carries user_id and the
+   * same properties as every other event and lands in both destinations under a
+   * name we chose.
+   *
+   * Once per load. This is a single page with in-page anchors, so a hash change
+   * is someone jumping to a section, not viewing a new page.
+   */
+  useEffect(() => {
+    const referrer = document.referrer;
+    pushEvent({
+      event: EVENTS.pageViewed,
+      page_path: window.location.pathname,
+      page_title: document.title,
+      ...(referrer ? { page_referrer: referrer } : {}),
+    });
+  }, []);
+
   /* ------------------------------------------------------------- clicks */
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -187,25 +206,15 @@ export default function Analytics() {
           // on every request to this domain.
           persistence: 'localStorage',
           debug: process.env.NODE_ENV !== 'production',
-          // Pageviews only. Everything else autocapture offers duplicates what
-          // this file already sends, with none of the meaning: its $mp_click
-          // carries a list of CSS classes where our element_click carries the
-          // label and the section, and its $mp_scroll fires on 25/50/75/100,
-          // the very same thresholds as our scroll_depth.
+          // Off in full. Everything autocapture offered duplicated what this
+          // file already sends, with none of the meaning: its $mp_click carried
+          // a list of CSS classes where our click event carries the label and
+          // the section, its $mp_scroll fired on the very same 25/50/75/100
+          // thresholds, and its page view arrived as [Auto] Page View with no
+          // user_id on it. The page view is sent explicitly below instead.
           //
-          // Each key has to be named. Passing an object merges over Mixpanel's
-          // defaults rather than replacing them, so anything left out stays on.
-          // page_leave is absent because it already defaults to off, and the
-          // shipped types reject the key even though the runtime reads it.
-          autocapture: {
-            pageview: 'full-url',
-            click: false,
-            dead_click: false,
-            rage_click: false,
-            input: false,
-            scroll: false,
-            submit: false,
-          },
+          // Session replay is a separate subsystem and is unaffected by this.
+          autocapture: false,
           record_sessions_percent: 100,
         });
 
