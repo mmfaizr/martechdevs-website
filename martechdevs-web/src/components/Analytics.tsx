@@ -170,7 +170,25 @@ export default function Analytics() {
       .then(({ default: mixpanel }) => {
         if (cancelled) return;
         mixpanel.init(MIXPANEL_TOKEN, {
-          autocapture: true,
+          // Pageviews only. Everything else autocapture offers duplicates what
+          // this file already sends, with none of the meaning: its $mp_click
+          // carries a list of CSS classes where our own click event carries the
+          // label and the section, and its $mp_scroll fires on 25/50/75/100,
+          // the very same thresholds as our scroll_depth.
+          //
+          // Each key has to be named. Passing an object merges over Mixpanel's
+          // defaults rather than replacing them, so anything left out stays on.
+          // page_leave is absent because it already defaults to off, and the
+          // shipped types reject the key even though the runtime reads it.
+          autocapture: {
+            pageview: 'full-url',
+            click: false,
+            dead_click: false,
+            rage_click: false,
+            input: false,
+            scroll: false,
+            submit: false,
+          },
           record_sessions_percent: 100,
         });
         // Expose it under the name the rest of the app already reads, and
