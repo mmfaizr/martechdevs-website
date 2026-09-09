@@ -199,6 +199,37 @@ export function labelFor(el: HTMLElement): string {
 }
 
 /**
+ * Event name for a click, built from the control's own label:
+ * "Book a call" becomes "Book a call Clicked".
+ *
+ * This is a deliberate exception to the rule against runtime-built event names.
+ * It reads well in Mixpanel without a lookup, at the cost of a new event every
+ * time a button's wording changes, so the old name stays in reports and the new
+ * one starts from zero. Renaming a CTA is therefore a tracking change too.
+ */
+export function clickEventName(el: HTMLElement): string {
+  const label = labelFor(el).replace(/\s+/g, ' ').trim().slice(0, 60);
+  return label ? `${label} Clicked` : 'Element Clicked';
+}
+
+/**
+ * How far down the page the click landed, in percent.
+ *
+ * On a page this long, which is over 30,000px, "header" alone does not say
+ * whether a CTA converts near the top or after someone has read the whole
+ * thing. Falls back to 0 when the document has no height to measure against.
+ */
+export function clickDepth(el: HTMLElement): number {
+  const docHeight = Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight
+  );
+  if (!docHeight) return 0;
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  return Math.min(100, Math.max(0, Math.round((top / docHeight) * 100)));
+}
+
+/**
  * Which part of the page the click happened in.
  *
  * Sections on this site are identified by id (`#services`, `#testimonials`,

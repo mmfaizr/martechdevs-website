@@ -5,6 +5,8 @@ import {
   pushEvent,
   labelFor,
   sectionFor,
+  clickEventName,
+  clickDepth,
   onMixpanelReady,
   MIXPANEL_TOKEN,
   SCROLL_THRESHOLDS,
@@ -37,22 +39,26 @@ export default function Analytics() {
       const el = target.closest<HTMLElement>('a, button, [role="button"]');
       if (!el) return;
 
-      // A named CTA reports under its own event name. Everything else lands as
-      // element_click. One event per click either way, so a GTM tag that fires
-      // on any custom event cannot double count a conversion.
-      const named = el.dataset.track;
       const anchor = el instanceof HTMLAnchorElement ? el : null;
       const href = anchor?.getAttribute('href') || '';
+      const cta = el.dataset.track;
 
+      // One event per click, named after the control. The stable name a CTA was
+      // instrumented with rides along as cta_id, so a conversion can still be
+      // counted after someone rewords the button.
+      //
       // Properties that do not apply are left out rather than sent empty. A
       // button has no href and most elements have no id, and an empty string
       // still creates the property in Mixpanel, so every report then has to
       // filter it back out.
       pushEvent({
-        event: named || 'element_click',
+        event: clickEventName(el),
         click_text: labelFor(el),
         click_element: anchor ? 'link' : 'button',
+        click_tag: el.tagName.toLowerCase(),
         click_section: sectionFor(el),
+        click_position_percent: clickDepth(el),
+        ...(cta ? { cta_id: cta } : {}),
         ...(href ? { click_url: href } : {}),
         ...(el.id ? { click_id: el.id } : {}),
       });
@@ -182,7 +188,7 @@ export default function Analytics() {
           debug: process.env.NODE_ENV !== 'production',
           // Pageviews only. Everything else autocapture offers duplicates what
           // this file already sends, with none of the meaning: its $mp_click
-          // carries a list of CSS classes where our own click event carries the
+          // carries a list of CSS classes where our element_click carries the
           // label and the section, and its $mp_scroll fires on 25/50/75/100,
           // the very same thresholds as our scroll_depth.
           //
