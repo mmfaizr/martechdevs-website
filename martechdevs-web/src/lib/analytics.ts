@@ -75,6 +75,23 @@ function currentUserId(): string {
   return id;
 }
 
+/**
+ * The dataLayer spelling of an event name: "Book a Call Clicked" becomes
+ * "book_a_call_clicked".
+ *
+ * Mixpanel reads better in Title Case, but a GTM event name with spaces in it
+ * is awkward to match on and GA4 rejects one outright, so each destination gets
+ * the spelling it wants. Deriving the second from the first keeps them in step
+ * without a lookup table to forget to update.
+ */
+export function snakeCase(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
 /* ------------------------------------------------------------- mixpanel */
 
 /** Events seen before the library finished loading, replayed in order. */
@@ -168,15 +185,15 @@ export function pushEvent(payload: DataLayerEvent) {
   const userId = currentUserId();
   const enriched = userId ? { ...payload, user_id: userId } : payload;
 
-  // Split the Mixpanel copy off BEFORE handing the object to GTM. The container
-  // stamps its own keys onto whatever is pushed, in place, so reading the
-  // properties afterwards ships `gtm.uniqueEventId` to Mixpanel with every
-  // event. Mixpanel also takes the name as its own argument, so `event` is not
-  // repeated inside the properties.
+  // Mixpanel takes the name as its own argument, so `event` is not repeated
+  // inside the properties.
   const { event, ...props } = enriched;
 
+  // A fresh object goes to GTM rather than the one Mixpanel reads. The
+  // container stamps its own keys onto whatever is pushed, in place, so sharing
+  // the object would ship `gtm.uniqueEventId` to Mixpanel with every event.
   window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push(enriched);
+  window.dataLayer.push({ event: snakeCase(event), ...props });
 
   trackMixpanel(event, props);
 }
