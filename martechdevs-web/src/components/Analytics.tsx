@@ -7,6 +7,8 @@ import {
   sectionFor,
   clickEventName,
   clickDepth,
+  registerSuperProps,
+  markContextReady,
   EVENTS,
   onMixpanelReady,
   MIXPANEL_TOKEN,
@@ -31,6 +33,45 @@ import {
  * instrument it.
  */
 export default function Analytics() {
+  /* -------------------------------------------------------------- ip */
+  /*
+   * The visitor's IP, for telling real traffic from datacenters. Mixpanel
+   * already reads the address off the request to resolve city and country, but
+   * it does not keep it as a property, and a browser cannot see its own, so it
+   * takes a round trip to our own server to get one.
+   *
+   * Mixpanel only. It is deliberately not pushed to the dataLayer: GA4's terms
+   * forbid sending IP addresses, and everything in the dataLayer is one tag away
+   * from ending up there.
+   */
+  useEffect(() => {
+    let cancelled = false;
+
+    // Hold the queue until this settles, so the page view carries the address
+    // rather than racing the library for it. Capped, because a lookup that
+    // never answers must not sit on the events for ever.
+    const release = setTimeout(markContextReady, 2000);
+
+    fetch('/api/client-ip', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { ip?: string } | null) => {
+        if (cancelled) return;
+        if (data?.ip) registerSuperProps({ ip_address: data.ip });
+      })
+      .catch(() => {
+        // An address we could not read is not worth a broken page.
+      })
+      .finally(() => {
+        clearTimeout(release);
+        markContextReady();
+      });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(release);
+    };
+  }, []);
+
   /* ---------------------------------------------------------- page view */
   /*
    * Sent by hand rather than left to autocapture, so it carries user_id and the
@@ -220,7 +261,7 @@ export default function Analytics() {
 
         // Context that belongs on every event rather than being repeated at
         // each call site.
-        mixpanel.register({ platform: 'web' });
+        registerSuperProps({ platform: 'web' });
         // Expose it under the name the rest of the app already reads, and
         // release anything tracked while it was still downloading.
         window.mixpanel = mixpanel as unknown as Window['mixpanel'];

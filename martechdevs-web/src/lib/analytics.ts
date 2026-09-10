@@ -11,6 +11,7 @@ type Mixpanel = {
   track: (name: string, props?: Record<string, unknown>) => void;
   identify: (id: string) => void;
   init: (token: string, config?: Record<string, unknown>) => void;
+  register: (props: Record<string, unknown>) => void;
 };
 
 declare global {
@@ -126,8 +127,24 @@ function sendToMixpanel(name: string, props: Record<string, unknown>) {
   }
 }
 
+/**
+ * Whether the context lookups have settled, one way or the other.
+ *
+ * The queue waits on this as well as on the library. Without it the page view
+ * goes out the moment Mixpanel is ready and misses the IP whenever the lookup
+ * is the slower of the two, and the page view is the one event a bot reliably
+ * fires before leaving, so it is the one that most needs the address on it.
+ */
+let contextReady = false;
+
+/** Release the queue: the context arrived, failed, or ran out of time. */
+export function markContextReady() {
+  contextReady = true;
+  flushPending();
+}
+
 function flushPending(): boolean {
-  if (!mixpanelReady()) return false;
+  if (!mixpanelReady() || !contextReady) return false;
   while (pending.length) {
     const next = pending.shift();
     if (next) sendToMixpanel(next[0], next[1]);
@@ -141,7 +158,10 @@ function flushPending(): boolean {
  * and replay once it lands rather than being dropped.
  */
 function trackMixpanel(name: string, props: Record<string, unknown>) {
-  if (mixpanelReady()) {
+  // Both conditions, not just the library. Sending as soon as Mixpanel is ready
+  // would let anything clicked in the first couple of seconds go out without the
+  // IP on it.
+  if (mixpanelReady() && contextReady) {
     sendToMixpanel(name, props);
     return;
   }
@@ -162,8 +182,39 @@ function trackMixpanel(name: string, props: Record<string, unknown>) {
   }, 300);
 }
 
+/** Context to put on every Mixpanel event, held until the library can take it. */
+const superProps: Record<string, unknown> = {};
+
+/**
+ * Add super properties, whenever they happen to arrive.
+ *
+ * The IP lookup and the library download race each other, so whichever lands
+ * second applies what the first left here. Registering before the queue is
+ * released is what puts these on the page view as well, rather than only on
+ * whatever the visitor does next.
+ */
+export function registerSuperProps(props: Record<string, unknown>) {
+  Object.assign(superProps, props);
+
+  const mp = window.mixpanel;
+  if (typeof mp?.register !== 'function') return;
+  try {
+    mp.register(props);
+  } catch {
+    // Context is a nice-to-have, never a reason to lose the event.
+  }
+}
+
 /** Called once the library has initialised, to release anything queued. */
 export function onMixpanelReady() {
+  const mp = window.mixpanel;
+  if (typeof mp?.register === 'function' && Object.keys(superProps).length) {
+    try {
+      mp.register(superProps);
+    } catch {
+      // As above.
+    }
+  }
   flushPending();
 }
 
