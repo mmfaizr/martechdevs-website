@@ -49,8 +49,16 @@ export default function Analytics() {
 
     // Hold the queue until this settles, so the page view carries the address
     // rather than racing the library for it. Capped, because a lookup that
-    // never answers must not sit on the events for ever.
+    // never answers must not sit on the events for ever. The lookup runs about
+    // a second in production, so the cap is headroom rather than the usual path.
     const release = setTimeout(markContextReady, 2000);
+
+    // Release early if the visitor leaves first. A page view without the
+    // address still counts the visit; one that never sent counts nothing, and
+    // load-once-and-leave is exactly the behaviour being investigated here.
+    // Delivery on unload is best effort, which still beats a certain loss.
+    const releaseOnLeave = () => markContextReady();
+    window.addEventListener('pagehide', releaseOnLeave);
 
     fetch('/api/client-ip', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
@@ -69,6 +77,7 @@ export default function Analytics() {
     return () => {
       cancelled = true;
       clearTimeout(release);
+      window.removeEventListener('pagehide', releaseOnLeave);
     };
   }, []);
 
