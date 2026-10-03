@@ -7,10 +7,10 @@ import { NextRequest, NextResponse } from 'next/server';
  * either or both of:
  *
  * - Email through Resend. RESEND_API_KEY and QUOTE_TO_EMAIL are required.
- *   QUOTE_FROM_EMAIL needs a domain verified in Resend; without one it falls
- *   back to Resend's shared sender, which only delivers to the address the
- *   Resend account was opened with. Reply-To is the lead, so answering the
- *   email answers them.
+ *   It is sent from quote.martechdevs.com, the subdomain verified in Resend,
+ *   so it passes SPF and DKIM and lands in the inbox rather than in spam.
+ *   QUOTE_FROM_EMAIL overrides the sender and needs a verified domain too.
+ *   Reply-To is the lead, so answering the email answers them.
  * - QUOTE_WEBHOOK_URL, for a Slack incoming webhook, a Zapier or Make catch
  *   hook, or anything else that takes a JSON POST. The body carries a `text`
  *   line for Slack and the raw fields for everything else.
@@ -144,7 +144,7 @@ function escapeHtml(value: string): string {
 }
 
 async function sendEmail(apiKey: string, to: string, lead: Lead, text: string) {
-  const from = process.env.QUOTE_FROM_EMAIL || 'martechdevs leads <onboarding@resend.dev>';
+  const from = process.env.QUOTE_FROM_EMAIL || 'martechdevs leads <leads@quote.martechdevs.com>';
   const subject = `${lead.offer ? '[Startup 50%] ' : ''}New quote request: ${lead.company_domain}`;
 
   const row = (label: string, value: string) =>
