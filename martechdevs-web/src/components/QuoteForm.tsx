@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { identifyLead, pushEvent } from '@/lib/analytics';
-import { markQuoteSubmitted, type QuoteOffer } from '@/lib/quote';
+import { pushEvent } from '@/lib/analytics';
+import { THANK_YOU_PATH, markQuoteSubmitted, reportConversion, stashConversion, type QuoteOffer } from '@/lib/quote';
 
 /* Site palette, the same values the footer uses. */
 const BORDER = '#E4E9E6';
@@ -141,7 +140,6 @@ const tileOn = 'border-teal-700 bg-teal-50/60 shadow-sm';
 const STEPS = ['Your tools', 'What you need', 'Your email'];
 
 export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
-  const router = useRouter();
   const [step, setStep] = useState(0);
   const [tools, setTools] = useState<string[]>([]);
   const [areas, setAreas] = useState<string[]>([]);
@@ -224,49 +222,19 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
 
     markQuoteSubmitted();
 
-    // Email for Google Ads enhanced conversions. Pushed on its own, outside
-    // pushEvent, so it never rides along to Mixpanel or a GA4 event tag.
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ user_data: { email: cleanEmail } });
-
-    const domain = cleanEmail.split('@')[1];
-    const profile = {
-      company_domain: domain,
-      quote_tools: tools.join(', '),
-      quote_areas: areas.join(', '),
-      quote_offer: offer || 'none',
-      quote_submitted_at: new Date().toISOString(),
-    };
-
-    // Profile first, so the submit event below lands on it.
-    identifyLead(cleanEmail, profile);
-
-    pushEvent({
-      event: 'Quote Form Submitted',
-      tools: tools.join(', '),
-      areas: areas.join(', '),
-      tool_count: tools.length,
-      area_count: areas.length,
-      offer: offer || 'none',
-    });
-
-    // Intercom, when GTM has loaded it: `update` with an email creates or
-    // updates the contact, then `quote_requested` fires the Intercom rule for
-    // quote requests, so that rule only runs for people who sent the form.
-    if (typeof window.Intercom === 'function') {
-      try {
-        window.Intercom('update', { email: cleanEmail, company: { company_id: domain, name: domain }, ...profile });
-        window.Intercom('trackEvent', 'quote_requested', {
-          tools: profile.quote_tools,
-          areas: profile.quote_areas,
-          offer: profile.quote_offer,
-        });
-      } catch {
-        // The lead already went through the API.
-      }
+    // The thank-you page reports the lead, not this one, and is loaded in full
+    // rather than routed to in place. That gives Google Ads a real page view on
+    // the conversion URL, and puts `quote_form_submitted` in that page's own
+    // dataLayer, which is where GTM preview and Tag Assistant look for it.
+    const lead = { email: cleanEmail, tools, areas, offer: offer || '' };
+    if (stashConversion(lead)) {
+      window.location.assign(THANK_YOU_PATH);
+    } else {
+      // Storage is blocked, so report from here and give the tags a moment to
+      // send before the page changes.
+      reportConversion({ ...lead, at: Date.now() });
+      setTimeout(() => window.location.assign(THANK_YOU_PATH), 800);
     }
-
-    router.push('/quote/thank-you');
   }
 
   return (

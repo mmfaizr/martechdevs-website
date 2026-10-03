@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import QuoteConversion from '@/components/QuoteConversion';
 
 /**
  * Where the quote form lands. Its own URL so Google Ads can count a lead with
@@ -21,6 +22,7 @@ const NEXT_STEPS = [
 export default function ThankYouPage() {
   return (
     <main className="min-h-screen" style={{ background: 'linear-gradient(to bottom, #F7FAF8, #FFFFFF 420px)' }}>
+      <QuoteConversion />
       <header className="mx-auto flex max-w-5xl items-center px-5 py-6 sm:px-8">
         <Link href="/" aria-label="martechdevs home">
           <Image src="/assets/martechdevs_logo.svg" alt="MartechDevs" width={140} height={35} className="h-8 w-auto" style={{ width: 'auto' }} priority />

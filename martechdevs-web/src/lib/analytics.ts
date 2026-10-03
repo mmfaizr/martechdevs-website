@@ -146,6 +146,12 @@ export function markContextReady() {
 
 function flushPending(): boolean {
   if (!mixpanelReady() || !contextReady) return false;
+  // A waiting lead goes first, so the events queued with it land on its profile.
+  if (pendingLead) {
+    const [email, props] = pendingLead;
+    pendingLead = null;
+    applyLead(email, props);
+  }
   while (pending.length) {
     const next = pending.shift();
     if (next) sendToMixpanel(next[0], next[1]);
@@ -178,7 +184,10 @@ function trackMixpanel(name: string, props: Record<string, unknown>) {
     if (flushPending() || waited >= 20000) {
       clearInterval(flushTimer);
       flushTimer = undefined;
-      if (!mixpanelReady()) pending.length = 0;
+      if (!mixpanelReady()) {
+        pending.length = 0;
+        pendingLead = null;
+      }
     }
   }, 300);
 }
@@ -221,6 +230,9 @@ export function onMixpanelReady() {
 
 /* ---------------------------------------------------------------- leads */
 
+/** A lead that arrived before the library did, applied ahead of the queue. */
+let pendingLead: [string, Record<string, unknown>] | null = null;
+
 /**
  * Give a visitor who just sent the quote form a Mixpanel profile.
  *
@@ -231,10 +243,17 @@ export function onMixpanelReady() {
  * history from this visit into the new profile.
  *
  * Call it before the submit event is tracked, so that event lands on the
- * profile rather than on the anonymous id.
+ * profile rather than on the anonymous id. On a freshly loaded page the
+ * library is usually still downloading, so the lead waits and is applied ahead
+ * of the queued events, which the submit event's own queueing releases.
  */
 export function identifyLead(email: string, props: Record<string, unknown>) {
   if (typeof window === 'undefined') return;
+  if (mixpanelReady() && contextReady) applyLead(email, props);
+  else pendingLead = [email, props];
+}
+
+function applyLead(email: string, props: Record<string, unknown>) {
   const mp = window.mixpanel;
   if (typeof mp?.track !== 'function') return;
 
