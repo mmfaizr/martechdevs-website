@@ -6,6 +6,13 @@ import Image from 'next/image';
 import { openQuote } from '@/lib/quote';
 
 /**
+ * Acquisition ribbon ground: deep emerald into a teal-green glow behind the
+ * text, then forest green. Every stop is dark enough that the amber-200 link
+ * holds at least 4.5:1 contrast wherever the text wraps, white well above.
+ */
+const RIBBON_GRADIENT = 'linear-gradient(90deg, #064E3B 0%, #0B6E5F 50%, #166534 100%)';
+
+/**
  * Party popper for the acquisition ribbon. Drawn here rather than an emoji, so
  * it looks the same on every platform and sits on the site's colours.
  */
@@ -39,10 +46,22 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
           the ribbon at whatever height the ribbon wraps to on small screens.
           The frame passes clicks through its empty margins. */}
       <div className="pointer-events-none fixed inset-x-0 top-0 z-50">
-      <div className="pointer-events-auto flex items-center justify-center gap-2 bg-[#2B3B31] px-4 py-2 text-center text-xs font-medium leading-snug text-white sm:text-sm">
+      <div
+        className="pointer-events-auto flex items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium leading-snug text-white sm:text-sm"
+        style={{ background: RIBBON_GRADIENT }}
+      >
         <Popper />
         <span>
-          martechdevs has been acquired by <span className="font-semibold text-[#F5B942]">Growth and Analytics Partners</span>
+          martechdevs has been acquired by{' '}
+          <a
+            href="https://www.growthandanalytics.com/"
+            target="_blank"
+            rel="noopener"
+            data-track="acquisition_ribbon"
+            className="font-semibold text-[#FDE68A] underline decoration-[#FDE68A]/40 underline-offset-2 transition-colors hover:decoration-[#FDE68A]"
+          >
+            Growth and Analytics Partners
+          </a>
         </span>
         <Popper />
       </div>
@@ -320,12 +339,11 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             Truly DFY. This is our priority <span className="text-teal-600 font-bold">#1</span>
           </motion.p>
 
-          {/* Phones and tablets only. The desktop CTA lives in the column
-              beside the diagram, which on a phone sits a full screen further
-              down, so this keeps a quote button above the fold. */}
-          <div className="-mt-3 mb-2 text-center lg:hidden">
+          {/* The first thing to act on, directly under the headline, so a
+              quote button is above the fold on every screen size. */}
+          <div className="-mt-3 mb-2 text-center">
             <button
-              onClick={() => openQuote('hero_mobile')}
+              onClick={() => openQuote('hero_top')}
               data-track="quote_requested"
               className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-lg font-semibold text-base shadow-md transition-colors"
             >
