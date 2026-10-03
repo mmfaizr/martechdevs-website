@@ -3,19 +3,23 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import { openQuote } from '@/lib/quote';
 
 /**
- * Quote CTA. Records the intent as `quote_requested` in Intercom and stops
- * there. Opening the messenger is Intercom's job: a rule on that event is what
- * starts the conversation, so calling `show` here as well would fight it.
- *
- * Intercom is installed through GTM rather than in this app, so it can still be
- * absent when someone clicks early or when GTM is blocked. The guard keeps that
- * case a no-op rather than a thrown error.
+ * Party popper for the acquisition ribbon. Drawn here rather than an emoji, so
+ * it looks the same on every platform and sits on the site's colours.
  */
-function requestQuote() {
-  if (typeof window.Intercom !== 'function') return;
-  window.Intercom('trackEvent', 'quote_requested');
+function Popper() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0" aria-hidden="true">
+      <path d="M4 20l4.5-12 7.5 7.5z" fill="#F5B942" stroke="#F5B942" strokeWidth={1.5} />
+      <path d="M6.6 14.6l2.8 2.8M8 10.8l5.2 5.2" stroke="#2B3B31" strokeWidth={1.2} />
+      <path d="M14 4.5c.6 1.4.4 2.6-.6 3.6M19.5 10c-1.4-.6-2.6-.4-3.6.6" stroke="#5EEAD4" strokeWidth={1.75} />
+      <path d="M17 3.5v2M20.5 6.5h-2" stroke="#FCA5A5" strokeWidth={1.75} />
+      <circle cx="11" cy="3.5" r="1" fill="#FCA5A5" />
+      <circle cx="20.5" cy="13.5" r="1" fill="#5EEAD4" />
+    </svg>
+  );
 }
 
 export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
@@ -31,8 +35,20 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
 
   return (
     <>
+      {/* Ribbon and navigation share one fixed frame, so the header sits under
+          the ribbon at whatever height the ribbon wraps to on small screens.
+          The frame passes clicks through its empty margins. */}
+      <div className="pointer-events-none fixed inset-x-0 top-0 z-50">
+      <div className="pointer-events-auto flex items-center justify-center gap-2 bg-[#2B3B31] px-4 py-2 text-center text-xs font-medium leading-snug text-white sm:text-sm">
+        <Popper />
+        <span>
+          martechdevs has been acquired by <span className="font-semibold text-[#F5B942]">Growth and Analytics Partners</span>
+        </span>
+        <Popper />
+      </div>
+
       {/* Navigation */}
-      <header className="fixed top-5 left-1/2 -translate-x-1/2 w-[95%] max-w-[1200px] z-50 bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm transition-all duration-300">
+      <header className="pointer-events-auto mx-auto mt-3 w-[95%] max-w-[1200px] bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm transition-all duration-300">
         <div className="px-6 md:px-10">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
@@ -65,7 +81,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
 
             <div className="flex items-center gap-3">
               <button
-                onClick={requestQuote}
+                onClick={() => openQuote('header')}
                 data-track="quote_requested"
                 className="hidden md:flex bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors items-center gap-2 cursor-pointer"
               >
@@ -99,6 +115,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
           </div>
         </div>
       </header>
+      </div>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
@@ -108,7 +125,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-white pt-24 px-6 pb-6 md:hidden"
+            className="fixed inset-0 z-40 bg-white pt-36 px-6 pb-6 md:hidden"
           >
             <div className="flex flex-col gap-6 text-center">
               <a
@@ -137,7 +154,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                 <button
                   data-track="quote_requested"
                   className="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-8 py-3 rounded-lg text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto cursor-pointer"
-                  onClick={() => { setMobileMenuOpen(false); requestQuote(); }}
+                  onClick={() => { setMobileMenuOpen(false); openQuote('mobile_menu'); }}
                 >
                   Get Instant Quote
                 </button>
@@ -156,7 +173,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
       </AnimatePresence>
 
       {/* Hero Section - Centered Content Only */}
-      <section className="pt-36 md:pt-40 pb-12 bg-gradient-to-b from-gray-50 to-white w-full overflow-hidden">
+      <section className="pt-44 md:pt-48 pb-12 bg-gradient-to-b from-gray-50 to-white w-full overflow-hidden">
         <div className="container mx-auto px-6 sm:px-12 lg:px-20 relative">
 
           {/* Top Tagline - Centered */}
@@ -303,6 +320,22 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             Truly DFY. This is our priority <span className="text-teal-600 font-bold">#1</span>
           </motion.p>
 
+          {/* Phones and tablets only. The desktop CTA lives in the column
+              beside the diagram, which on a phone sits a full screen further
+              down, so this keeps a quote button above the fold. */}
+          <div className="-mt-3 mb-2 text-center lg:hidden">
+            <button
+              onClick={() => openQuote('hero_mobile')}
+              data-track="quote_requested"
+              className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-lg font-semibold text-base shadow-md transition-colors"
+            >
+              Request a quote
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
           {/* CTA Button - Centered - REMOVED as requested */}
           {/*
           <motion.div
@@ -326,7 +359,10 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
       </section>
 
       {/* Content + Diagram Section - SEPARATE FROM HERO */}
-      <section className="bg-white py-12 w-full">
+      {/* overflow-x-clip: the diagram slides in from 20px right, and on phones
+          that offset would widen the whole page until it animates. Clip, not
+          hidden, so the sticky text column keeps working. */}
+      <section className="bg-white py-12 w-full overflow-x-clip">
         <div className="w-full px-0 md:px-0">
           <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 items-start">
 
@@ -367,7 +403,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                 className="hidden lg:block"
               >
                 <button
-                  onClick={requestQuote}
+                  onClick={() => openQuote('hero')}
                   data-track="quote_requested"
                   className="inline-flex items-center gap-2 bg-teal-700 hover:bg-teal-800 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
                 >

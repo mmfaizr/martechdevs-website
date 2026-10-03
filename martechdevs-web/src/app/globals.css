@@ -167,3 +167,48 @@ h1, h2, h3, h4, h5, h6 {
    never have worked: every selector but the first targeted elements inside the
    embed, which is a cross-origin document that no stylesheet of ours can reach.
    The booking embed is Cal.com now and needs no overrides at all. */
+
+/* Quote form step entrance. Plain CSS so it runs without JS frames. */
+@keyframes quote-step-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.quote-step-in {
+  animation: quote-step-in 0.22s ease-out both;
+}
+
+@keyframes quote-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes quote-dialog-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.quote-overlay-in {
+  animation: quote-overlay-in 0.2s ease-out both;
+}
+
+.quote-dialog-in {
+  animation: quote-dialog-in 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quote-step-in,
+  .quote-overlay-in,
+  .quote-dialog-in { animation: none; }
+}
+
+/* Intercom out of the way while the quote form is open. Its launcher and
+   proactive messages are pinned above any z-index the page can set, and on a
+   phone the message covered half the tiles. #intercom-container holds the
+   launcher, the notification stack and the messenger; the lightweight app is
+   the launcher Intercom draws before it fully boots. #intercom-frame is left
+   alone: it is Intercom's invisible boot frame. */
+html.quote-open #intercom-container,
+html.quote-open .intercom-lightweight-app {
+  display: none !important;
+}

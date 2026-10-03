@@ -5,6 +5,7 @@ import FeaturedCaseStudies from '@/components/FeaturedCaseStudies';
 import AllServiceSections from '@/components/AllServiceSections';
 import Testimonials from '@/components/Testimonials';
 import Footer from '@/components/Footer';
+import QuoteModal from '@/components/QuoteModal';
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <AllServiceSections />
       <Testimonials />
       <Footer />
+      <QuoteModal />
     </main>
   );
 }

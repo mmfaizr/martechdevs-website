@@ -396,16 +396,16 @@ export default function Testimonials() {
 
         {/* Logo Pagination/Navigation */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-6 mb-10">
-          <div className="inline-flex items-center gap-4 md:gap-6 bg-gray-50/80 backdrop-blur-sm p-3 rounded-2xl border border-gray-100/50 shadow-inner">
+          <div className="inline-flex max-w-full items-center gap-1 sm:gap-4 md:gap-6 bg-gray-50/80 backdrop-blur-sm p-2 sm:p-3 rounded-2xl border border-gray-100/50 shadow-inner">
             {testimonials.map((t) => (
               <button
                 key={t.id}
                 onClick={() => handleLogoClick(t.id)}
-                className={`transition-all duration-300 grayscale hover:grayscale-0 relative px-3 py-2 rounded-lg ${
+                className={`transition-all duration-300 grayscale hover:grayscale-0 relative px-1.5 sm:px-3 py-2 rounded-lg ${
                   activeId === t.id ? 'grayscale-0 bg-white shadow-sm scale-105' : 'opacity-50 hover:opacity-80 hover:bg-white/50'
                 }`}
               >
-                <div className="h-5 w-24 md:h-6 md:w-28 flex items-center justify-center">
+                <div className="h-5 w-16 sm:w-24 md:h-6 md:w-28 flex items-center justify-center">
                   <Image
                     src={`/assets/client logos/${t.clientLogo}`}
                     alt={t.company}

@@ -12,6 +12,7 @@ type Mixpanel = {
   identify: (id: string) => void;
   init: (token: string, config?: Record<string, unknown>) => void;
   register: (props: Record<string, unknown>) => void;
+  people: { set: (props: Record<string, unknown>) => void };
 };
 
 declare global {
@@ -216,6 +217,36 @@ export function onMixpanelReady() {
     }
   }
   flushPending();
+}
+
+/* ---------------------------------------------------------------- leads */
+
+/**
+ * Give a visitor who just sent the quote form a Mixpanel profile.
+ *
+ * Someone who arrived on an outbound link is already identified by the id in
+ * `utm_campaign`. Switching them to their email would split one person across
+ * two profiles, so they keep that id and the email goes onto it as `$email`.
+ * Everyone else is identified by the email itself, which merges the anonymous
+ * history from this visit into the new profile.
+ *
+ * Call it before the submit event is tracked, so that event lands on the
+ * profile rather than on the anonymous id.
+ */
+export function identifyLead(email: string, props: Record<string, unknown>) {
+  if (typeof window === 'undefined') return;
+  const mp = window.mixpanel;
+  if (typeof mp?.track !== 'function') return;
+
+  try {
+    if (!currentUserId() && identified !== email) {
+      identified = email;
+      mp.identify?.(email);
+    }
+    mp.people?.set({ $email: email, ...props });
+  } catch {
+    // A failed profile update must not block the thank-you page.
+  }
 }
 
 /* ---------------------------------------------------------------- push */
