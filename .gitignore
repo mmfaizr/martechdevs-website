@@ -14,3 +14,7 @@
 # no commits, refs or reflog survived - so there is nothing in it to recover.
 # Kept on disk until the new history is safely pushed, then it can be deleted.
 .git.broken/
+
+# local secrets. Production values live in Vercel's environment variables.
+.env
+.env.*
