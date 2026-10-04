@@ -8,6 +8,51 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
+  /* Bottom edge of the fixed ribbon and header. HeroSection measures and sets
+     the real value, because the ribbon wraps to two lines on narrow screens;
+     these are the values the page starts with until it does. */
+  --header-bottom: 127px;
+  /* Room the pinned service cards leave below the header for the services nav.
+     The nav wraps onto more rows the narrower the screen, up to four on the
+     smallest phones, so the room steps down as the screen widens. */
+  --services-nav-room: 124px;
+}
+
+@media (min-width: 360px) {
+  :root {
+    --services-nav-room: 100px;
+  }
+}
+
+@media (min-width: 480px) {
+  :root {
+    --services-nav-room: 72px;
+  }
+}
+
+@media (min-width: 640px) {
+  :root {
+    --header-bottom: 114px;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --services-nav-room: 80px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --services-nav-room: 66px;
+  }
+}
+
+/* A pinned service card pads its content clear of the ribbon, the header and
+   the services nav that hangs from it. A stylesheet rule rather than an inline
+   style, because the CSS build drops custom properties no rule uses. */
+.service-card-pinned {
+  padding-top: calc(var(--header-bottom) + var(--services-nav-room));
 }
 
 html {

@@ -422,7 +422,7 @@ export default function AllServiceSections() {
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
-      const headerHeight = 84; // Approximately the height of the fixed header
+      const headerHeight = headerBottom();
 
       // Hysteresis, not a single threshold. The show/hide line sits exactly at
       // the top of the first card and the bottom of the last one, so a bare
@@ -535,7 +535,10 @@ export default function AllServiceSections() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-[84px] inset-x-0 z-30 w-full pointer-events-none flex justify-center"
+            // 2px up, so its top edge tucks under the header's border and the
+            // two read as one panel.
+            style={{ top: 'calc(var(--header-bottom) - 2px)' }}
+            className="fixed inset-x-0 z-30 w-full pointer-events-none flex justify-center"
           >
             <div className="pointer-events-auto w-[95%] md:w-[90%] max-w-[1150px] relative">
               <div className="bg-white/95 backdrop-blur-md border-x border-b border-gray-200 shadow-sm rounded-b-2xl px-2 py-1.5 md:px-4 md:py-2.5 mx-auto w-full origin-top">
@@ -603,14 +606,24 @@ export default function AllServiceSections() {
 
 /**
  * The stack pins flush with the top of the viewport so each card's tint runs
- * full-bleed behind the floating header (20-86) and the services nav (84-135) -
- * both of which stay above it on z-index. Pinning lower left a hard horizontal
- * seam across the page instead.
+ * full-bleed behind the ribbon, the floating header and the services nav that
+ * hangs from it, all of which stay above it on z-index. Pinning lower left a
+ * hard horizontal seam across the page instead.
  */
 const STACK_TOP = 0;
 
-/** Clearance so pinned content clears those two floating bars. */
-const CONTENT_INSET = 152;
+/**
+ * The header's bottom edge in px, as HeroSection publishes it. Read from the
+ * inline style it sets, which costs nothing inside a scroll handler, with the
+ * stylesheet default behind it.
+ */
+function headerBottom(): number {
+  const root = document.documentElement;
+  const value =
+    root.style.getPropertyValue('--header-bottom') ||
+    getComputedStyle(root).getPropertyValue('--header-bottom');
+  return parseFloat(value) || 114;
+}
 
 /**
  * One card in the scroll stack.
@@ -761,7 +774,7 @@ const StackedService = memo(function StackedService({
           )}
           <ServiceSection
             {...service}
-            topInset={CONTENT_INSET}
+            pinned
             style={
               // Both ends of the stack are square: the first card has nothing
               // behind it to slide over, and the last one is deliberately left

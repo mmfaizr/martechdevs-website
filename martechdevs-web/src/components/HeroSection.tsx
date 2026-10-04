@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { openQuote } from '@/lib/quote';
@@ -31,6 +31,24 @@ function Popper() {
 
 export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Publish where the header ends as --header-bottom. The services nav hangs
+  // from it and the pinned service cards pad below it, and its position moves
+  // with the ribbon above, which wraps to two lines on narrow screens.
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const publish = () =>
+      document.documentElement.style.setProperty(
+        '--header-bottom',
+        `${Math.round(header.getBoundingClientRect().bottom)}px`
+      );
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(header.parentElement ?? header);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -67,7 +85,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
       </div>
 
       {/* Navigation */}
-      <header className="pointer-events-auto mx-auto mt-3 w-[95%] max-w-[1200px] bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm transition-all duration-300">
+      <header ref={headerRef} className="pointer-events-auto mx-auto mt-3 w-[95%] max-w-[1200px] bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm transition-all duration-300">
         <div className="px-6 md:px-10">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
@@ -385,7 +403,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
           <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 items-start">
 
             {/* Left Column - Sticky Text */}
-            <div className="lg:sticky lg:top-32 lg:self-start space-y-6 px-4 md:pl-10 lg:pl-20">
+            <div className="lg:sticky lg:top-[calc(var(--header-bottom)_+_2.5rem)] lg:self-start space-y-6 px-4 md:pl-10 lg:pl-20">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}

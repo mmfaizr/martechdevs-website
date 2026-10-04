@@ -27,10 +27,10 @@ interface ServiceSectionProps {
   accentColor?: string;
   whatWeDo: ServiceItem[];
   whatYouGet: ServiceItem[];
-  /** Clearance for the floating header + services nav when the card is pinned
-   *  at the top of the viewport. The tint runs full-bleed behind both; this
-   *  just keeps the content out from under them. */
-  topInset?: number;
+  /** Pinned at the top of the viewport in the services stack. The tint runs
+   *  full-bleed behind the floating ribbon, header and services nav, and the
+   *  content is padded out from under them (`.service-card-pinned`). */
+  pinned?: boolean;
   /** Applied to the <section> itself. The rounded corners live here rather than
    *  on a wrapper with overflow:hidden - a background clips to its own radius
    *  for free, whereas eight stacked full-viewport rounded masks broke
@@ -47,7 +47,7 @@ export default function ServiceSection({
   bgColor,
   whatWeDo,
   whatYouGet,
-  topInset,
+  pinned,
   style,
 }: ServiceSectionProps) {
   // Opens on the outcome, not the method. Someone scanning the page wants to know
@@ -60,8 +60,8 @@ export default function ServiceSection({
       // min-height matters for the stack: a pinned card has to reach the bottom
       // of the viewport, or the incoming card's inset edges reveal the white
       // page in the bottom corners instead of the card behind.
-      className={`${bgColor} py-12 md:py-16 lg:py-20 ${topInset ? 'min-h-[100svh]' : ''}`}
-      style={{ ...(topInset ? { paddingTop: topInset } : null), ...style }}
+      className={`${bgColor} py-12 md:py-16 lg:py-20 ${pinned ? 'service-card-pinned min-h-[100svh]' : ''}`}
+      style={style}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
