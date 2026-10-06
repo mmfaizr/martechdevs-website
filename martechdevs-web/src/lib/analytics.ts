@@ -46,29 +46,54 @@ export type DataLayerEvent = Record<string, unknown> & { event: string };
 const USER_ID_KEY = 'mtd_user_id';
 
 /**
+ * A lead id from the outbound email links: six lowercase Crockford base32
+ * characters, so a real campaign name like `lead_gen` never matches.
+ */
+const LEAD_ID_RE = /^[0-9a-hjkmnp-tv-z]{6}$/;
+
+export function isLeadId(value: string): boolean {
+  return LEAD_ID_RE.test(value);
+}
+
+/**
  * The visitor's id, taken from `utm_campaign` on the landing URL.
  *
- * Outbound links carry a per-recipient value there, so it answers who clicked
- * rather than which campaign they came from. The URL wins whenever it carries
- * one, so a fresh link re-identifies someone mid-session; otherwise the value
- * stored on arrival is reused, which is what keeps the id on events fired long
- * after landing and on any URL that has since lost its query string.
+ * Only the outbound email links (utm_source=email, utm_medium=martech) carry a
+ * per-recipient lead id there. Every other source, ads included, puts a shared
+ * campaign name in that slot, which would merge all of its visitors into one
+ * Mixpanel profile, so those are ignored.
  *
- * Returns empty for organic and direct visits, and `pushEvent` then omits the
- * key rather than sending a blank id.
+ * The URL wins whenever it carries an id, so a fresh link re-identifies someone
+ * mid-session; otherwise the value stored on arrival is reused, which is what
+ * keeps the id on events fired long after landing and on any URL that has
+ * since lost its query string.
+ *
+ * Returns empty for every other visit, and `pushEvent` then omits the key
+ * rather than sending a blank id.
  */
 function currentUserId(): string {
   let id = '';
 
   try {
-    id = new URLSearchParams(window.location.search).get('utm_campaign')?.trim() || '';
+    const params = new URLSearchParams(window.location.search);
+    const campaign = params.get('utm_campaign')?.trim().toLowerCase() || '';
+    if (
+      params.get('utm_source') === 'email' &&
+      params.get('utm_medium') === 'martech' &&
+      isLeadId(campaign)
+    ) {
+      id = campaign;
+    }
   } catch {
     // A malformed query string is not worth losing the event over.
   }
 
   try {
     if (id) sessionStorage.setItem(USER_ID_KEY, id);
-    else id = sessionStorage.getItem(USER_ID_KEY) || '';
+    else {
+      const stored = sessionStorage.getItem(USER_ID_KEY) || '';
+      if (isLeadId(stored)) id = stored;
+    }
   } catch {
     // Private mode and blocked site data both throw on access. The id from the
     // URL still stands for this page, it just will not outlive it.

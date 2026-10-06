@@ -8,6 +8,7 @@ import {
   clickEventName,
   clickDepth,
   registerSuperProps,
+  isLeadId,
   markContextReady,
   EVENTS,
   onMixpanelReady,
@@ -267,6 +268,16 @@ export default function Analytics() {
           autocapture: false,
           record_sessions_percent: 100,
         });
+
+        // Browsers once identified by a shared campaign name (any utm_campaign
+        // was taken as the id) go back to an anonymous id. A kept id is the
+        // anonymous one, an outbound lead id, or a quote form email.
+        try {
+          const id = String(mixpanel.get_distinct_id() || '');
+          if (id && !id.startsWith('$device:') && !isLeadId(id) && !id.includes('@')) mixpanel.reset();
+        } catch {
+          // Leave the id alone rather than fail the load.
+        }
 
         // Context that belongs on every event rather than being repeated at
         // each call site.
