@@ -11,6 +11,15 @@ import { NextRequest, NextResponse } from 'next/server';
  *   so it passes SPF and DKIM and lands in the inbox rather than in spam.
  *   QUOTE_FROM_EMAIL overrides the sender and needs a verified domain too.
  *   Reply-To is the lead, so answering the email answers them.
+ * - Twenty, when TWENTY_API_KEY is set. The lead becomes a person (with the
+ *   quote fields filled) and company, plus a New stage opportunity owned by
+ *   Faiz (TWENTY_OWNER_MEMBER_ID overrides), with the request as a note. A
+ *   Twenty workflow on the person's Quote submitted at field sends the
+ *   thank-you email from faiz@martechdevs.com. scripts/twenty-setup.mjs
+ *   creates the fields.
+ * - Attio, when ATTIO_API_KEY is set. The lead becomes a person and company,
+ *   a Lead stage deal owned by ATTIO_DEAL_OWNER, and an entry in the "Quote
+ *   requests" list. scripts/attio-setup.mjs creates the fields and the list.
  * - QUOTE_WEBHOOK_URL, for a Slack incoming webhook, a Zapier or Make catch
  *   hook, or anything else that takes a JSON POST. The body carries a `text`
  *   line for Slack and the raw fields for everything else.
@@ -94,8 +103,10 @@ export async function POST(request: NextRequest) {
   const webhook = process.env.QUOTE_WEBHOOK_URL;
   const resendKey = process.env.RESEND_API_KEY;
   const to = process.env.QUOTE_TO_EMAIL;
+  const attioKey = process.env.ATTIO_API_KEY;
+  const twentyKey = process.env.TWENTY_API_KEY;
 
-  if (!webhook && !(resendKey && to)) {
+  if (!webhook && !(resendKey && to) && !attioKey && !twentyKey) {
     console.log('[quote] no destination set, lead logged only:', JSON.stringify(lead));
     return NextResponse.json({ ok: true });
   }
@@ -103,6 +114,8 @@ export async function POST(request: NextRequest) {
   const sends: Promise<void>[] = [];
   if (resendKey && to) sends.push(sendEmail(resendKey, to, lead, text));
   if (webhook) sends.push(postWebhook(webhook, { text, ...lead }));
+  if (attioKey) sends.push(sendToAttio(attioKey, lead, text));
+  if (twentyKey) sends.push(sendToTwenty(twentyKey, lead, text));
 
   // The lead counts as delivered if any destination took it. Only when every
   // one failed does the visitor see an error and get the chance to retry.
@@ -184,4 +197,138 @@ async function sendEmail(apiKey: string, to: string, lead: Lead, text: string) {
     signal: AbortSignal.timeout(8000),
   });
   if (!res.ok) throw new Error(`resend answered ${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
+function sourceLine(lead: Lead) {
+  return [lead.attribution.utm_source, lead.attribution.utm_campaign, lead.attribution.gclid ? 'gclid' : '']
+    .filter(Boolean)
+    .join(' / ');
+}
+
+async function twenty(apiKey: string, method: string, path: string, body?: Record<string, unknown>) {
+  const base = process.env.TWENTY_API_URL || 'https://api.twenty.com';
+  const res = await fetch(`${base}/rest${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error(`twenty ${method} ${path} answered ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return (await res.json()).data as Record<string, unknown>;
+}
+
+type TwentyRecord = { id: string };
+
+/** The first record matching `filter`, in Twenty's REST filter syntax. */
+async function twentyFind(apiKey: string, plural: string, filter: string): Promise<TwentyRecord | undefined> {
+  const data = await twenty(apiKey, 'GET', `/${plural}?limit=1&filter=${encodeURIComponent(filter)}`);
+  return (data[plural] as TwentyRecord[])[0];
+}
+
+/**
+ * Company and person are found before they are created, so a repeat lead
+ * updates the same records. The company goes in first: Twenty's built-in
+ * "Create company when adding a new person" workflow then finds it rather than
+ * making a second one. Each request gets its own opportunity.
+ */
+async function sendToTwenty(apiKey: string, lead: Lead, text: string) {
+  const domain = lead.company_domain.replace(/"/g, '');
+  const company =
+    (await twentyFind(apiKey, 'companies', `domainName.primaryLinkUrl[ilike]:"%${domain}"`)) ??
+    ((await twenty(apiKey, 'POST', '/companies', {
+      name: domain,
+      domainName: { primaryLinkUrl: `https://${domain}`, primaryLinkLabel: domain },
+    })).createCompany as TwentyRecord);
+
+  const fields = {
+    companyId: company.id,
+    quoteTools: lead.tools.join(', '),
+    quoteAreas: lead.areas.join(', '),
+    quoteOffer: lead.offer ? OFFERS[lead.offer] : '',
+    quoteSource: sourceLine(lead) || 'direct',
+    quoteSubmittedAt: lead.submitted_at,
+  };
+  const existing = await twentyFind(apiKey, 'people', `emails.primaryEmail[eq]:"${lead.email.replace(/"/g, '')}"`);
+  const person = existing
+    ? ((await twenty(apiKey, 'PATCH', `/people/${existing.id}`, fields)).updatePerson as TwentyRecord)
+    : ((await twenty(apiKey, 'POST', '/people', { emails: { primaryEmail: lead.email }, ...fields }))
+        .createPerson as TwentyRecord);
+
+  // Faiz's workspace member in Twenty.
+  const ownerId = process.env.TWENTY_OWNER_MEMBER_ID || 'f8152b5b-263d-4c59-ae70-d6fbb45fda64';
+  const opportunity = (await twenty(apiKey, 'POST', '/opportunities', {
+    name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${lead.company_domain}`,
+    stage: 'NEW',
+    companyId: company.id,
+    pointOfContactId: person.id,
+    ownerId,
+  })).createOpportunity as TwentyRecord;
+
+  const note = (await twenty(apiKey, 'POST', '/notes', {
+    title: 'Website quote request',
+    bodyV2: { markdown: text.replace(/\n/g, '\n\n') },
+  })).createNote as TwentyRecord;
+  await twenty(apiKey, 'POST', '/noteTargets', { noteId: note.id, targetOpportunityId: opportunity.id });
+}
+
+async function attio(apiKey: string, method: string, path: string, data: Record<string, unknown>) {
+  const res = await fetch(`https://api.attio.com/v2${path}`, {
+    method,
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data }),
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error(`attio ${method} ${path} answered ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return (await res.json()).data as { id: { record_id: string } };
+}
+
+/**
+ * Company and person are asserted, so a repeat lead updates the same records.
+ * The list entry is asserted too, so someone who asks twice is listed once.
+ * Each request still gets its own deal.
+ */
+async function sendToAttio(apiKey: string, lead: Lead, text: string) {
+  const company = await attio(apiKey, 'PUT', '/objects/companies/records?matching_attribute=domains', {
+    values: { domains: [lead.company_domain] },
+  });
+  const companyRef = { target_object: 'companies', target_record_id: company.id.record_id };
+
+  const source = sourceLine(lead);
+  const person = await attio(apiKey, 'PUT', '/objects/people/records?matching_attribute=email_addresses', {
+    values: {
+      email_addresses: [lead.email],
+      company: [companyRef],
+      quote_tools: lead.tools.join(', '),
+      quote_areas: lead.areas.join(', '),
+      quote_offer: lead.offer ? OFFERS[lead.offer] : '',
+      quote_source: source || 'direct',
+      quote_submitted_at: lead.submitted_at,
+    },
+  });
+  const personId = person.id.record_id;
+
+  const deal = await attio(apiKey, 'POST', '/objects/deals/records', {
+    values: {
+      name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${lead.company_domain}`,
+      stage: 'Lead',
+      owner: [{ workspace_member_email_address: process.env.ATTIO_DEAL_OWNER || 'faiz@martechdevs.com' }],
+      associated_people: [{ target_object: 'people', target_record_id: personId }],
+      associated_company: [companyRef],
+    },
+  });
+
+  await Promise.all([
+    attio(apiKey, 'POST', '/notes', {
+      parent_object: 'deals',
+      parent_record_id: deal.id.record_id,
+      title: 'Website quote request',
+      format: 'plaintext',
+      content: text,
+    }),
+    attio(apiKey, 'PUT', '/lists/quote_requests/entries', {
+      parent_object: 'people',
+      parent_record_id: personId,
+      entry_values: {},
+    }),
+  ]);
 }
