@@ -52,6 +52,23 @@ const ICONS = {
   arrow: 'M5 12h14M13 6l6 6-6 6',
 };
 
+/** Addresses as filed with the Florida Secretary of State, plus the Dhaka team. */
+const OFFICES = [
+  {
+    label: 'Principal office',
+    lines: ['Growth & Analytics Partners LLC', '7901 4th St N, Ste 300', 'St. Petersburg, FL 33702, USA'],
+  },
+  {
+    label: 'Global capability center',
+    lines: [
+      'JCX Business Tower (10th Floor)',
+      '1136/A, Block I, Japan Street',
+      'Bashundhara Residential Area',
+      'Dhaka 1229, Bangladesh',
+    ],
+  },
+];
+
 const CALL_FACTS = [
   { icon: ICONS.clock, label: '30 minutes' },
   /* Not "Google Meet or Zoom" any more. The event behind this calendar is set
@@ -552,6 +569,22 @@ export default function Footer() {
                 </p>
               </div>
 
+              <div className="grid gap-6 text-[13px] leading-relaxed sm:grid-cols-2 sm:gap-10">
+                {OFFICES.map((o) => (
+                  <address key={o.label} className="not-italic" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    <span
+                      className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider"
+                      style={{ color: 'rgba(255,255,255,0.32)' }}
+                    >
+                      {o.label}
+                    </span>
+                    {o.lines.map((line) => (
+                      <span key={line} className="block">{line}</span>
+                    ))}
+                  </address>
+                ))}
+              </div>
+
               <div className="flex gap-2.5">
                 <a
                   href="https://www.linkedin.com/company/martechdevs"
@@ -585,7 +618,7 @@ export default function Footer() {
               className="mt-9 flex flex-col gap-4 text-[13px] sm:flex-row sm:items-center sm:justify-between"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              <p>© {new Date().getFullYear()} martechdevs. All rights reserved.</p>
+              <p>© {new Date().getFullYear()} Growth &amp; Analytics Partners LLC. martechdevs is a Growth &amp; Analytics Partners company.</p>
               {/* Both still point at "#": src/app has no /privacy or /terms
                   route, and parking them is more honest than shipping two 404s.
                   Swap the moment those pages exist. */}
