@@ -78,7 +78,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
             data-track="acquisition_ribbon"
             className="font-semibold text-[#FDE68A] underline decoration-[#FDE68A]/40 underline-offset-2 transition-colors hover:decoration-[#FDE68A]"
           >
-            Growth and Analytics Partners
+            Growth and Analytics Partners LLC
           </a>
         </span>
         <Popper />
