@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { pushEvent } from '@/lib/analytics';
+import StackScan from '@/components/StackScan';
 import { THANK_YOU_PATH, markQuoteSubmitted, reportConversion, stashConversion, type QuoteOffer } from '@/lib/quote';
 
 /* Site palette, the same values the footer uses. */
@@ -137,6 +138,7 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
   const [tools, setTools] = useState<string[]>([]);
   const [areas, setAreas] = useState<string[]>([]);
   const [email, setEmail] = useState('');
+  const [site, setSite] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [touched, setTouched] = useState(false);
   const [sending, setSending] = useState(false);
@@ -211,6 +213,7 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
           email: cleanEmail,
           tools,
           areas,
+          site,
           website: honeypot,
           offer: offer || '',
           attribution: { ...attribution, page: window.location.pathname },
@@ -281,6 +284,11 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                 Which tools do you use today?
               </legend>
               <p className="mt-1 text-sm text-gray-500">Pick all that apply. It tells us what we are integrating.</p>
+
+              <StackScan
+                onSite={setSite}
+                onFound={(found) => setTools((list) => [...list, ...found.filter((t) => !list.includes(t))])}
+              />
 
               <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-2.5 lg:grid-cols-5">
                 {TOOLS.map((tool) => {
