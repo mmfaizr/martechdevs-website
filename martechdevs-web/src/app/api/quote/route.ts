@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { companyDomain } from '@/lib/freeDomains';
 
 /**
  * Quote form submissions.
@@ -34,13 +35,6 @@ const OFFERS: Record<string, string> = { startup_50: 'Startup 50% off (exit offe
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Kept short and server side as well, so a crafted POST cannot skip it. */
-const FREE_DOMAINS = new Set([
-  'gmail.com', 'googlemail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
-  'live.com', 'msn.com', 'icloud.com', 'me.com', 'aol.com', 'proton.me',
-  'protonmail.com', 'gmx.com', 'mail.com', 'yandex.com', 'zoho.com',
-]);
-
 function list(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((v): v is string => typeof v === 'string').map((v) => v.slice(0, 80)).slice(0, 40);
@@ -61,9 +55,8 @@ export async function POST(request: NextRequest) {
   }
 
   const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
-  const domain = email.split('@')[1] || '';
-  if (!EMAIL_RE.test(email) || FREE_DOMAINS.has(domain)) {
-    return NextResponse.json({ ok: false, error: 'Please use your company email' }, { status: 400 });
+  if (!EMAIL_RE.test(email)) {
+    return NextResponse.json({ ok: false, error: 'Please enter a valid email' }, { status: 400 });
   }
 
   const tools = list(body.tools);
@@ -81,7 +74,7 @@ export async function POST(request: NextRequest) {
 
   const lead = {
     email,
-    company_domain: domain,
+    company_domain: companyDomain(email),
     tools,
     areas,
     offer,
@@ -134,6 +127,7 @@ export async function POST(request: NextRequest) {
 
 type Lead = {
   email: string;
+  /** Blank for a personal mailbox. */
   company_domain: string;
   tools: string[];
   areas: string[];
@@ -152,13 +146,18 @@ async function postWebhook(url: string, payload: Record<string, unknown>) {
   if (!res.ok) throw new Error(`webhook answered ${res.status}`);
 }
 
+/** What a lead is called in subjects and deal names: the company, else the email. */
+function leadName(lead: Lead): string {
+  return lead.company_domain || lead.email;
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
 }
 
 async function sendEmail(apiKey: string, to: string, lead: Lead, text: string) {
   const from = process.env.QUOTE_FROM_EMAIL || 'martechdevs leads <leads@quote.martechdevs.com>';
-  const subject = `${lead.offer ? '[Startup 50%] ' : ''}New quote request: ${lead.company_domain}`;
+  const subject = `${lead.offer ? '[Startup 50%] ' : ''}New quote request: ${leadName(lead)}`;
 
   const row = (label: string, value: string) =>
     `<tr><td style="padding:6px 16px 6px 0;color:#6b7280;vertical-align:top;white-space:nowrap">${label}</td>` +
@@ -173,7 +172,7 @@ async function sendEmail(apiKey: string, to: string, lead: Lead, text: string) {
     `<h2 style="margin:0 0 12px;font-size:18px;color:#111827">New quote request</h2>` +
     `<table style="border-collapse:collapse">` +
     row('Email', lead.email) +
-    row('Company', lead.company_domain) +
+    row('Company', lead.company_domain || 'Personal email') +
     row('Tools', lead.tools.join(', ')) +
     row('Needs help with', lead.areas.join(', ')) +
     (lead.offer ? row('Offer', OFFERS[lead.offer]) : '') +
@@ -233,15 +232,16 @@ async function twentyFind(apiKey: string, plural: string, filter: string): Promi
  */
 async function sendToTwenty(apiKey: string, lead: Lead, text: string) {
   const domain = lead.company_domain.replace(/"/g, '');
-  const company =
-    (await twentyFind(apiKey, 'companies', `domainName.primaryLinkUrl[ilike]:"%${domain}"`)) ??
-    ((await twenty(apiKey, 'POST', '/companies', {
-      name: domain,
-      domainName: { primaryLinkUrl: `https://${domain}`, primaryLinkLabel: domain },
-    })).createCompany as TwentyRecord);
+  const company = domain
+    ? ((await twentyFind(apiKey, 'companies', `domainName.primaryLinkUrl[ilike]:"%${domain}"`)) ??
+      ((await twenty(apiKey, 'POST', '/companies', {
+        name: domain,
+        domainName: { primaryLinkUrl: `https://${domain}`, primaryLinkLabel: domain },
+      })).createCompany as TwentyRecord))
+    : undefined;
 
   const fields = {
-    companyId: company.id,
+    ...(company ? { companyId: company.id } : {}),
     quoteTools: lead.tools.join(', '),
     quoteAreas: lead.areas.join(', '),
     quoteOffer: lead.offer ? OFFERS[lead.offer] : '',
@@ -257,9 +257,9 @@ async function sendToTwenty(apiKey: string, lead: Lead, text: string) {
   // Faiz's workspace member in Twenty.
   const ownerId = process.env.TWENTY_OWNER_MEMBER_ID || 'f8152b5b-263d-4c59-ae70-d6fbb45fda64';
   const opportunity = (await twenty(apiKey, 'POST', '/opportunities', {
-    name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${lead.company_domain}`,
+    name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${leadName(lead)}`,
     stage: 'NEW',
-    companyId: company.id,
+    ...(company ? { companyId: company.id } : {}),
     pointOfContactId: person.id,
     ownerId,
   })).createOpportunity as TwentyRecord;
@@ -288,16 +288,18 @@ async function attio(apiKey: string, method: string, path: string, data: Record<
  * Each request still gets its own deal.
  */
 async function sendToAttio(apiKey: string, lead: Lead, text: string) {
-  const company = await attio(apiKey, 'PUT', '/objects/companies/records?matching_attribute=domains', {
-    values: { domains: [lead.company_domain] },
-  });
-  const companyRef = { target_object: 'companies', target_record_id: company.id.record_id };
+  const company = lead.company_domain
+    ? await attio(apiKey, 'PUT', '/objects/companies/records?matching_attribute=domains', {
+        values: { domains: [lead.company_domain] },
+      })
+    : undefined;
+  const companyRefs = company ? [{ target_object: 'companies', target_record_id: company.id.record_id }] : [];
 
   const source = sourceLine(lead);
   const person = await attio(apiKey, 'PUT', '/objects/people/records?matching_attribute=email_addresses', {
     values: {
       email_addresses: [lead.email],
-      company: [companyRef],
+      company: companyRefs,
       quote_tools: lead.tools.join(', '),
       quote_areas: lead.areas.join(', '),
       quote_offer: lead.offer ? OFFERS[lead.offer] : '',
@@ -309,11 +311,11 @@ async function sendToAttio(apiKey: string, lead: Lead, text: string) {
 
   const deal = await attio(apiKey, 'POST', '/objects/deals/records', {
     values: {
-      name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${lead.company_domain}`,
+      name: `${lead.offer ? '[Startup 50%] ' : ''}Quote: ${leadName(lead)}`,
       stage: 'Lead',
       owner: [{ workspace_member_email_address: process.env.ATTIO_DEAL_OWNER || 'faiz@martechdevs.com' }],
       associated_people: [{ target_object: 'people', target_record_id: personId }],
-      associated_company: [companyRef],
+      associated_company: companyRefs,
     },
   });
 

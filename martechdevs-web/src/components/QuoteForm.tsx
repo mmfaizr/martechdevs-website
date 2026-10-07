@@ -96,12 +96,6 @@ const AREAS = [
   },
 ];
 
-const FREE_DOMAINS = new Set([
-  'gmail.com', 'googlemail.com', 'yahoo.com', 'hotmail.com', 'outlook.com',
-  'live.com', 'msn.com', 'icloud.com', 'me.com', 'aol.com', 'proton.me',
-  'protonmail.com', 'gmx.com', 'mail.com', 'yandex.com', 'zoho.com',
-]);
-
 const ATTRIBUTION_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid'];
 
 /** Where the landing URL's ad parameters are kept until the form is sent. */
@@ -109,9 +103,8 @@ const ATTRIBUTION_STORE = 'mtd_quote_attribution';
 
 function emailProblem(email: string): string {
   const value = email.trim().toLowerCase();
-  if (!value) return 'Enter your work email.';
+  if (!value) return 'Enter your email.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'That email does not look right.';
-  if (FREE_DOMAINS.has(value.split('@')[1])) return 'Please use your company email, not a personal one.';
   return '';
 }
 
@@ -174,7 +167,18 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
 
   const goTo = (next: number) => {
     setStep(next);
-    pushEvent({ event: 'Quote Form Step Viewed', step: next + 1, step_name: STEPS[next], offer: offer || 'none' });
+    // The picks so far ride on every step event, so a visitor who drops off
+    // before the email step still shows what they were after.
+    pushEvent({
+      event: 'Quote Form Step Viewed',
+      step: next + 1,
+      step_name: STEPS[next],
+      offer: offer || 'none',
+      tools: tools.join(', '),
+      areas: areas.join(', '),
+      tool_count: tools.length,
+      area_count: areas.length,
+    });
     // The form sits in a scrolling modal, so bring its top back into view
     // rather than scrolling the page underneath.
     rootRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -405,7 +409,7 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
               </div>
 
               <label htmlFor="quote-email" className="mt-6 block text-sm font-semibold text-gray-900">
-                Company email
+                Email
               </label>
               <input
                 ref={emailRef}

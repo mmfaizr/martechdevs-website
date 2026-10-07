@@ -1,4 +1,5 @@
 import { identifyLead, pushEvent } from '@/lib/analytics';
+import { companyDomain } from '@/lib/freeDomains';
 
 /**
  * Opening the quote form from anywhere on the page.
@@ -124,7 +125,7 @@ function whenIntercom(fn: (intercom: NonNullable<Window['Intercom']>) => void) {
  * event its rule listens for.
  */
 export function reportConversion(lead: QuoteLead) {
-  const domain = lead.email.split('@')[1] || '';
+  const domain = companyDomain(lead.email);
   const tools = lead.tools.join(', ');
   const areas = lead.areas.join(', ');
   const offer = lead.offer || 'none';
@@ -155,7 +156,11 @@ export function reportConversion(lead: QuoteLead) {
   });
 
   whenIntercom((intercom) => {
-    intercom('update', { email: lead.email, company: { company_id: domain, name: domain }, ...profile });
+    intercom('update', {
+      email: lead.email,
+      ...(domain ? { company: { company_id: domain, name: domain } } : {}),
+      ...profile,
+    });
     intercom('trackEvent', 'quote_requested', { tools, areas, offer });
   });
 }
