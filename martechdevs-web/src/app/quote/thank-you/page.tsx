@@ -56,7 +56,7 @@ export default function ThankYouPage() {
 
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link href="/#book-call" className="inline-flex items-center gap-2 rounded-lg bg-teal-700 px-6 py-3 font-semibold text-white shadow-md transition-colors hover:bg-teal-800">
-            Book a call instead
+            Book a free audit instead
           </Link>
           <Link href="/" className="inline-flex items-center gap-2 rounded-lg border bg-white px-6 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-50" style={{ borderColor: '#E4E9E6' }}>
             Back to the site

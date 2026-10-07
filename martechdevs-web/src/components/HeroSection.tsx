@@ -129,7 +129,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                 data-track="book_call"
                 className="hidden md:flex bg-gray-50 hover:bg-gray-100 text-gray-900 px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors items-center gap-2 border border-gray-200"
               >
-                Book a call
+                Book a Free Audit
               </a>
 
               {/* Mobile Menu Button */}
@@ -201,7 +201,7 @@ export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) 
                   className="inline-flex bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-3 rounded-lg text-lg font-semibold transition-colors items-center gap-2 justify-center w-full max-w-xs mx-auto"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Book a call
+                  Book a Free Audit
                 </a>
               </div>
             </div>

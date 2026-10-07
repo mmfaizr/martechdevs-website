@@ -186,10 +186,10 @@ export default function Footer() {
             className="text-center mb-10"
           >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
-              Book a call
+              Book a Free Audit
             </h2>
             <p className="text-gray-600 text-base max-w-lg mx-auto">
-              A free consultation to work out what your stack needs. No pitch.
+              A free audit of your stack and what it needs. No pitch.
             </p>
           </motion.div>
 
@@ -340,7 +340,7 @@ export default function Footer() {
       {/* ---------------------------------------------------------- footer */}
       {/* The argument first, the evidence under it.
        *
-       * Directly above this sits a 5xl "Book a call" heading and a live
+       * Directly above this sits a 5xl "Book a Free Audit" heading and a live
        * calendar, so a sixth booking button here would be the same ask at the
        * same volume thirty pixels later. Instead: the reason stated once, then
        * the one route the calendar cannot offer - a smaller commitment. An
