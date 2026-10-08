@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import QuoteForm from '@/components/QuoteForm';
+import { Confetti, Popper } from '@/components/Festive';
 import { pushEvent } from '@/lib/analytics';
 import { OPEN_QUOTE_EVENT, hasSubmittedQuote, type OpenQuoteDetail, type QuoteOffer } from '@/lib/quote';
 
@@ -182,28 +183,35 @@ export default function QuoteModal() {
         </button>
 
         <div className="overflow-y-auto overscroll-contain px-4 pb-2 pt-10 sm:px-8 sm:pt-7">
-          <div className="mx-auto mb-5 max-w-2xl text-center">
+          <div className={`relative mx-auto mb-4 text-center ${startup ? '-mx-4 -mt-10 px-4 pb-4 pt-10 sm:-mx-8 sm:-mt-7 sm:px-8 sm:pt-6' : 'max-w-2xl'}`}
+               style={startup ? { background: 'radial-gradient(90% 100% at 50% 0%, #E3F4EC 0%, #FFFFFF 75%)' } : undefined}>
+            {startup && <Confetti />}
             {startup ? (
-              <>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800">
-                  Startup offer
+              <div className="relative mx-auto max-w-2xl">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-teal-800">
+                  <Popper className="h-5 w-5" />
+                  martechdevs startup offer
                 </span>
                 <h2 id="quote-dialog-title" className="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-                  Wait, startups get <span className="text-teal-700">50% off</span>
+                  Wait, startups get{' '}
+                  <span className="relative whitespace-nowrap text-teal-700">
+                    50% off
+                    <svg viewBox="0 0 120 10" preserveAspectRatio="none" className="absolute -bottom-1.5 left-0 h-2 w-full" aria-hidden="true">
+                      <path d="M2 7c30-5 70-6 116-2" fill="none" stroke="#5EEAD4" strokeWidth="4" strokeLinecap="round" />
+                    </svg>
+                  </span>
                 </h2>
-                <p className="mt-2 text-sm text-gray-600 sm:text-base">
-                  Tell us your stack in under a minute and we will send a fixed quote with the discount applied.
-                </p>
-              </>
+                <p className="mt-2.5 text-sm text-gray-600 sm:text-base">Tell us your stack and get a fixed quote with the discount applied.</p>
+              </div>
             ) : (
               <>
                 <h2 id="quote-dialog-title" className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
                   Get a fixed-price quote
                 </h2>
-                <p className="mt-2 hidden text-sm text-gray-600 sm:block sm:text-base">Two quick questions and your email. Takes under a minute.</p>
+                <p className="mt-2 text-sm text-gray-600 sm:text-base">Three quick steps. Takes under a minute.</p>
               </>
             )}
-            <ul className="mt-3 hidden flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-gray-600 sm:flex">
+            <ul className="relative mt-3 hidden flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-gray-600 sm:flex">
               {PROOF.map((item) => (
                 <li key={item} className="flex items-center gap-1.5">
                   <Tick />

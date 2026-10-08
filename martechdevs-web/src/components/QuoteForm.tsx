@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { pushEvent } from '@/lib/analytics';
-import StackScan from '@/components/StackScan';
 import { THANK_YOU_PATH, markQuoteSubmitted, reportConversion, stashConversion, type QuoteOffer } from '@/lib/quote';
 
 /* Site palette, the same values the footer uses. */
@@ -14,80 +13,42 @@ const TOOL_ICON = (file: string) => `/assets/tool logos icons/${file} logo icon.
 /** Question one. Logos are the ones already shipped for the service sections. */
 const TOOLS = [
   { label: 'HubSpot', icon: TOOL_ICON('hubspot') },
-  { label: 'Salesforce', icon: TOOL_ICON('salesforce') },
   { label: 'Segment', icon: TOOL_ICON('segment') },
-  { label: 'RudderStack', icon: TOOL_ICON('rudderstuck') },
   { label: 'GA4', icon: TOOL_ICON('ga4') },
   { label: 'GTM', icon: TOOL_ICON('gtm') },
   { label: 'Google Ads', icon: TOOL_ICON('google ads') },
-  { label: 'Meta Ads', icon: TOOL_ICON('meta ads') },
   { label: 'Mixpanel', icon: TOOL_ICON('mixpanel') },
-  { label: 'Amplitude', icon: TOOL_ICON('amplitude') },
   { label: 'Braze', icon: TOOL_ICON('braze') },
-  { label: 'Customer.io', icon: TOOL_ICON('customerio') },
   { label: 'Intercom', icon: TOOL_ICON('intercom') },
-  { label: 'Zendesk', icon: TOOL_ICON('zendesk') },
   { label: 'Snowflake', icon: TOOL_ICON('snowflake') },
-  { label: 'BigQuery', icon: TOOL_ICON('bigquery') },
   { label: 'Fivetran', icon: TOOL_ICON('fivetran') },
-  { label: 'Hightouch', icon: TOOL_ICON('hightouch') },
 ];
 
 /* Stroke icons on a 24 box, 1.75 wide, round caps: the footer's icon language. */
 const AREAS = [
   {
-    label: 'Ad conversion tracking',
-    hint: 'Server-side GTM, CAPI, enhanced conversions',
+    label: 'Tracking & ad conversions',
+    hint: 'GTM, server-side, CAPI, Consent Mode v2',
     path: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 12h.01',
   },
   {
-    label: 'Consent & compliance',
-    hint: 'Consent Mode v2, GDPR, cookie banners',
-    path: 'M12 3.5l7 2.6v5.6c0 4.3-3 7.4-7 8.8-4-1.4-7-4.5-7-8.8V6.1zM9 12l2.2 2.2L15.5 10',
-  },
-  {
-    label: 'Product analytics',
-    hint: 'Event plans, funnels, retention',
+    label: 'Analytics & attribution',
+    hint: 'Funnels, retention, dashboards, true ROI',
     path: 'M4 20h16M7 16v-5M12 16V6M17 16v-8',
   },
   {
-    label: 'CDP & identity',
-    hint: 'Segment or RudderStack, one customer view',
-    path: 'M12 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M5 20c.8-3.4 3.6-5.5 7-5.5s6.2 2.1 7 5.5',
-  },
-  {
-    label: 'CRM & lead routing',
-    hint: 'Pipelines, lead scoring, MQL to SQL',
-    path: 'M4 5h16l-6 7.5V19l-4-2v-4.5z',
-  },
-  {
-    label: 'Lifecycle messaging',
-    hint: 'Email, push and in-app journeys',
-    path: 'M3.5 6.5h17v11h-17zM3.5 7.2 12 13l8.5-5.8',
-  },
-  {
-    label: 'Data warehouse',
-    hint: 'Snowflake or BigQuery, pipelines, dbt',
+    label: 'CDP & data warehouse',
+    hint: 'Segment, Snowflake, pipelines, reverse ETL',
     path: 'M12 3.5c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3M4 6.5v11c0 1.7 3.6 3 8 3s8-1.3 8-3v-11M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
   },
   {
-    label: 'Reverse ETL & audiences',
-    hint: 'Warehouse segments into your tools',
-    path: 'M4 9h13l-3.5-3.5M20 15H7l3.5 3.5',
+    label: 'CRM & lifecycle messaging',
+    hint: 'Lead routing, email and push journeys',
+    path: 'M3.5 6.5h17v11h-17zM3.5 7.2 12 13l8.5-5.8',
   },
   {
-    label: 'Reporting & attribution',
-    hint: 'Dashboards you can trust, true ROI',
-    path: 'M12 3.5a8.5 8.5 0 1 0 8.5 8.5H12zM15 3.8A8.5 8.5 0 0 1 20.2 9H15z',
-  },
-  {
-    label: 'Support & AI chatbots',
-    hint: 'Intercom or Zendesk, Fin, routing',
-    path: 'M4.5 5.5h15v10h-8l-4.5 3.5v-3.5h-2.5zM9 10.5h.01M12 10.5h.01M15 10.5h.01',
-  },
-  {
-    label: 'AI agents & automation',
-    hint: 'Agents wired into your own data',
+    label: 'Support & AI agents',
+    hint: 'Intercom, Fin, agents on your own data',
     path: 'M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8zM18.5 16l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z',
   },
   {
@@ -95,6 +56,12 @@ const AREAS = [
     hint: 'Tell us the goal, we will scope it',
     path: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M9.6 9.3a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.7M12 17h.01',
   },
+];
+
+/** Where the stack runs. Picked on step one alongside the tools. */
+const PLATFORMS = [
+  { label: 'Website', path: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M3.5 12h17M12 3.5c2.3 2.4 3.4 5.2 3.4 8.5s-1.1 6.1-3.4 8.5c-2.3-2.4-3.4-5.2-3.4-8.5s1.1-6.1 3.4-8.5' },
+  { label: 'Mobile apps', path: 'M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 19V5A1.5 1.5 0 0 1 8 3.5M11 17.5h2' },
 ];
 
 const ATTRIBUTION_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'gclid', 'gbraid', 'wbraid'];
@@ -130,15 +97,28 @@ const tileBase =
   'relative flex w-full rounded-xl border-2 bg-white text-left transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2';
 const tileIdle = 'border-[#E4E9E6] hover:border-teal-600/50 hover:shadow-sm';
 const tileOn = 'border-teal-700 bg-teal-50/60 shadow-sm';
+/** Platform and tool tiles on step one: icon and name side by side. */
+const tileRow = 'items-center gap-3 px-3 py-3 sm:px-4 sm:py-3.5';
+const tileLabel = 'pr-4 text-sm font-semibold leading-tight text-gray-900 sm:text-base';
 
-const STEPS = ['Your tools', 'What you need', 'Your email'];
+const STEPS = ['Your stack', 'What you need', 'Your email'];
+
+/** Every step is the same height, so the dialog does not jump between them. */
+const stepFrame = 'quote-step-in flex flex-col sm:min-h-[524px]';
+
+/* One footer and one set of buttons for every step, so Back and the main
+   action sit in exactly the same place whichever step is showing. */
+const footerRow = 'sticky bottom-0 mt-auto flex items-center justify-between gap-4 bg-white/95 pb-5 pt-6 backdrop-blur-sm';
+const primaryBtn =
+  'inline-flex items-center gap-2 rounded-lg bg-teal-700 px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none';
+const backBtn = 'px-2 py-3 text-sm font-semibold text-gray-600 hover:text-gray-900';
 
 export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
   const [step, setStep] = useState(0);
   const [tools, setTools] = useState<string[]>([]);
   const [areas, setAreas] = useState<string[]>([]);
+  const [platforms, setPlatforms] = useState<string[]>([]);
   const [email, setEmail] = useState('');
-  const [site, setSite] = useState('');
   const [honeypot, setHoneypot] = useState('');
   const [touched, setTouched] = useState(false);
   const [sending, setSending] = useState(false);
@@ -176,6 +156,7 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
       step: next + 1,
       step_name: STEPS[next],
       offer: offer || 'none',
+      platforms: platforms.join(', '),
       tools: tools.join(', '),
       areas: areas.join(', '),
       tool_count: tools.length,
@@ -211,9 +192,9 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: cleanEmail,
+          platforms,
           tools,
           areas,
-          site,
           website: honeypot,
           offer: offer || '',
           attribution: { ...attribution, page: window.location.pathname },
@@ -247,7 +228,7 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
   return (
     <div ref={rootRef} className="mx-auto w-full max-w-4xl scroll-mt-4">
       {/* Progress */}
-      <div className="mb-5 flex items-center gap-2 sm:gap-3" aria-label={`Step ${step + 1} of 3`}>
+      <div className="mb-7 flex items-center gap-2 sm:gap-3" aria-label={`Step ${step + 1} of 3`}>
         {STEPS.map((name, i) => (
           <div key={name} className="flex flex-1 flex-col gap-2">
             <div className="h-1.5 overflow-hidden rounded-full" style={{ background: BORDER }}>
@@ -276,21 +257,42 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
             exit-then-enter sequencing waits on animation frames, and a
             throttled tab can leave the form blank between steps. */}
           {step === 0 && (
-            <fieldset
+            <div
               key="tools"
-              className="quote-step-in"
+              role="group"
+              aria-labelledby="quote-step-tools"
+              className={stepFrame}
             >
-              <legend className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
-                Which tools do you use today?
-              </legend>
-              <p className="mt-1 text-sm text-gray-500">Pick all that apply. It tells us what we are integrating.</p>
+              <h2 id="quote-step-tools" className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
+                Tell us about your stack
+              </h2>
+              <p className="mt-1.5 text-sm text-gray-500">Pick everything that applies. It tells us what we are integrating.</p>
 
-              <StackScan
-                onSite={setSite}
-                onFound={(found) => setTools((list) => [...list, ...found.filter((t) => !list.includes(t))])}
-              />
+              <p className="mt-6 text-sm font-semibold text-gray-900">Where do your customers use your product?</p>
+              <div className="mt-2.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {PLATFORMS.map((p) => {
+                  const on = platforms.includes(p.label);
+                  return (
+                    <button
+                      key={p.label}
+                      type="button"
+                      aria-pressed={on}
+                      data-track="quote_platform"
+                      onClick={() => toggle(setPlatforms, p.label)}
+                      className={`${tileBase} ${on ? tileOn : tileIdle} ${tileRow}`}
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: '#F2F6F4' }}>
+                        <Icon path={p.path} className={`h-5 w-5 ${on ? 'text-teal-700' : 'text-gray-600'}`} />
+                      </span>
+                      <span className={tileLabel}>{p.label}</span>
+                      {on && <Check />}
+                    </button>
+                  );
+                })}
+              </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-2.5 lg:grid-cols-5">
+              <p className="mt-6 text-sm font-semibold text-gray-900">Do you use any of these tools currently? <span className="font-normal text-gray-400">(optional)</span></p>
+              <div className="mt-2.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {TOOLS.map((tool) => {
                   const on = tools.includes(tool.label);
                   return (
@@ -300,10 +302,10 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                       aria-pressed={on}
                       data-track="quote_tool"
                       onClick={() => toggle(setTools, tool.label)}
-                      className={`${tileBase} ${on ? tileOn : tileIdle} flex-col items-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-2.5 sm:px-3 sm:text-left`}
+                      className={`${tileBase} ${on ? tileOn : tileIdle} ${tileRow}`}
                     >
-                      <Image src={tool.icon} alt="" width={32} height={32} className="h-6 w-6 shrink-0 rounded-md sm:h-7 sm:w-7" />
-                      <span className="text-xs font-semibold leading-tight text-gray-900 sm:pr-4 sm:text-sm">{tool.label}</span>
+                      <Image src={tool.icon} alt="" width={32} height={32} className="h-8 w-8 shrink-0 rounded-lg" />
+                      <span className={tileLabel}>{tool.label}</span>
                       {on && <Check />}
                     </button>
                   );
@@ -316,43 +318,46 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                       aria-pressed={on}
                       data-track="quote_tool"
                       onClick={() => toggle(setTools, 'Other')}
-                      className={`${tileBase} ${on ? tileOn : tileIdle} flex-col items-center gap-1 px-1.5 py-2 text-center sm:flex-row sm:gap-2.5 sm:px-3 sm:text-left`}
+                      className={`${tileBase} ${on ? tileOn : tileIdle} ${tileRow}`}
                     >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-500" style={{ background: '#F2F6F4' }}>
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500" style={{ background: '#F2F6F4' }}>
                         <Icon path="M12 5v14M5 12h14" className="h-4 w-4" />
                       </span>
-                      <span className="text-xs font-semibold leading-tight text-gray-900 sm:pr-4 sm:text-sm">Other</span>
+                      <span className={tileLabel}>Other</span>
                       {on && <Check />}
                     </button>
                   );
                 })()}
               </div>
 
-              <div className="sticky bottom-0 mt-4 flex justify-end bg-white/95 py-3 backdrop-blur-sm">
+              <div className={footerRow}>
+                <span />
                 <button
                   type="button"
-                  disabled={!tools.length}
+                  disabled={!platforms.length}
                   onClick={() => goTo(1)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-teal-700 px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                  className={primaryBtn}
                 >
                   Continue
                   <Icon path="M5 12h14M13 6l6 6-6 6" className="h-4 w-4" />
                 </button>
               </div>
-            </fieldset>
+            </div>
           )}
 
           {step === 1 && (
-            <fieldset
+            <div
               key="areas"
-              className="quote-step-in"
+              role="group"
+              aria-labelledby="quote-step-areas"
+              className={stepFrame}
             >
-              <legend className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
+              <h2 id="quote-step-areas" className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
                 Where do you need support?
-              </legend>
-              <p className="mt-1 text-sm text-gray-500">Pick all that apply. We price each area separately.</p>
+              </h2>
+              <p className="mt-1.5 text-sm text-gray-500">Pick all that apply. We price each area separately.</p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5 lg:grid-cols-4">
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {AREAS.map((area) => {
                   const on = areas.includes(area.label);
                   return (
@@ -362,17 +367,17 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                       aria-pressed={on}
                       data-track="quote_area"
                       onClick={() => toggle(setAreas, area.label)}
-                      className={`${tileBase} ${on ? tileOn : tileIdle} items-center gap-2.5 p-2.5 sm:items-start sm:p-3`}
+                      className={`${tileBase} ${on ? tileOn : tileIdle} ${tileRow} sm:py-4`}
                     >
                       <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${on ? 'bg-teal-700 text-white' : 'text-teal-800'}`}
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${on ? 'bg-teal-700 text-white' : 'text-teal-800'}`}
                         style={on ? undefined : { background: '#F2F6F4' }}
                       >
                         <Icon path={area.path} className="h-5 w-5" />
                       </span>
-                      <span className="pr-3">
-                        <span className="block text-xs font-semibold leading-tight text-gray-900 sm:text-sm">{area.label}</span>
-                        <span className="mt-0.5 hidden text-xs leading-snug text-gray-500 sm:block">{area.hint}</span>
+                      <span className="pr-4">
+                        <span className="block text-sm font-semibold leading-tight text-gray-900 sm:text-base">{area.label}</span>
+                        <span className="mt-1 block text-xs leading-snug text-gray-500 sm:text-sm">{area.hint}</span>
                       </span>
                       {on && <Check />}
                     </button>
@@ -380,39 +385,41 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                 })}
               </div>
 
-              <div className="sticky bottom-0 mt-4 flex items-center justify-between bg-white/95 py-3 backdrop-blur-sm">
-                <button type="button" onClick={() => goTo(0)} className="px-2 py-3 text-sm font-semibold text-gray-600 hover:text-gray-900">
+              <div className={footerRow}>
+                <button type="button" onClick={() => goTo(0)} className={backBtn}>
                   Back
                 </button>
                 <button
                   type="button"
                   disabled={!areas.length}
                   onClick={() => goTo(2)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-teal-700 px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                  className={primaryBtn}
                 >
                   Continue
                   <Icon path="M5 12h14M13 6l6 6-6 6" className="h-4 w-4" />
                 </button>
               </div>
-            </fieldset>
+            </div>
           )}
 
           {step === 2 && (
             <div
               key="email"
-              className="quote-step-in mx-auto max-w-xl"
+              className={stepFrame}
             >
+              <div className="mx-auto w-full max-w-xl">
               <h2 className="text-xl font-semibold tracking-tight text-gray-900 sm:text-2xl">
                 Where should we send your quote?
               </h2>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-1.5 text-sm text-gray-500">
                 {offer === 'startup_50'
-                  ? 'Your quote comes with the 50% startup discount applied, usually within one business day.'
+                  ? 'With the 50% startup discount applied, usually within one business day.'
                   : 'A fixed price and timeline, usually within one business day.'}
               </p>
 
               <div className="mt-6 rounded-xl border p-4 text-sm text-gray-600" style={{ borderColor: BORDER, background: '#F7FAF8' }}>
-                <p><span className="font-semibold text-gray-900">Tools:</span> {tools.join(', ')}</p>
+                {!!platforms.length && <p className="mb-1"><span className="font-semibold text-gray-900">Platforms:</span> {platforms.join(', ')}</p>}
+                <p><span className="font-semibold text-gray-900">Tools:</span> {tools.join(', ') || 'None yet'}</p>
                 <p className="mt-1"><span className="font-semibold text-gray-900">Support:</span> {areas.join(', ')}</p>
               </div>
 
@@ -431,29 +438,28 @@ export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
                 onBlur={() => setTouched(true)}
                 aria-invalid={touched && !!problem}
                 aria-describedby="quote-email-error"
-                className={`mt-2 w-full rounded-xl border-2 bg-white px-4 py-4 text-lg text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-teal-700 ${touched && problem ? 'border-red-400' : 'border-[#E4E9E6]'}`}
+                className={`mt-2 w-full rounded-xl border-2 bg-white px-4 py-3.5 text-lg text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-teal-700 ${touched && problem ? 'border-red-400' : 'border-[#E4E9E6]'}`}
               />
               <p id="quote-email-error" className="mt-2 min-h-5 text-sm text-red-600" role="alert">
                 {(touched && problem) || sendError}
               </p>
 
-              <button
-                type="submit"
-                disabled={sending}
-                className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 px-7 py-4 text-lg font-semibold text-white shadow-md transition-all hover:bg-teal-800 hover:shadow-lg disabled:opacity-60"
-              >
-                {sending ? 'Sending…' : 'Get my quote'}
-                {!sending && <Icon path="M5 12h14M13 6l6 6-6 6" className="h-5 w-5" />}
-              </button>
+              </div>
 
-              <div className="mt-4 flex items-center justify-between">
-                <button type="button" onClick={() => goTo(1)} className="px-2 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900">
+              <div className={footerRow}>
+                <button type="button" onClick={() => goTo(1)} className={backBtn}>
                   Back
                 </button>
-                <p className="flex items-center gap-1.5 text-xs text-gray-500">
-                  <Icon path="M12 3.5l7 2.6v5.6c0 4.3-3 7.4-7 8.8-4-1.4-7-4.5-7-8.8V6.1zM9 12l2.2 2.2L15.5 10" className="h-4 w-4" />
-                  No spam. One email with your quote.
-                </p>
+                <div className="flex items-center gap-4">
+                  <p className="hidden items-center gap-1.5 text-xs text-gray-500 sm:flex">
+                    <Icon path="M12 3.5l7 2.6v5.6c0 4.3-3 7.4-7 8.8-4-1.4-7-4.5-7-8.8V6.1zM9 12l2.2 2.2L15.5 10" className="h-4 w-4" />
+                    No spam. One email with your quote.
+                  </p>
+                  <button type="submit" disabled={sending} className={primaryBtn}>
+                    {sending ? 'Sending…' : 'Get my quote'}
+                    {!sending && <Icon path="M5 12h14M13 6l6 6-6 6" className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             </div>
           )}

@@ -59,12 +59,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Please enter a valid email' }, { status: 400 });
   }
 
-  // The site the visitor scanned on step one, if any. Hostname only.
-  const site =
-    typeof body.site === 'string' && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(body.site.trim())
-      ? body.site.trim().toLowerCase().slice(0, 100)
-      : '';
-
+  const platforms = list(body.platforms);
   const tools = list(body.tools);
   const areas = list(body.areas);
   const attribution =
@@ -80,9 +75,8 @@ export async function POST(request: NextRequest) {
 
   const lead = {
     email,
-    // A personal email still gets a company when the scanned site names one.
-    company_domain: companyDomain(email) || site,
-    site,
+    company_domain: companyDomain(email),
+    platforms,
     tools,
     areas,
     offer,
@@ -92,9 +86,9 @@ export async function POST(request: NextRequest) {
 
   const text =
     `New quote request from ${email}\n` +
+    (platforms.length ? `Platforms: ${platforms.join(', ')}\n` : '') +
     `Tools: ${tools.join(', ') || 'none picked'}\n` +
     `Needs help with: ${areas.join(', ') || 'none picked'}` +
-    (site ? `\nWebsite scanned: ${site}` : '') +
     (offer ? `\nOffer: ${OFFERS[offer]}` : '') +
     (attribution.utm_source || attribution.gclid
       ? `\nSource: ${[attribution.utm_source, attribution.utm_campaign, attribution.gclid ? 'gclid' : '']
@@ -136,9 +130,9 @@ export async function POST(request: NextRequest) {
 
 type Lead = {
   email: string;
-  /** Blank for a personal mailbox with no scanned site. */
+  /** Blank for a personal mailbox. */
   company_domain: string;
-  site: string;
+  platforms: string[];
   tools: string[];
   areas: string[];
   offer: string;
@@ -183,7 +177,7 @@ async function sendEmail(apiKey: string, to: string, lead: Lead, text: string) {
     `<table style="border-collapse:collapse">` +
     row('Email', lead.email) +
     row('Company', lead.company_domain || 'Personal email') +
-    (lead.site ? row('Website scanned', lead.site) : '') +
+    row('Platforms', lead.platforms.join(', ')) +
     row('Tools', lead.tools.join(', ')) +
     row('Needs help with', lead.areas.join(', ')) +
     (lead.offer ? row('Offer', OFFERS[lead.offer]) : '') +

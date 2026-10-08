@@ -241,10 +241,26 @@ h1, h2, h3, h4, h5, h6 {
   animation: quote-dialog-in 0.25s ease-out both;
 }
 
+/* Startup offer confetti: drops in once, then drifts a little. */
+@keyframes quote-confetti {
+  0% { opacity: 0; transform: translateY(-14px) rotate(-20deg); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes quote-confetti-float {
+  50% { transform: translateY(-4px); }
+}
+
+.quote-confetti {
+  animation: quote-confetti 0.7s ease-out both, quote-confetti-float 3.2s ease-in-out 0.8s infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .quote-step-in,
   .quote-overlay-in,
-  .quote-dialog-in { animation: none; }
+  .quote-dialog-in,
+  .quote-confetti { animation: none; }
 }
 
 /* Intercom out of the way while the quote form is open. Its launcher and

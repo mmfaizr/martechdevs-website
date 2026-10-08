@@ -4,30 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { openQuote } from '@/lib/quote';
-
-/**
- * Acquisition ribbon ground: deep emerald into a teal-green glow behind the
- * text, then forest green. Every stop is dark enough that the amber-200 link
- * holds at least 4.5:1 contrast wherever the text wraps, white well above.
- */
-const RIBBON_GRADIENT = 'linear-gradient(90deg, #064E3B 0%, #0B6E5F 50%, #166534 100%)';
-
-/**
- * Party popper for the acquisition ribbon. Drawn here rather than an emoji, so
- * it looks the same on every platform and sits on the site's colours.
- */
-function Popper() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 shrink-0" aria-hidden="true">
-      <path d="M4 20l4.5-12 7.5 7.5z" fill="#F5B942" stroke="#F5B942" strokeWidth={1.5} />
-      <path d="M6.6 14.6l2.8 2.8M8 10.8l5.2 5.2" stroke="#2B3B31" strokeWidth={1.2} />
-      <path d="M14 4.5c.6 1.4.4 2.6-.6 3.6M19.5 10c-1.4-.6-2.6-.4-3.6.6" stroke="#5EEAD4" strokeWidth={1.75} />
-      <path d="M17 3.5v2M20.5 6.5h-2" stroke="#FCA5A5" strokeWidth={1.75} />
-      <circle cx="11" cy="3.5" r="1" fill="#FCA5A5" />
-      <circle cx="20.5" cy="13.5" r="1" fill="#5EEAD4" />
-    </svg>
-  );
-}
+import { Popper, RIBBON_GRADIENT } from '@/components/Festive';
 
 export default function HeroSection({ diagram }: { diagram?: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
