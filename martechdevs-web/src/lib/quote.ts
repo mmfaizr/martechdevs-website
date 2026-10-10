@@ -11,10 +11,22 @@ import { companyDomain } from '@/lib/freeDomains';
 
 export type QuoteOffer = 'startup_50';
 
+/** The needs on the form's second step, by the label the visitor sees. */
+export type QuoteArea =
+  | 'Tracking & ad conversions'
+  | 'Analytics & attribution'
+  | 'CDP & data warehouse'
+  | 'CRM & lifecycle messaging'
+  | 'GTM engineering & outbound'
+  | 'Support & AI agents'
+  | 'Not sure yet';
+
 export type OpenQuoteDetail = {
   /** Where the form was opened from, for reporting. */
   source: string;
   offer?: QuoteOffer;
+  /** Ticked in advance on the second step. The visitor can still change it. */
+  area?: QuoteArea;
 };
 
 export const OPEN_QUOTE_EVENT = 'mtd:open-quote';
@@ -25,8 +37,8 @@ export const OPEN_QUOTE_EVENT = 'mtd:open-quote';
  */
 const SUBMITTED_KEY = 'mtd_quote_submitted';
 
-export function openQuote(source: string, offer?: QuoteOffer) {
-  window.dispatchEvent(new CustomEvent<OpenQuoteDetail>(OPEN_QUOTE_EVENT, { detail: { source, offer } }));
+export function openQuote(source: string, offer?: QuoteOffer, area?: QuoteArea) {
+  window.dispatchEvent(new CustomEvent<OpenQuoteDetail>(OPEN_QUOTE_EVENT, { detail: { source, offer, area } }));
 }
 
 export function markQuoteSubmitted() {

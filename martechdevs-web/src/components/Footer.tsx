@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { SERVICE_PAGES } from '@/lib/site';
 
 /* The palette here is the site's own, not Tailwind's defaults.
  *
@@ -157,7 +158,9 @@ const BOOKING_URL = 'https://cal.com/team/martechdevs/discovery';
 const SKELETON_HOLD_MS = 700;
 const SKELETON_FADE_MS = 500;
 
-export default function Footer() {
+/** `home` keeps the stage links as bare anchors. Elsewhere they lead back to
+ *  the homepage sections, since the service pages do not carry them. */
+export default function Footer({ home = false }: { home?: boolean }) {
   const [bookingLoaded, setBookingLoaded] = useState(false);
   const [skeletonFading, setSkeletonFading] = useState(false);
   const [skeletonGone, setSkeletonGone] = useState(false);
@@ -301,9 +304,13 @@ export default function Footer() {
                     page-level chrome the standalone booking page carries, so
                     nothing has to be cropped from this side. */}
                 <div className="absolute inset-0 overflow-hidden">
+                  {/* Lazy, so a visitor who never scrolls this far never
+                      downloads Cal.com. It starts loading a screen or so
+                      before it comes into view. */}
                   <iframe
                     src={`${BOOKING_URL}?embed=true&layout=month_view`}
                     title="Book a discovery call with MartechDevs"
+                    loading="lazy"
                     className="absolute inset-0 w-full h-full border-0"
                     onLoad={() => setBookingLoaded(true)}
                   />
@@ -517,7 +524,7 @@ export default function Footer() {
                       {s.links.map(([label, href]) => (
                         <li key={href}>
                           <a
-                            href={href}
+                            href={home ? href : `/${href}`}
                             className="group inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors hover:text-white"
                             style={{ color: 'rgba(255,255,255,0.78)' }}
                           >
@@ -540,6 +547,23 @@ export default function Footer() {
             <p className="mt-8 max-w-4xl text-[12.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
               <span style={{ color: 'rgba(255,255,255,0.5)' }}>Also integrate: </span>{ALSO}
             </p>
+
+            {/* The service pages, one line rather than a column of links. */}
+            <nav aria-label="Service pages" className="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2.5 text-[13px]">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Services
+              </span>
+              {SERVICE_PAGES.map((page) => (
+                <a
+                  key={page.slug}
+                  href={`/${page.slug}`}
+                  className="font-medium transition-colors hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.78)' }}
+                >
+                  {page.label}
+                </a>
+              ))}
+            </nav>
 
             {/* ------------------------------------------------- the rail -- */}
             <div

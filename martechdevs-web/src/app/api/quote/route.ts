@@ -90,6 +90,9 @@ export async function POST(request: NextRequest) {
     `Tools: ${tools.join(', ') || 'none picked'}\n` +
     `Needs help with: ${areas.join(', ') || 'none picked'}` +
     (offer ? `\nOffer: ${OFFERS[offer]}` : '') +
+    // The service page the form was sent from, which is the ad group for a
+    // lead from Google Ads. Left off for the homepage.
+    (attribution.page && attribution.page !== '/' ? `\nPage: ${attribution.page}` : '') +
     (attribution.utm_source || attribution.gclid
       ? `\nSource: ${[attribution.utm_source, attribution.utm_campaign, attribution.gclid ? 'gclid' : '']
           .filter(Boolean)

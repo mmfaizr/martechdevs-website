@@ -3,6 +3,7 @@ import { Inter_Tight } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import Analytics from "@/components/Analytics";
+import { SITE_URL } from "@/lib/site";
 // Chat widget disabled. Re-enable by uncommenting this import and the
 // <MartechChat /> mount below.
 // import MartechChat from "@/components/MartechChat";
@@ -14,6 +15,8 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
+  // Resolves each page's relative canonical and Open Graph URL.
+  metadataBase: new URL(SITE_URL),
   title: "martechdevs - We Integrate Your Martech + Analytics + GTM + Agentic Tools",
   description: "We integrate your Martech + Analytics + GTM + Agentic tools. Lightning fast. Get accurate data, automated messaging, and unified customer views.",
   keywords: "martech, analytics, GTM, server-side GTM, agentic tools, AI agents, Segment, Mixpanel, HubSpot, data integration, customer data platform",

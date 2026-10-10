@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import HeroSection from '@/components/HeroSection';
 import MartechStack from '@/components/MartechStack';
 import ClientLogos from '@/components/ClientLogos';
@@ -7,6 +8,10 @@ import Testimonials from '@/components/Testimonials';
 import Footer from '@/components/Footer';
 import QuoteModal from '@/components/QuoteModal';
 
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
@@ -14,7 +19,7 @@ export default function Home() {
       <ClientLogos />
       <AllServiceSections />
       <Testimonials />
-      <Footer />
+      <Footer home />
       <QuoteModal />
     </main>
   );

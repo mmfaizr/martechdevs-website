@@ -4,13 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import QuoteForm from '@/components/QuoteForm';
 import { Confetti, Popper } from '@/components/Festive';
 import { pushEvent } from '@/lib/analytics';
-import { OPEN_QUOTE_EVENT, hasSubmittedQuote, type OpenQuoteDetail, type QuoteOffer } from '@/lib/quote';
+import { OPEN_QUOTE_EVENT, hasSubmittedQuote, type OpenQuoteDetail, type QuoteArea, type QuoteOffer } from '@/lib/quote';
 
 /**
- * The quote form as a modal on the homepage, plus the exit-intent startup offer.
+ * The quote form as a modal, plus the exit-intent startup offer.
  *
  * Any CTA opens it through `openQuote`. Opening the page at `/#quote` opens it
  * too, so an ad or an email can land someone straight on the form.
+ *
+ * A service page passes its own `area`, so the form opens with that need
+ * ticked however it was opened: a CTA, the header, the exit offer or the link.
  *
  * Plain CSS for the entrance rather than framer's AnimatePresence: its exit
  * sequencing waits on animation frames, and a throttled tab could leave the
@@ -42,9 +45,13 @@ function Tick() {
   );
 }
 
-export default function QuoteModal() {
+export default function QuoteModal({ area: pageArea }: { area?: QuoteArea }) {
   const [open, setOpen] = useState(false);
   const [offer, setOffer] = useState<QuoteOffer | undefined>();
+  const [area, setArea] = useState<QuoteArea | undefined>();
+  // "Wait," only makes sense to someone on their way out. A visitor who
+  // clicked a startup offer on the page gets the plain headline.
+  const [fromExit, setFromExit] = useState(false);
   const openRef = useRef(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -53,10 +60,18 @@ export default function QuoteModal() {
     if (openRef.current) return;
     openRef.current = true;
     returnFocus.current = document.activeElement as HTMLElement | null;
+    const preselected = detail.area ?? pageArea;
     setOffer(detail.offer);
+    setArea(preselected);
+    setFromExit(detail.source === 'exit_intent');
     setOpen(true);
-    pushEvent({ event: 'Quote Form Opened', source: detail.source, offer: detail.offer || 'none' });
-  }, []);
+    pushEvent({
+      event: 'Quote Form Opened',
+      source: detail.source,
+      offer: detail.offer || 'none',
+      ...(preselected ? { preselected_area: preselected } : {}),
+    });
+  }, [pageArea]);
 
   const close = useCallback(() => {
     openRef.current = false;
@@ -193,7 +208,7 @@ export default function QuoteModal() {
                   martechdevs startup offer
                 </span>
                 <h2 id="quote-dialog-title" className="mt-2 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-                  Wait, startups get{' '}
+                  {fromExit ? 'Wait, startups get' : 'Startups get'}{' '}
                   <span className="relative whitespace-nowrap text-teal-700">
                     50% off
                     <svg viewBox="0 0 120 10" preserveAspectRatio="none" className="absolute -bottom-1.5 left-0 h-2 w-full" aria-hidden="true">
@@ -221,7 +236,7 @@ export default function QuoteModal() {
             </ul>
           </div>
 
-          <QuoteForm offer={offer} />
+          <QuoteForm offer={offer} area={area} />
         </div>
       </div>
     </div>

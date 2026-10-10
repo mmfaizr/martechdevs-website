@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { pushEvent } from '@/lib/analytics';
-import { THANK_YOU_PATH, markQuoteSubmitted, reportConversion, stashConversion, type QuoteOffer } from '@/lib/quote';
+import { THANK_YOU_PATH, markQuoteSubmitted, reportConversion, stashConversion, type QuoteArea, type QuoteOffer } from '@/lib/quote';
 
 /* Site palette, the same values the footer uses. */
 const BORDER = '#E4E9E6';
@@ -25,7 +25,7 @@ const TOOLS = [
 ];
 
 /* Stroke icons on a 24 box, 1.75 wide, round caps: the footer's icon language. */
-const AREAS = [
+const AREAS: { label: QuoteArea; hint: string; path: string }[] = [
   {
     label: 'Tracking & ad conversions',
     hint: 'GTM, server-side, CAPI, Consent Mode v2',
@@ -45,6 +45,11 @@ const AREAS = [
     label: 'CRM & lifecycle messaging',
     hint: 'Lead routing, email and push journeys',
     path: 'M3.5 6.5h17v11h-17zM3.5 7.2 12 13l8.5-5.8',
+  },
+  {
+    label: 'GTM engineering & outbound',
+    hint: 'Clay, Apollo, enrichment, cold email infrastructure',
+    path: 'M20.5 3.5 3.5 10.6l6.9 3 3 6.9zM10.4 13.6l10.1-10.1',
   },
   {
     label: 'Support & AI agents',
@@ -113,10 +118,11 @@ const primaryBtn =
   'inline-flex items-center gap-2 rounded-lg bg-teal-700 px-6 py-3 text-base font-semibold text-white shadow-md transition-all hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none';
 const backBtn = 'px-2 py-3 text-sm font-semibold text-gray-600 hover:text-gray-900';
 
-export default function QuoteForm({ offer }: { offer?: QuoteOffer }) {
+/** `area` comes ticked on step two, for a form opened from a service page. */
+export default function QuoteForm({ offer, area }: { offer?: QuoteOffer; area?: QuoteArea }) {
   const [step, setStep] = useState(0);
   const [tools, setTools] = useState<string[]>([]);
-  const [areas, setAreas] = useState<string[]>([]);
+  const [areas, setAreas] = useState<string[]>(area ? [area] : []);
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [email, setEmail] = useState('');
   const [honeypot, setHoneypot] = useState('');
