@@ -169,10 +169,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
             </h1>
           </div>
 
-          <p className="rise-in mx-auto max-w-2xl text-base font-medium text-gray-600 md:text-lg" style={rise(160)}>
-            Truly DFY. This is our priority <span className="font-bold text-teal-600">#1</span>
-          </p>
-          <p className="rise-in mx-auto mt-4 max-w-[868px] text-balance text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
+          <p className="rise-in mx-auto max-w-[868px] text-balance text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
             <Rich text={c.hero.solution} />
           </p>
           {c.hero.aside && (
@@ -221,14 +218,13 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
           </ul>
 
           <div className="rise-in" style={rise(420)}>
-            <p className="mt-10 text-sm text-gray-500">Tools we set up and connect</p>
             {/* One scrolling line, like the logo strip on growthandanalytics.com.
                 Three equal runs so the loop is seamless; each run is the list
                 twice over, wide enough to fill the strip on a big screen. The
                 first chip of each name is real text, the repeats draw theirs
                 from a data attribute, so the names are not in the page six
                 times over. */}
-            <div className="mx-auto mt-3 max-w-5xl overflow-hidden py-1" style={STRIP_FADE}>
+            <div className="mx-auto mt-10 max-w-5xl overflow-hidden py-1" style={STRIP_FADE}>
               <ul className="animate-marquee flex w-max gap-2" style={{ animationDuration: '45s' }}>
                 {[0, 1, 2, 3, 4, 5].flatMap((run) =>
                   c.tools.map((tool) => (
@@ -257,7 +253,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
             </div>
           </div>
 
-          <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-sm" style={rise(480)}>
+          <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-sm lg:max-w-none lg:whitespace-nowrap" style={rise(480)}>
             * 74+ martech and growth stack implementations, delivered through{' '}
             <a href={SITE_URL} className="font-medium text-teal-700 underline underline-offset-2 hover:text-teal-800">
               martechdevs
