@@ -38,11 +38,13 @@ const page: ServicePageContent = {
     h2: '**Snowflake, BigQuery and Segment** implementation',
     lead: 'Data warehouse consulting from the people who build it. **We design the warehouse, collect the data, model it** and send it back out to your tools.',
     problems: [
-      "Every team's export **gives a different answer**.",
-      'Usage, revenue and support **live in separate tools**.',
-      "Your CRM **can't see what customers actually do**.",
-      'Pipelines break quietly and **reports go wrong**.',
+      { title: 'Three teams, three revenue numbers.', detail: 'Every metric is rebuilt in a different spreadsheet.' },
+      { title: 'Your CDP bill grows faster than its value.', detail: 'Events flow everywhere, and nobody trusts them.' },
+      { title: "The warehouse knows what your tools can't see.", detail: 'LTV and churn risk never reach HubSpot or Braze.' },
+      { title: 'Pipelines fail quietly and nobody owns them.', detail: 'You find out from a wrong dashboard, days later.' },
     ],
+    fix:
+      'We build the warehouse as **the single source of truth**: modeled with dbt, fed by pipelines you can trust and **synced back into every tool** with reverse ETL, so every team works from the same customer.',
     items: [
       {
         title: 'Snowflake or BigQuery setup',

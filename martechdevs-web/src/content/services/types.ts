@@ -38,8 +38,10 @@ export type ServicePageContent = {
   setup: {
     h2: string;
     lead: string;
-    /** Shown beside the stack diagram, mid-page. */
-    problems: string[];
+    /** Shown beside the stack diagram, mid-page: a headline and its cost, one line each. */
+    problems: { title: string; detail: string }[];
+    /** How we fix it, under the problems. */
+    fix: string;
     /** `icon` is a file in /assets/icons. */
     items: { title: string; body: string; icon: string }[];
   };

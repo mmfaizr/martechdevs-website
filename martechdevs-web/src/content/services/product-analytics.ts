@@ -36,11 +36,13 @@ const page: ServicePageContent = {
     h2: '**Product analytics implementation**, from tracking plan to dashboards',
     lead: 'Product analytics consultants who **write the plan, ship the events and check them**, so your product and growth teams get data they can rely on.',
     problems: [
-      'One action is tracked under **three event names**.',
-      "Funnels **don't match the database**.",
-      'App and web users **never join up in one profile**.',
-      "You can't see **which campaigns bring users who stay**.",
+      { title: 'Dashboards full of events nobody can explain.', detail: 'Three names for one action, and no tracking plan.' },
+      { title: 'Funnels never match the database.', detail: 'So product decisions fall back to gut feel.' },
+      { title: 'Nobody can say what makes a user stick.', detail: 'Activation and retention drivers are guesswork.' },
+      { title: 'Paid installs look great until you check revenue.', detail: 'Attribution and product data never meet.' },
     ],
+    fix:
+      'We implement analytics from **a tracking plan your team signs off**, add server-side and attribution data, and **validate every event**, so funnels, retention and ROI answer real product questions.',
     items: [
       {
         title: 'Tracking plan',

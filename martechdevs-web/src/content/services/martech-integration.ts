@@ -40,11 +40,13 @@ const page: ServicePageContent = {
     h2: '**Martech implementation**, done hands-on',
     lead: 'Big agencies hand you a strategy deck. **We do the marketing stack integration itself**: the audit, the setup and the testing, in your own accounts.',
     problems: [
-      'Every tool shows **different numbers** for one customer.',
-      '**Nobody owns** how your tools connect.',
-      'Integration tickets **sit behind product work**.',
-      'You pay for features **the data never reaches**.',
+      { title: 'Every tool has its own version of the customer.', detail: 'HubSpot, Mixpanel and Braze disagree on who is active.' },
+      { title: 'Your stack grew one Zapier at a time.', detail: 'No one can map what syncs where, or what breaks next.' },
+      { title: 'Martech tickets lose to product every sprint.', detail: 'Your integrations never make the engineering roadmap.' },
+      { title: "You pay for features you can't switch on.", detail: 'Scoring and audiences wait on data that never lands.' },
     ],
+    fix:
+      'We treat your stack as one system: **one tracking plan, one customer ID and one source of truth**, wired end to end, so **marketing stops waiting on engineering**.',
     items: [
       {
         title: 'Martech stack audit',

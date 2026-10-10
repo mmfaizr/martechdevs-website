@@ -43,11 +43,13 @@ const page: ServicePageContent = {
     h2: '**GTM engineering services** for outbound and ABM',
     lead: 'GTM engineers on demand. **We build the lead data, personalization, sending infrastructure and CRM workflows** behind your outbound.',
     problems: [
-      'Lead lists from one database, and **too many bounces**.',
-      'Every prospect gets **the same template**.',
-      'One big send **got your main domain flagged**.',
-      'Replies and meetings **never reach the CRM**.',
+      { title: 'Reply rates fall every quarter.', detail: 'Generic sequences hit the same lists everyone else bought.' },
+      { title: 'Your best accounts are missing from your lists.', detail: 'One data provider leaves gaps in emails and phones.' },
+      { title: 'Deliverability dies after the first big push.', detail: 'Skip warmup and rotation, and the main domain pays.' },
+      { title: 'Reps spend more time researching than selling.', detail: 'Personalization is manual, so it never scales.' },
     ],
+    fix:
+      'We engineer outbound like a product: **multi-source enrichment in Clay**, research-based personalization and **sending infrastructure that protects your domain**, all feeding one CRM view of every account.',
     items: [
       {
         title: 'Clay tables and lead enrichment',

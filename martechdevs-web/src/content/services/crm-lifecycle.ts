@@ -36,11 +36,13 @@ const page: ServicePageContent = {
     h2: '**HubSpot, Braze and marketing automation** services',
     lead: 'HubSpot consultants and lifecycle specialists who do the setup themselves. **Your CRM matches how you sell**, and every message is triggered by real customer data.',
     problems: [
-      'New leads **wait hours for an owner**.',
-      'Half the CRM is **empty or out of date**.',
-      'Every customer gets **the same email sequence**.',
-      'Each team sees **a different version of the customer**.',
+      { title: 'Hot leads sit unassigned while reps chase cold ones.', detail: 'Routing ignores product usage and buying intent.' },
+      { title: 'Your CRM is a graveyard of half-filled records.', detail: 'Duplicates, stale owners and fields nobody trusts.' },
+      { title: 'Every user gets the same drip, whatever they did.', detail: 'Journeys run on timers instead of product events.' },
+      { title: 'Sales and marketing argue over what an MQL is.', detail: 'No shared lifecycle stages, so the handoff leaks.' },
     ],
+    fix:
+      'We rebuild the CRM around **your real sales motion** and wire lifecycle messaging to **live product and billing data**, so every lead reaches the right owner and every message lands at the right moment.',
     items: [
       {
         title: 'HubSpot CRM implementation',

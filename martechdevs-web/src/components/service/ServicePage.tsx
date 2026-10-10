@@ -314,20 +314,21 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
         <Reveal>
           <h2 className="text-balance text-2xl font-semibold leading-tight tracking-tight md:text-3xl">Sound familiar?</h2>
         </Reveal>
-        <ul className="space-y-4">
+        <ul className="space-y-5">
           {c.setup.problems.map((problem, i) => (
-            <Reveal as="li" key={problem} delay={i * 0.06} className="flex gap-3 text-base leading-relaxed text-gray-400 lg:text-[15px] xl:text-lg">
-              <Icon path={PATHS.cross} className="mt-0.5 h-5 w-5 shrink-0 text-gray-300 xl:mt-1" />
-              <span>
-                <Rich text={problem} strong="font-bold text-gray-900" />
-              </span>
+            <Reveal as="li" key={problem.title} delay={i * 0.06} className="flex gap-3">
+              <Icon path={PATHS.cross} className="mt-0.5 h-5 w-5 shrink-0 text-rose-300 xl:mt-1" />
+              <div>
+                <p className="text-base font-semibold leading-snug text-gray-900 lg:text-[15px] xl:text-lg">{problem.title}</p>
+                <p className="mt-1 text-sm leading-snug text-gray-500 xl:text-[15px]">{problem.detail}</p>
+              </div>
             </Reveal>
           ))}
         </ul>
-        <Reveal>
-          <p className="text-base leading-relaxed lg:text-[15px] xl:text-lg">
-            <span className="text-gray-400">Every broken week costs you</span>{' '}
-            <span className="font-bold text-gray-900">data, conversions and ad spend</span>.
+        {/* How we fix it, in the homepage's own voice: grey, with the point in black. */}
+        <Reveal className="border-t pt-6" style={{ borderColor: BORDER }}>
+          <p className="text-lg leading-relaxed text-gray-400 xl:text-xl">
+            <Rich text={c.setup.fix} strong="font-bold text-gray-900" />
           </p>
         </Reveal>
         <Reveal>

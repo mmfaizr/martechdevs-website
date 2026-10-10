@@ -37,11 +37,13 @@ const page: ServicePageContent = {
     h2: '**Google Analytics and Tag Manager setup**, done properly',
     lead: 'A marketing analytics agency that does the technical work. **Every tag, event and conversion is planned, built and tested**, so GA4, Google Ads and Meta report numbers you can act on.',
     problems: [
-      'Ads, Meta and GA4 **report different conversions**.',
-      'Conversions **dropped with the cookie banner**.',
-      'A GTM container full of **tags nobody dares delete**.',
-      'Ad blockers **hide part of your traffic**.',
+      { title: 'GA4, Google Ads and your CRM never agree.', detail: 'Nobody knows which lead count belongs in the board deck.' },
+      { title: 'Smart Bidding is learning from bad conversions.', detail: 'Duplicates and misfires teach it to buy the wrong clicks.' },
+      { title: 'Consent Mode quietly cut your conversions.', detail: 'Declined visitors vanish instead of being modeled.' },
+      { title: 'Every site release breaks a tag somewhere.', detail: 'There is no data layer contract, so fixes never stick.' },
     ],
+    fix:
+      'We rebuild measurement on **a written tracking plan, server-side tagging and Consent Mode v2**, then reconcile conversions against your CRM, so **bidding and budget decisions run on numbers you can defend**.',
     items: [
       {
         title: 'GA4 setup and audit',
