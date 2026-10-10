@@ -17,10 +17,7 @@ const page: ServicePageContent = {
       'Go-to-market (GTM) engineering: Clay, Apollo and ZoomInfo enrichment, personalized ABM, cold email infrastructure with warmup, and custom CRM workflows.',
   },
   hero: {
-    eyebrow: 'GTM engineering & outbound',
     h1: '**Go-to-market (GTM) engineering** for personalized outbound at scale',
-    problem:
-      'Lead lists from one database, the same template for everyone, a main domain flagged after one big send. **Outbound breaks when the data and infrastructure behind it are weak.**',
     solution:
       'We build the go-to-market engine: **Clay, Apollo and ZoomInfo** enrichment, personalization for every account, **cold email infrastructure** with warmup, and CRM workflows that capture every reply.',
     aside: { text: 'Here GTM means go-to-market. For Google Tag Manager,', link: 'see analytics and tracking', href: '/analytics-tracking' },

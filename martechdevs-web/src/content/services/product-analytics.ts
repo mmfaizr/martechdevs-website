@@ -10,10 +10,7 @@ const page: ServicePageContent = {
       'Mixpanel and Amplitude implementation: tracking plans, validated events, funnels, retention and campaign ROI, plus AppsFlyer and Adjust. Fixed price.',
   },
   hero: {
-    eyebrow: 'Product analytics',
     h1: '**Mixpanel and Amplitude implementation** that shows where users drop off',
-    problem:
-      "The same action is tracked under three names, funnels don't match the database, and **the product team has stopped trusting the dashboards**.",
     solution:
       'We implement **Mixpanel or Amplitude** from a tracking plan, add backend events and **AppsFlyer or Adjust** data, and validate every event end to end, so **funnels, retention and campaign ROI hold up**.',
   },

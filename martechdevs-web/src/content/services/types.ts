@@ -18,10 +18,7 @@ export type ServicePageContent = {
    * the dark half and the rest is grey, in a paragraph they are bold.
    */
   hero: {
-    eyebrow: string;
     h1: string;
-    /** The pain, said first. */
-    problem: string;
     /** What we set up, with the tool names. */
     solution: string;
     /** One extra line under the intro, with a link. */

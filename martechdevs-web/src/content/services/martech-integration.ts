@@ -13,10 +13,7 @@ const page: ServicePageContent = {
       'Hands-on martech consultants. We integrate HubSpot, Segment, GA4, Mixpanel, Braze and Snowflake into one working stack. Fixed price, live in weeks.',
   },
   hero: {
-    eyebrow: 'Martech integration',
     h1: '**Martech stack integration** that makes your tools agree',
-    problem:
-      "Your CRM, analytics and messaging tools each tell a different story, and **the integration work never leaves the backlog**.",
     solution:
       'We connect **HubSpot, Segment, GA4, Mixpanel, Braze and Snowflake** with the rest of your stack, so data is collected once and **every tool reports the same numbers**.',
   },

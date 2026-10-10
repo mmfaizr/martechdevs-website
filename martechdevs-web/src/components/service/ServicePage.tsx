@@ -12,6 +12,7 @@ import MobileQuoteBar from './MobileQuoteBar';
 import LazyStackDiagram from './LazyStackDiagram';
 import Reveal from './Reveal';
 import Rich, { plain } from './Rich';
+import { SITE_URL } from '@/lib/site';
 import type { ServicePageContent } from '@/content/services/types';
 
 /**
@@ -137,15 +138,17 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       {/* ---------------------------------------------------------- hero */}
       <section id="hero" className="w-full overflow-hidden bg-gradient-to-b from-gray-50 to-white pb-12 pt-36 md:pt-48">
         <div className="container relative mx-auto px-6 text-center sm:px-12 lg:px-20">
-          <p
-            className="rise-in inline-flex items-center gap-1.5 rounded-full border bg-white px-3 py-1 text-xs font-medium text-teal-800 sm:text-sm"
-            style={{ borderColor: BORDER }}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
-            {c.hero.eyebrow}
+          {/* The homepage hero's tagline slot. The asterisk is explained in the
+              note at the foot of the hero. */}
+          <p className="rise-in mx-auto max-w-2xl text-balance text-sm text-gray-600 md:text-base">
+            Experience hassle-free, blazing fast implementation, backed by{' '}
+            <span className="font-bold text-teal-600">74+</span> martech and growth stacks
+            <a href="#implementations-note" aria-label="About the 74+ implementations" className="text-teal-600 no-underline">
+              *
+            </a>
           </p>
 
-          <div className="relative mb-7 mt-5">
+          <div className="relative mb-6 mt-4">
             {/* The homepage heading's own frame, 868 by 190, so the badges
                 land in the same spots on every page whatever this heading's
                 length. They pop in on wide screens only, as on the homepage. */}
@@ -160,10 +163,10 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
             </h1>
           </div>
 
-          <p className="rise-in mx-auto max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl" style={rise(160)}>
-            <Rich text={c.hero.problem} />
+          <p className="rise-in mx-auto max-w-2xl text-base font-medium text-gray-600 md:text-lg" style={rise(160)}>
+            Truly DFY. This is our priority <span className="font-bold text-teal-600">#1</span>
           </p>
-          <p className="rise-in mx-auto mt-4 max-w-2xl text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
+          <p className="rise-in mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
             <Rich text={c.hero.solution} />
           </p>
           {c.hero.aside && (
@@ -236,6 +239,24 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
               ))}
             </ul>
           </div>
+
+          <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-sm" style={rise(480)}>
+            * 74+ martech and growth stack implementations, delivered through{' '}
+            <a href={SITE_URL} className="font-medium text-teal-700 underline underline-offset-2 hover:text-teal-800">
+              martechdevs
+            </a>{' '}
+            and{' '}
+            <a
+              href="https://www.growthandanalytics.com/"
+              target="_blank"
+              rel="noopener"
+              data-track="growth_and_analytics_link"
+              className="font-medium text-teal-700 underline underline-offset-2 hover:text-teal-800"
+            >
+              Growth and Analytics Partners LLC
+            </a>
+            .
+          </p>
         </div>
       </section>
 

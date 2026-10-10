@@ -10,10 +10,7 @@ const page: ServicePageContent = {
       'Snowflake and Google BigQuery setup, Segment CDP implementation, Fivetran and Airbyte pipelines, dbt models and reverse ETL to HubSpot and Braze. Fixed price.',
   },
   hero: {
-    eyebrow: 'Data warehouse & CDP',
     h1: '**Data warehouse and CDP implementation** for one trusted customer view',
-    problem:
-      'Customer data is spread across your app, CRM, billing and support tools, and **nobody can say what a customer is worth**.',
     solution:
       'We set up **Snowflake or Google BigQuery**, Segment or RudderStack, Fivetran or Airbyte pipelines, dbt models and reverse ETL with Hightouch, so **one trusted customer view feeds every tool**.',
   },

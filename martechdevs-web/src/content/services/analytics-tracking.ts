@@ -11,10 +11,7 @@ const page: ServicePageContent = {
       'GA4 and Google Tag Manager setup, server-side GTM, Google Ads and Meta CAPI conversion tracking, and Consent Mode v2. Fixed price, tested end to end.',
   },
   hero: {
-    eyebrow: 'Analytics & tracking',
     h1: '**GA4 and Google Tag Manager setup**, with conversion tracking you can trust',
-    problem:
-      'Google Ads, Meta and GA4 each count a different number of conversions, and **nobody trusts the data enough to move budget**.',
     solution:
       'We set up **Google Analytics 4, Google Tag Manager (GTM) and server-side tracking**, with Google Ads and Meta conversion tracking and Consent Mode v2, then **test every event end to end**.',
   },

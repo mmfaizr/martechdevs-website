@@ -11,10 +11,7 @@ const page: ServicePageContent = {
       'HubSpot implementation, Salesforce integration and lead routing, plus Braze, Customer.io and Intercom journeys triggered by real customer data. Fixed price.',
   },
   hero: {
-    eyebrow: 'CRM & lifecycle',
     h1: '**HubSpot implementation** and lifecycle messaging, built on real customer data',
-    problem:
-      'New leads wait for an owner, half the CRM is out of date, and **messages go out on a timer instead of when customers act**.',
     solution:
       'We set up **HubSpot CRM or Salesforce** around your sales process, then build **Braze, Customer.io, Intercom or CleverTap** journeys triggered by what customers actually do.',
   },
