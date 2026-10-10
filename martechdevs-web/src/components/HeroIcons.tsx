@@ -7,14 +7,13 @@ import Image from 'next/image';
 export type HeroBadge = { name: string; icon?: string; path?: string };
 
 /* Six slots, three each side of the heading, popping in one after another.
-   The box is the homepage badge's own size; the dark slots are where the
-   homepage draws its dark badges. */
+   The box is the homepage badge's own size. */
 const SLOTS = [
-  { place: 'top-[-30px] xl:left-[-120px] 2xl:left-[-160px]', delay: 0.3, size: 72, dark: true },
+  { place: 'top-[-30px] xl:left-[-120px] 2xl:left-[-160px]', delay: 0.3, size: 72 },
   { place: 'top-[70px] xl:left-[-190px] 2xl:left-[-260px]', delay: 0.4, size: 64 },
   { place: 'bottom-[-20px] xl:left-[-135px] 2xl:left-[-180px]', delay: 0.5, size: 64 },
   { place: 'top-[-40px] xl:right-[-150px] 2xl:right-[-200px]', delay: 0.6, size: 64 },
-  { place: 'top-[60px] xl:right-[-200px] 2xl:right-[-280px]', delay: 0.7, size: 72, dark: true },
+  { place: 'top-[60px] xl:right-[-200px] 2xl:right-[-280px]', delay: 0.7, size: 72 },
   { place: 'bottom-[-10px] xl:right-[-145px] 2xl:right-[-190px]', delay: 0.8, size: 64 },
 ];
 
@@ -28,14 +27,16 @@ const HOME = [
   ['braze hero icon.svg', 'Braze'],
 ];
 
-/** A service page's badge, drawn to sit beside the homepage's: a tilted logo in a round chip. */
-function Badge({ badge, dark, size }: { badge: HeroBadge; dark?: boolean; size: number }) {
+/**
+ * A service page's badge: a tilted logo in a white round chip. Always white,
+ * since the logo files carry a light plate that looks pasted on over a dark
+ * chip. The bigger slots get a bigger chip, as on the homepage.
+ */
+function Badge({ badge, size }: { badge: HeroBadge; size: number }) {
   return (
     <div className="flex items-center justify-center" style={{ width: size, height: size }}>
       <div
-        className={`flex h-[52px] w-[52px] cursor-default items-center justify-center rounded-full shadow-[0_10px_22px_-8px_rgba(27,37,30,0.35)] ring-1 transition-transform duration-300 ease-in-out hover:scale-110 ${
-          dark ? 'bg-[#2B3B31] ring-[#2B3B31]' : 'bg-white ring-black/5'
-        }`}
+        className={`flex ${size > 64 ? 'h-14 w-14' : 'h-[52px] w-[52px]'} cursor-default items-center justify-center rounded-full bg-white shadow-[0_10px_22px_-8px_rgba(27,37,30,0.35)] ring-1 ring-black/5 transition-transform duration-300 ease-in-out hover:scale-110`}
       >
         {badge.icon ? (
           <Image
@@ -53,7 +54,7 @@ function Badge({ badge, dark, size }: { badge: HeroBadge; dark?: boolean; size: 
             strokeWidth={1.75}
             strokeLinecap="round"
             strokeLinejoin="round"
-            className={`h-6 w-6 -rotate-12 ${dark ? 'text-[#3FBE8C]' : 'text-teal-700'}`}
+            className="h-6 w-6 -rotate-12 text-teal-700"
             role="img"
             aria-label={badge.name}
           >
@@ -85,7 +86,7 @@ export default function HeroIcons({ badges }: { badges?: HeroBadge[] }) {
           className={`absolute hidden xl:block z-10 ${slot.place}`}
         >
           {badges ? (
-            <Badge badge={badges[i]} dark={slot.dark} size={slot.size} />
+            <Badge badge={badges[i]} size={slot.size} />
           ) : (
             <Image
               src={`/assets/hero section logo icons/${HOME[i][0]}`}
