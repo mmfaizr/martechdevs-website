@@ -22,7 +22,7 @@ const page: ServicePageContent = {
     { name: 'RudderStack', icon: 'rudderstuck' },
     { name: 'Fivetran', icon: 'fivetran' },
     { name: 'Airbyte', icon: 'airbyte' },
-    { name: 'dbt' },
+    { name: 'dbt', icon: 'dbt' },
     { name: 'Hightouch', icon: 'hightouch' },
     { name: 'Census', icon: 'census' },
   ],

@@ -22,8 +22,8 @@ const page: ServicePageContent = {
     { name: 'Server-side GTM', icon: 'server' },
     { name: 'Google Ads', icon: 'google ads' },
     { name: 'Meta Ads', icon: 'meta ads' },
-    { name: 'Looker Studio' },
-    { name: 'Consent Mode v2' },
+    { name: 'Looker Studio', icon: 'looker studio' },
+    { name: 'Consent Mode v2', icon: 'google' },
   ],
   heroBadges: [
     { name: 'GA4', icon: 'ga4' },

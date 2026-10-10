@@ -79,8 +79,8 @@ function jsonLd(data: unknown) {
 
 /** Soft edges on the tools strip, in percent so a phone still shows most of it. */
 const STRIP_FADE = {
-  maskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
-  WebkitMaskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+  maskImage: 'linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)',
+  WebkitMaskImage: 'linear-gradient(to right, transparent, #000 10%, #000 90%, transparent)',
 };
 
 /** Hero pieces rise in one after another. */
@@ -215,32 +215,32 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
           </ul>
 
           <div className="rise-in" style={rise(420)}>
-            {/* One scrolling line, like the logo strip on growthandanalytics.com.
-                Three equal runs so the loop is seamless; each run is the list
-                twice over, wide enough to fill the strip on a big screen. The
-                first chip of each name is real text, the repeats draw theirs
-                from a data attribute, so the names are not in the page six
-                times over. */}
-            <div className="mx-auto mt-10 max-w-5xl overflow-hidden py-1" style={STRIP_FADE}>
-              <ul className="animate-marquee flex w-max gap-2" style={{ animationDuration: '45s' }}>
+            {/* One scrolling line of tool chips. Three equal runs make the loop
+                seamless; each run is the list twice over, wide enough to fill
+                the strip. The first chip of each name is real text, the
+                repeats draw theirs from a data attribute, so the names are not
+                in the page six times over. */}
+            <div className="mx-auto mt-10 max-w-6xl overflow-hidden py-1" style={STRIP_FADE}>
+              <ul className="animate-marquee flex w-max gap-3" style={{ animationDuration: `${c.tools.length * 7}s` }}>
                 {[0, 1, 2, 3, 4, 5].flatMap((run) =>
                   c.tools.map((tool) => (
                     <li
                       key={`${run}-${tool.name}`}
                       aria-hidden={run > 0 || undefined}
-                      className="flex shrink-0 items-center gap-2 rounded-full border bg-white py-1.5 pl-2 pr-3.5 text-sm font-medium text-gray-700"
+                      className="flex shrink-0 items-center gap-2.5 rounded-full border bg-white py-2 pl-2.5 pr-5 text-base font-medium text-gray-800"
                       style={{ borderColor: BORDER }}
                     >
                       {tool.icon ? (
                         <Image
                           src={`/assets/tool logos icons/${tool.icon} logo icon.svg`}
                           alt=""
-                          width={20}
-                          height={20}
-                          className="h-5 w-5 rounded"
+                          width={28}
+                          height={28}
+                          loading={run === 0 ? 'eager' : 'lazy'}
+                          className="h-7 w-7 rounded-md"
                         />
                       ) : (
-                        <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-teal-600" />
+                        <span className="ml-2 h-2 w-2 rounded-full bg-teal-600" />
                       )}
                       {run === 0 ? tool.name : <span data-name={tool.name} className="before:content-[attr(data-name)]" />}
                     </li>
