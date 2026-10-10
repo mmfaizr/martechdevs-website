@@ -52,9 +52,6 @@ export default function ClientLogos() {
           transition={{ duration: 0.5 }}
           className="text-center mb-8"
         >
-          <p className="text-gray-400 text-xs uppercase tracking-widest font-medium mb-1">
-            Our clients
-          </p>
           <h2 className="text-xl md:text-2xl font-semibold text-gray-900">
             Trusted by fast-growing teams
           </h2>

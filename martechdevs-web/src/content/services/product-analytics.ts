@@ -24,14 +24,22 @@ const page: ServicePageContent = {
     { name: 'iOS', icon: 'ios' },
     { name: 'Android', icon: 'android' },
   ],
+  heroBadges: [
+    { name: 'Mixpanel', icon: 'mixpanel' },
+    { name: 'AppsFlyer', icon: 'appsflyer' },
+    { name: 'Segment', icon: 'segment' },
+    { name: 'Amplitude', icon: 'amplitude' },
+    { name: 'Adjust', icon: 'adjust' },
+    { name: 'iOS', icon: 'ios' },
+  ],
   setup: {
     h2: '**Product analytics implementation**, from tracking plan to dashboards',
     lead: 'Product analytics consultants who **write the plan, ship the events and check them**, so your product and growth teams get data they can rely on.',
     problems: [
-      'The same action is tracked under **three different event names**.',
-      "Funnel numbers don't match the database, so **nobody acts on them**.",
-      'App installs and web signups **never connect to the same user**.',
-      'You can see traffic by campaign, but not **which campaigns bring users who stay and pay**.',
+      'One action is tracked under **three event names**.',
+      "Funnels **don't match the database**.",
+      'App and web users **never join up in one profile**.',
+      "You can't see **which campaigns bring users who stay**.",
     ],
     items: [
       {

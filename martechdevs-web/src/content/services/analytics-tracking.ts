@@ -25,14 +25,22 @@ const page: ServicePageContent = {
     { name: 'Looker Studio' },
     { name: 'Consent Mode v2' },
   ],
+  heroBadges: [
+    { name: 'GA4', icon: 'ga4' },
+    { name: 'Google Tag Manager', icon: 'gtm' },
+    { name: 'Google Ads', icon: 'google ads' },
+    { name: 'Meta Ads', icon: 'meta ads' },
+    { name: 'Server-side GTM', icon: 'server' },
+    { name: 'BigQuery', icon: 'bigquery' },
+  ],
   setup: {
     h2: '**Google Analytics and Tag Manager setup**, done properly',
     lead: 'A marketing analytics agency that does the technical work. **Every tag, event and conversion is planned, built and tested**, so GA4, Google Ads and Meta report numbers you can act on.',
     problems: [
-      'Google Ads, Meta and GA4 each report **a different number of conversions**.',
-      'Conversions dropped when the cookie banner went live, and **nobody knows by how much**.',
-      'The GTM container is full of **old tags nobody dares to delete**.',
-      'Ad blockers and browser privacy limits **hide part of your traffic**.',
+      'Ads, Meta and GA4 **report different conversions**.',
+      'Conversions **dropped with the cookie banner**.',
+      'A GTM container full of **tags nobody dares delete**.',
+      'Ad blockers **hide part of your traffic**.',
     ],
     items: [
       {

@@ -6,7 +6,6 @@ import ClientLogos from '@/components/ClientLogos';
 import Testimonials from '@/components/Testimonials';
 import Footer from '@/components/Footer';
 import QuoteModal from '@/components/QuoteModal';
-import { Popper } from '@/components/Festive';
 import QuoteButton from './QuoteButton';
 import MobileQuoteBar from './MobileQuoteBar';
 import LazyStackDiagram from './LazyStackDiagram';
@@ -34,7 +33,7 @@ const GROUND = '#F7FAF8';
 const GREEN = '#3FBE8C';
 
 const WRAP = 'mx-auto max-w-6xl px-5 sm:px-6 lg:px-8';
-const H2 = 'mt-4 text-balance text-3xl font-semibold leading-tight tracking-tight md:text-4xl';
+const H2 = 'text-balance text-3xl font-semibold leading-tight tracking-tight md:text-4xl';
 /** Two-tone headings, as the homepage's service titles: the marked words dark, the rest grey. */
 const HEAD_STRONG = 'font-semibold text-gray-900';
 const HEAD_MUTED = 'text-gray-400';
@@ -71,11 +70,6 @@ function Tick() {
       <Icon path={PATHS.check} width={2.5} className="h-3 w-3" />
     </span>
   );
-}
-
-/** Section label, the pill the homepage testimonials open with. */
-function Label({ children }: { children: React.ReactNode }) {
-  return <span className="inline-block rounded-full bg-teal-100 px-3 py-1 text-sm font-medium text-teal-700">{children}</span>;
 }
 
 /** JSON for a script tag, with `<` escaped so the copy can never close the tag. */
@@ -162,7 +156,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
                 land in the same spots on every page whatever this heading's
                 length. They pop in on wide screens only, as on the homepage. */}
             <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[190px] w-[868px] -translate-x-1/2 xl:block [&>div]:pointer-events-auto">
-              <HeroIcons />
+              <HeroIcons badges={c.heroBadges} />
             </div>
             <h1
               className="rise-in mx-auto max-w-[868px] text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl md:text-5xl"
@@ -282,7 +276,6 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       <section id="what-we-set-up" className="scroll-mt-36 py-16 md:py-24">
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-3xl text-center">
-            <Label>What we set up</Label>
             <h2 className={H2}>
               <Rich text={c.setup.h2} strong={HEAD_STRONG} muted={HEAD_MUTED} />
             </h2>
@@ -319,13 +312,12 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       {/* ------------------------------------------- the stack, mid-page */}
       <DiagramSection id="stack" diagram={<LazyStackDiagram />}>
         <Reveal>
-          <Label>The problem</Label>
-          <h2 className="mt-4 text-balance text-2xl font-semibold leading-tight tracking-tight md:text-3xl">Sound familiar?</h2>
+          <h2 className="text-balance text-2xl font-semibold leading-tight tracking-tight md:text-3xl">Sound familiar?</h2>
         </Reveal>
         <ul className="space-y-4">
           {c.setup.problems.map((problem, i) => (
-            <Reveal as="li" key={problem} delay={i * 0.06} className="flex gap-3 text-lg leading-relaxed text-gray-400 md:text-xl">
-              <Icon path={PATHS.cross} className="mt-1 h-5 w-5 shrink-0 text-gray-300 md:mt-1.5" />
+            <Reveal as="li" key={problem} delay={i * 0.06} className="flex gap-3 text-base leading-relaxed text-gray-400 lg:text-[15px] xl:text-lg">
+              <Icon path={PATHS.cross} className="mt-0.5 h-5 w-5 shrink-0 text-gray-300 xl:mt-1" />
               <span>
                 <Rich text={problem} strong="font-bold text-gray-900" />
               </span>
@@ -333,9 +325,9 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
           ))}
         </ul>
         <Reveal>
-          <p className="text-lg leading-relaxed md:text-xl">
-            <span className="text-gray-400">Every week it stays that way is a week of</span>{' '}
-            <span className="font-bold text-gray-900">lost data, missed conversions and wasted ad spend</span>.
+          <p className="text-base leading-relaxed lg:text-[15px] xl:text-lg">
+            <span className="text-gray-400">Every broken week costs you</span>{' '}
+            <span className="font-bold text-gray-900">data, conversions and ad spend</span>.
           </p>
         </Reveal>
         <Reveal>
@@ -350,7 +342,6 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       <section id="how-it-works" className="py-16 md:py-24" style={{ background: GROUND }}>
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-3xl text-center">
-            <Label>How it works</Label>
             <h2 className={H2}>
               <Rich text={c.steps.h2} strong={HEAD_STRONG} muted={HEAD_MUTED} />
             </h2>
@@ -382,7 +373,6 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       <section id="offer" className="scroll-mt-36 py-16 md:py-24" style={{ background: GROUND }}>
         <div className={WRAP}>
           <Reveal className="mx-auto max-w-3xl text-center">
-            <Label>Pricing</Label>
             <h2 className={H2}>
               <Rich text={c.offer.h2} strong={HEAD_STRONG} muted={HEAD_MUTED} />
             </h2>
@@ -430,11 +420,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
               style={{ borderColor: BORDER, background: 'radial-gradient(90% 100% at 50% 0%, #E3F4EC 0%, #FFFFFF 75%)' }}
             >
               <div id="startup-offer" className="flex h-full flex-col">
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-teal-800">
-                  <Popper className="h-5 w-5" />
-                  Startup offer
-                </span>
-                <h3 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                <h3 className="text-3xl font-semibold tracking-tight sm:text-4xl">
                   Startups get{' '}
                   <span className="relative whitespace-nowrap text-teal-700">
                     50% off
@@ -477,7 +463,6 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
       <section id="faq" className="scroll-mt-36 py-16 md:py-24">
         <div className={`${WRAP} grid gap-10 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:gap-16`}>
           <Reveal>
-            <Label>FAQ</Label>
             <h2 className={H2}>
               <Rich text={c.faq.h2} strong={HEAD_STRONG} muted={HEAD_MUTED} />
             </h2>

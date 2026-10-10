@@ -31,14 +31,22 @@ const page: ServicePageContent = {
     { name: 'Salesforce', icon: 'salesforce' },
     { name: 'Flito' },
   ],
+  heroBadges: [
+    { name: 'HubSpot', icon: 'hubspot' },
+    { name: 'Cold email', path: 'M20.5 3.5 3.5 10.6l6.9 3 3 6.9zM10.4 13.6l10.1-10.1' },
+    { name: 'Account-based marketing', path: 'M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 12h.01' },
+    { name: 'Salesforce', icon: 'salesforce' },
+    { name: 'Personalization', path: 'M12 3.5l1.8 5.2 5.2 1.8-5.2 1.8L12 17.5l-1.8-5.2L5 10.5l5.2-1.8zM18.5 16l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z' },
+    { name: 'Lead enrichment', path: 'M12 3.5c4.4 0 8 1.3 8 3s-3.6 3-8 3-8-1.3-8-3 3.6-3 8-3M4 6.5v11c0 1.7 3.6 3 8 3s8-1.3 8-3v-11M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3' },
+  ],
   setup: {
     h2: '**GTM engineering services** for outbound and ABM',
     lead: 'GTM engineers on demand. **We build the lead data, personalization, sending infrastructure and CRM workflows** behind your outbound.',
     problems: [
-      'Lead lists come from one database, and **too many emails bounce**.',
-      'Every prospect gets **the same template with their first name swapped in**.',
-      'One big send got **your main domain flagged as spam**.',
-      'Replies and meetings **live in inboxes instead of the CRM**.',
+      'Lead lists from one database, and **too many bounces**.',
+      'Every prospect gets **the same template**.',
+      'One big send **got your main domain flagged**.',
+      'Replies and meetings **never reach the CRM**.',
     ],
     items: [
       {

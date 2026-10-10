@@ -28,14 +28,22 @@ const page: ServicePageContent = {
     { name: 'Snowflake', icon: 'snowflake' },
     { name: 'Intercom', icon: 'intercom' },
   ],
+  heroBadges: [
+    { name: 'HubSpot', icon: 'hubspot' },
+    { name: 'Segment', icon: 'segment' },
+    { name: 'GA4', icon: 'ga4' },
+    { name: 'Mixpanel', icon: 'mixpanel' },
+    { name: 'Snowflake', icon: 'snowflake' },
+    { name: 'Braze', icon: 'braze' },
+  ],
   setup: {
     h2: '**Martech implementation**, done hands-on',
     lead: 'Big agencies hand you a strategy deck. **We do the marketing stack integration itself**: the audit, the setup and the testing, in your own accounts.',
     problems: [
-      'Your CRM, analytics and ad platforms show **different numbers for the same customers**.',
-      'Tools were added one at a time, and **nobody owns how they connect**.',
-      'Integration tickets **wait behind product work** in the engineering backlog.',
-      "You pay for features **you can't use because the data never arrives**.",
+      'Every tool shows **different numbers** for one customer.',
+      '**Nobody owns** how your tools connect.',
+      'Integration tickets **sit behind product work**.',
+      'You pay for features **the data never reaches**.',
     ],
     items: [
       {

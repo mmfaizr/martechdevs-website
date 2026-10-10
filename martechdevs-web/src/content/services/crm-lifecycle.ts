@@ -24,14 +24,22 @@ const page: ServicePageContent = {
     { name: 'Intercom', icon: 'intercom' },
     { name: 'CleverTap', icon: 'clevertap' },
   ],
+  heroBadges: [
+    { name: 'HubSpot', icon: 'hubspot' },
+    { name: 'Braze', icon: 'braze' },
+    { name: 'Customer.io', icon: 'customerio' },
+    { name: 'Salesforce', icon: 'salesforce' },
+    { name: 'Intercom', icon: 'intercom' },
+    { name: 'CleverTap', icon: 'clevertap' },
+  ],
   setup: {
     h2: '**HubSpot, Braze and marketing automation** services',
     lead: 'HubSpot consultants and lifecycle specialists who do the setup themselves. **Your CRM matches how you sell**, and every message is triggered by real customer data.',
     problems: [
-      'New leads wait hours for an owner, **or never get one**.',
-      'Half the CRM fields are **empty or out of date**.',
-      'Every customer gets **the same email sequence**, whatever they did in your product.',
-      'Marketing, sales and support each see **a different version of the customer**.',
+      'New leads **wait hours for an owner**.',
+      'Half the CRM is **empty or out of date**.',
+      'Every customer gets **the same email sequence**.',
+      'Each team sees **a different version of the customer**.',
     ],
     items: [
       {

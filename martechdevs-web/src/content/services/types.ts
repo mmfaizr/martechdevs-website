@@ -1,5 +1,6 @@
 import type { QuoteArea } from '@/lib/quote';
 import type { ServiceSlug } from '@/lib/site';
+import type { HeroBadge } from '@/components/HeroIcons';
 
 /**
  * The copy for one service landing page. Each page backs up the headlines of
@@ -28,6 +29,12 @@ export type ServicePageContent = {
   auditName: string;
   /** `icon` is the file name under /assets/tool logos icons, minus " logo icon.svg". */
   tools: { name: string; icon?: string }[];
+  /**
+   * The six badges around the hero heading on wide screens, in slot order:
+   * left top, left middle, left bottom, right top, right middle, right
+   * bottom. A tool logo by `icon`, or a stroke `path` where we ship no logo.
+   */
+  heroBadges: HeroBadge[];
   setup: {
     h2: string;
     lead: string;

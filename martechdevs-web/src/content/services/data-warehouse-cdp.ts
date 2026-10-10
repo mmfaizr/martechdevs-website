@@ -26,14 +26,22 @@ const page: ServicePageContent = {
     { name: 'Hightouch', icon: 'hightouch' },
     { name: 'Census', icon: 'census' },
   ],
+  heroBadges: [
+    { name: 'Snowflake', icon: 'snowflake' },
+    { name: 'Fivetran', icon: 'fivetran' },
+    { name: 'Segment', icon: 'segment' },
+    { name: 'BigQuery', icon: 'bigquery' },
+    { name: 'Hightouch', icon: 'hightouch' },
+    { name: 'Airbyte', icon: 'airbyte' },
+  ],
   setup: {
     h2: '**Snowflake, BigQuery and Segment** implementation',
     lead: 'Data warehouse consulting from the people who build it. **We design the warehouse, collect the data, model it** and send it back out to your tools.',
     problems: [
-      'Every team pulls its own export and **gets its own answer**.',
-      'Product usage lives in one tool, revenue in another and **support history in a third**.',
-      "Your CRM and messaging tools **can't see what customers actually do**.",
-      'Pipelines break quietly, and **someone finds out from a wrong report**.',
+      "Every team's export **gives a different answer**.",
+      'Usage, revenue and support **live in separate tools**.',
+      "Your CRM **can't see what customers actually do**.",
+      'Pipelines break quietly and **reports go wrong**.',
     ],
     items: [
       {

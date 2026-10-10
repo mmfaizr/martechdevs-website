@@ -212,15 +212,7 @@ export default function Footer({ home = false }: { home?: boolean }) {
                 className="md:col-span-2 p-6 md:p-8"
                 style={{ background: TILE, borderRight: `1px solid ${BORDER}` }}
               >
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-teal-800"
-                  style={{ border: `1px solid ${BORDER}` }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-600" />
-                  Free consultation
-                </span>
-
-                <h3 className="mt-4 text-xl font-semibold" style={{ color: INK }}>
+                <h3 className="text-xl font-semibold" style={{ color: INK }}>
                   Thirty minutes, and you leave with a plan
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
@@ -243,7 +235,7 @@ export default function Footer({ home = false }: { home?: boolean }) {
                 </ul>
 
                 <div className="mt-6 pt-6" style={{ borderTop: `1px solid ${BORDER}` }}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                  <p className="text-sm font-semibold text-gray-700">
                     What we&apos;ll cover
                   </p>
                   <ul className="mt-3 space-y-2.5">
@@ -438,14 +430,7 @@ export default function Footer({ home = false }: { home?: boolean }) {
             </motion.div>
 
             {/* --------------------------------------------- the evidence -- */}
-            <p
-              className="mt-16 text-[11px] font-semibold uppercase tracking-[0.14em] md:mt-20"
-              style={{ color: 'rgba(255,255,255,0.4)' }}
-            >
-              One pipeline, four stages
-            </p>
-
-            <nav aria-label="Services" className="relative mt-7">
+            <nav aria-label="Services" className="relative mt-16 md:mt-20">
               {/* The connector. One run with a node per stage, drawn once on
                   entry and then still - the illustrations' travelling bead is
                   deliberately left behind, because a bead orbiting a footer
@@ -597,8 +582,8 @@ export default function Footer({ home = false }: { home?: boolean }) {
                 {OFFICES.map((o) => (
                   <address key={o.label} className="not-italic" style={{ color: 'rgba(255,255,255,0.5)' }}>
                     <span
-                      className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider"
-                      style={{ color: 'rgba(255,255,255,0.32)' }}
+                      className="mb-1.5 block text-[13px] font-semibold"
+                      style={{ color: 'rgba(255,255,255,0.6)' }}
                     >
                       {o.label}
                     </span>
