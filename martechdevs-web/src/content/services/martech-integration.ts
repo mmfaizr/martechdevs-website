@@ -14,9 +14,11 @@ const page: ServicePageContent = {
   },
   hero: {
     eyebrow: 'Martech integration',
-    h1: 'Martech stack integration that makes your tools agree',
-    intro:
-      "Your CRM, analytics and messaging tools each tell a different story, and the integration work keeps slipping down your developers' backlog. We connect HubSpot, Segment, GA4, Mixpanel, Braze, Snowflake and the rest of your stack, so data is collected once and every tool reports the same numbers.",
+    h1: '**Martech stack integration** that makes your tools agree',
+    problem:
+      "Your CRM, analytics and messaging tools each tell a different story, and **the integration work never leaves the backlog**.",
+    solution:
+      'We connect **HubSpot, Segment, GA4, Mixpanel, Braze and Snowflake** with the rest of your stack, so data is collected once and **every tool reports the same numbers**.',
   },
   auditName: 'stack audit',
   tools: [
@@ -30,13 +32,13 @@ const page: ServicePageContent = {
     { name: 'Intercom', icon: 'intercom' },
   ],
   setup: {
-    h2: 'Martech implementation, done hands-on',
-    lead: 'Big agencies hand you a strategy deck. We do the marketing stack integration itself: the audit, the setup and the testing, in your own accounts.',
+    h2: '**Martech implementation**, done hands-on',
+    lead: 'Big agencies hand you a strategy deck. **We do the marketing stack integration itself**: the audit, the setup and the testing, in your own accounts.',
     problems: [
-      'Your CRM, analytics and ad platforms show different numbers for the same customers.',
-      'Tools were added one at a time, and nobody owns how they connect.',
-      'Integration tickets wait behind product work in the engineering backlog.',
-      "You pay for features you can't use because the data never arrives.",
+      'Your CRM, analytics and ad platforms show **different numbers for the same customers**.',
+      'Tools were added one at a time, and **nobody owns how they connect**.',
+      'Integration tickets **wait behind product work** in the engineering backlog.',
+      "You pay for features **you can't use because the data never arrives**.",
     ],
     items: [
       {
@@ -72,7 +74,7 @@ const page: ServicePageContent = {
     ],
   },
   steps: {
-    h2: 'How our martech consulting works',
+    h2: '**Martech consulting**, step by step',
     items: [
       { title: 'Free stack audit', body: 'A 30-minute call on your tools, where they break and what to fix first.' },
       { title: 'Fixed quote', body: 'Price, scope and timeline by email, usually within one business day.' },
@@ -82,49 +84,49 @@ const page: ServicePageContent = {
       { title: 'Hand over', body: 'Docs and a training session for your team, plus ongoing support if you want it.' },
     ],
   },
-  offer: { h2: 'Martech services at a fixed price' },
+  offer: { h2: '**Martech services** at a fixed price' },
   faq: {
-    h2: 'Martech integration FAQs',
+    h2: '**Martech integration** questions, answered',
     items: [
       {
         q: 'Which tools do you integrate?',
-        a: 'Most of the modern martech stack: HubSpot, Salesforce, Segment, RudderStack, GA4, Google Tag Manager, Mixpanel, Amplitude, Braze, Customer.io, Intercom, Snowflake, BigQuery, Fivetran and Hightouch, among others. If a tool has an API or webhooks, we can usually connect it.',
+        a: '**Most of the modern martech stack:** HubSpot, Salesforce, Segment, RudderStack, GA4, Google Tag Manager, Mixpanel, Amplitude, Braze, Customer.io, Intercom, Snowflake, BigQuery, Fivetran and Hightouch, among others. If a tool has an API or webhooks, we can usually connect it.',
       },
       {
         q: 'Do we have to switch tools?',
-        a: "No. We're vendor-neutral and we don't sell software. Most of the time the tools you already pay for are fine, and the wiring between them is what needs fixing. If a tool really is the wrong fit, we'll say why and what we'd use instead.",
+        a: "**No.** We're vendor-neutral and we don't sell software. Most of the time the tools you already pay for are fine, and the wiring between them is what needs fixing. If a tool really is the wrong fit, we'll say why and what we'd use instead.",
       },
       {
         q: 'How long does a martech integration take?',
-        a: 'Most projects are live within a few weeks. A single integration takes less, a full stack setup takes more. Your fixed quote gives the timeline before you commit.',
+        a: '**Most projects are live within a few weeks.** A single integration takes less, a full stack setup takes more. Your fixed quote gives the timeline before you commit.',
       },
       {
         q: 'How is the fixed price worked out?',
-        a: 'From the scope: which tools, which data, which platforms (web, app or both) and what has to be built or migrated. You get one price for the agreed scope, with no hourly billing.',
+        a: '**From the scope:** which tools, which data, which platforms (web, app or both) and what has to be built or migrated. You get one price for the agreed scope, with no hourly billing.',
       },
       {
         q: 'What does the free stack audit cover?',
-        a: "It's a 30-minute video call. We go through your current stack and where it hurts, the quick wins we can ship first, an integration roadmap, and the timeline, scope and next steps. There's no obligation.",
+        a: "**It's a 30-minute video call.** We go through your current stack and where it hurts, the quick wins we can ship first, an integration roadmap, and the timeline, scope and next steps. There's no obligation.",
       },
       {
         q: 'Do you document the work and train our team?',
-        a: 'Yes. Every project ends with documentation of what we built and how it fits together, and a training session so your team can run it and build on it.',
+        a: '**Yes.** Every project ends with documentation of what we built and how it fits together, and a training session so your team can run it and build on it.',
       },
       {
         q: 'Can you work alongside our developers?',
-        a: "Yes. We can do the whole build, or split it with your engineers. If they'd rather own the code inside your product, we write the specs, check their work and handle the setup inside each tool.",
+        a: "**Yes.** We can do the whole build, or split it with your engineers. If they'd rather own the code inside your product, we write the specs, check their work and handle the setup inside each tool.",
       },
       {
         q: 'What does a martech consultant from martechdevs actually do?',
-        a: 'The hands-on part of marketing technology consulting. We audit, plan and build the integration ourselves, from tracking and pipelines to CRM and messaging, in your accounts.',
+        a: '**The hands-on part of marketing technology consulting.** We audit, plan and build the integration ourselves, from tracking and pipelines to CRM and messaging, in your accounts.',
       },
       {
         q: 'Do you offer ongoing support?',
-        a: 'Yes. After launch we can stay on to fix what breaks when tools change and to add what you need next.',
+        a: '**Yes.** After launch we can stay on to fix what breaks when tools change and to add what you need next.',
       },
     ],
   },
-  cta: { h2: 'Clear your martech backlog at a fixed price' },
+  cta: { h2: '**Clear your martech backlog** at a fixed price' },
 };
 
 export default page;

@@ -256,11 +256,23 @@ h1, h2, h3, h4, h5, h6 {
   animation: quote-confetti 0.7s ease-out both, quote-confetti-float 3.2s ease-in-out 0.8s infinite;
 }
 
+/* Service page hero: the copy rises in on load. CSS rather than framer, so it
+   runs before hydration and the heading still paints straight away. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+.rise-in {
+  animation: rise-in 0.6s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .quote-step-in,
   .quote-overlay-in,
   .quote-dialog-in,
-  .quote-confetti { animation: none; }
+  .quote-confetti,
+  .rise-in { animation: none; }
 }
 
 /* Intercom out of the way while the quote form is open. Its launcher and

@@ -12,9 +12,11 @@ const page: ServicePageContent = {
   },
   hero: {
     eyebrow: 'CRM & lifecycle',
-    h1: 'HubSpot implementation and lifecycle messaging, built on real customer data',
-    intro:
-      'New leads wait for an owner, half the CRM is out of date, and your emails and push messages go out on a timer instead of when customers act. We set up HubSpot CRM or Salesforce around your sales process, then build Braze, Customer.io, Intercom or CleverTap journeys triggered by what customers actually do.',
+    h1: '**HubSpot implementation** and lifecycle messaging, built on real customer data',
+    problem:
+      'New leads wait for an owner, half the CRM is out of date, and **messages go out on a timer instead of when customers act**.',
+    solution:
+      'We set up **HubSpot CRM or Salesforce** around your sales process, then build **Braze, Customer.io, Intercom or CleverTap** journeys triggered by what customers actually do.',
   },
   auditName: 'CRM audit',
   tools: [
@@ -26,13 +28,13 @@ const page: ServicePageContent = {
     { name: 'CleverTap', icon: 'clevertap' },
   ],
   setup: {
-    h2: 'HubSpot, Braze and marketing automation services',
-    lead: 'HubSpot consultants and lifecycle specialists who do the setup themselves. Your CRM matches how you sell, and every message is triggered by real customer data.',
+    h2: '**HubSpot, Braze and marketing automation** services',
+    lead: 'HubSpot consultants and lifecycle specialists who do the setup themselves. **Your CRM matches how you sell**, and every message is triggered by real customer data.',
     problems: [
-      'New leads wait hours for an owner, or never get one.',
-      'Half the CRM fields are empty or out of date.',
-      'Every customer gets the same email sequence, whatever they did in your product.',
-      'Marketing, sales and support each see a different version of the customer.',
+      'New leads wait hours for an owner, **or never get one**.',
+      'Half the CRM fields are **empty or out of date**.',
+      'Every customer gets **the same email sequence**, whatever they did in your product.',
+      'Marketing, sales and support each see **a different version of the customer**.',
     ],
     items: [
       {
@@ -68,7 +70,7 @@ const page: ServicePageContent = {
     ],
   },
   steps: {
-    h2: 'How a HubSpot and lifecycle setup runs',
+    h2: '**HubSpot and lifecycle setup**, step by step',
     items: [
       { title: 'Free CRM audit', body: 'We look at your CRM, your messaging tools and the journeys you run today.' },
       { title: 'Fixed quote', body: 'Price, scope and timeline by email, usually within one business day.' },
@@ -78,45 +80,45 @@ const page: ServicePageContent = {
       { title: 'Hand over', body: 'Docs and a training session, so your team can edit journeys without us.' },
     ],
   },
-  offer: { h2: 'CRM and lifecycle setup at a fixed price' },
+  offer: { h2: '**CRM and lifecycle setup** at a fixed price' },
   faq: {
-    h2: 'HubSpot and lifecycle FAQs',
+    h2: '**HubSpot and lifecycle** questions, answered',
     items: [
       {
         q: 'Can you migrate us into HubSpot?',
-        a: 'Yes. We map your objects, properties and pipelines from the old CRM or spreadsheets, clean and dedupe the data, move contacts, companies, deals and their history, and check the counts before you switch over.',
+        a: '**Yes.** We map your objects, properties and pipelines from the old CRM or spreadsheets, clean and dedupe the data, move contacts, companies, deals and their history, and check the counts before you switch over.',
       },
       {
         q: 'How does the HubSpot and Salesforce sync work?',
-        a: "HubSpot's Salesforce integration syncs contacts, leads, companies and deals both ways. The work is in the setup: which records sync, which system wins on each field, and how lead status and ownership move, so sales and marketing don't overwrite each other. We configure the field mappings and sync rules and test them on real records.",
+        a: "**HubSpot's Salesforce integration syncs contacts, leads, companies and deals both ways.** The work is in the setup: which records sync, which system wins on each field, and how lead status and ownership move, so sales and marketing don't overwrite each other. We configure the field mappings and sync rules and test them on real records.",
       },
       {
         q: 'Braze or Customer.io?',
-        a: 'Braze is built for large consumer apps, with mobile push, in-app messages and real-time segments, and is priced for bigger teams. Customer.io is quicker to start, flexible with data, and fits SaaS and smaller teams well. We recommend one based on your channels, volume and budget, and we set up either.',
+        a: '**Braze is built for large consumer apps**, with mobile push, in-app messages and real-time segments, and is priced for bigger teams. **Customer.io is quicker to start**, flexible with data, and fits SaaS and smaller teams well. We recommend one based on your channels, volume and budget, and we set up either.',
       },
       {
         q: 'Which lifecycle journeys do you set up?',
-        a: 'Usually onboarding, abandoned cart or checkout recovery, trial conversion, win-back for inactive users and renewal reminders. Each one is triggered by real product or purchase events.',
+        a: '**Usually onboarding**, abandoned cart or checkout recovery, trial conversion, win-back for inactive users and renewal reminders. Each one is triggered by real product or purchase events.',
       },
       {
         q: 'Can you set up lead scoring and routing in HubSpot?',
-        a: 'Yes. We score leads on form fills, web activity and product signals, route them to the right owner by territory, segment or round robin, and alert reps with the context they need. The MQL to SQL handoff is written down and automated.',
+        a: '**Yes.** We score leads on form fills, web activity and product signals, route them to the right owner by territory, segment or round robin, and alert reps with the context they need. The MQL to SQL handoff is written down and automated.',
       },
       {
         q: 'Do you set up Intercom?',
-        a: 'Yes. We connect Intercom to your product data, so each conversation shows who the customer is and what they use, and set up proactive messages, product tours, help articles and Fin.',
+        a: '**Yes.** We connect Intercom to your product data, so each conversation shows who the customer is and what they use, and set up proactive messages, product tours, help articles and Fin.',
       },
       {
         q: 'Will our emails reach the inbox?',
-        a: 'We set up the sending side properly: authenticated domains with SPF, DKIM and DMARC, a dedicated sending subdomain where it helps, preference and unsubscribe handling, and IP warmup where you need it. That covers the technical side of inbox placement. Content and list quality do the rest.',
+        a: '**We set up the sending side properly:** authenticated domains with SPF, DKIM and DMARC, a dedicated sending subdomain where it helps, preference and unsubscribe handling, and IP warmup where you need it. That covers the technical side of inbox placement. Content and list quality do the rest.',
       },
       {
         q: 'What does the free CRM audit cover?',
-        a: "It's a 30-minute call on your CRM, your messaging tools and your current journeys: where it hurts, the quick wins, and what to fix first, with a timeline and next steps. There's no obligation.",
+        a: "**It's a 30-minute call** on your CRM, your messaging tools and your current journeys: where it hurts, the quick wins, and what to fix first, with a timeline and next steps. There's no obligation.",
       },
     ],
   },
-  cta: { h2: 'Get a fixed-price quote for your CRM and lifecycle setup' },
+  cta: { h2: '**Get a fixed-price quote** for your CRM and lifecycle setup' },
 };
 
 export default page;

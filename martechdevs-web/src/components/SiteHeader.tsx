@@ -252,7 +252,7 @@ export default function SiteHeader({
             className="fixed inset-0 z-40 overflow-y-auto bg-white pt-36 px-6 pb-8 md:hidden"
           >
             <div className="mx-auto max-w-sm">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Services</p>
+              <p className="px-3 text-sm font-semibold text-gray-500">Services</p>
               <ul className="mt-2 space-y-0.5">
                 {SERVICE_PAGES.map((page) => (
                   <li key={page.slug}>

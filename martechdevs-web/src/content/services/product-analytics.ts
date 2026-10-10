@@ -11,9 +11,11 @@ const page: ServicePageContent = {
   },
   hero: {
     eyebrow: 'Product analytics',
-    h1: 'Mixpanel and Amplitude implementation that shows where users drop off',
-    intro:
-      "The same action is tracked under three names, funnels don't match the database, and the product team has stopped trusting the dashboards. We implement Mixpanel or Amplitude from a tracking plan, add backend events and AppsFlyer or Adjust data, and validate every event end to end, so funnels, retention and campaign ROI hold up.",
+    h1: '**Mixpanel and Amplitude implementation** that shows where users drop off',
+    problem:
+      "The same action is tracked under three names, funnels don't match the database, and **the product team has stopped trusting the dashboards**.",
+    solution:
+      'We implement **Mixpanel or Amplitude** from a tracking plan, add backend events and **AppsFlyer or Adjust** data, and validate every event end to end, so **funnels, retention and campaign ROI hold up**.',
   },
   auditName: 'analytics audit',
   tools: [
@@ -26,13 +28,13 @@ const page: ServicePageContent = {
     { name: 'Android', icon: 'android' },
   ],
   setup: {
-    h2: 'Product analytics implementation, from tracking plan to dashboards',
-    lead: 'Product analytics consultants who write the plan, ship the events and check them, so your product and growth teams get data they can rely on.',
+    h2: '**Product analytics implementation**, from tracking plan to dashboards',
+    lead: 'Product analytics consultants who **write the plan, ship the events and check them**, so your product and growth teams get data they can rely on.',
     problems: [
-      'The same action is tracked under three different event names.',
-      "Funnel numbers don't match the database, so nobody acts on them.",
-      'App installs and web signups never connect to the same user.',
-      'You can see traffic by campaign, but not which campaigns bring users who stay and pay.',
+      'The same action is tracked under **three different event names**.',
+      "Funnel numbers don't match the database, so **nobody acts on them**.",
+      'App installs and web signups **never connect to the same user**.',
+      'You can see traffic by campaign, but not **which campaigns bring users who stay and pay**.',
     ],
     items: [
       {
@@ -68,7 +70,7 @@ const page: ServicePageContent = {
     ],
   },
   steps: {
-    h2: 'How a Mixpanel or Amplitude setup runs',
+    h2: '**Mixpanel and Amplitude setup**, step by step',
     items: [
       { title: 'Free analytics audit', body: 'We review your current events, reports and where the numbers stop adding up.' },
       { title: 'Fixed quote', body: 'Price, scope and timeline by email, usually within one business day.' },
@@ -78,45 +80,45 @@ const page: ServicePageContent = {
       { title: 'Hand over', body: 'Dashboards, docs and a walkthrough so your team can answer its own questions.' },
     ],
   },
-  offer: { h2: 'Product analytics setup at a fixed price' },
+  offer: { h2: '**Product analytics setup** at a fixed price' },
   faq: {
-    h2: 'Mixpanel and Amplitude FAQs',
+    h2: '**Mixpanel and Amplitude** questions, answered',
     items: [
       {
         q: 'Mixpanel or Amplitude?',
-        a: 'Both cover funnels, retention, cohorts and user paths well. Mixpanel prices by events and is quick for teams to pick up. Amplitude prices by tracked users and adds products like Experiment for A/B tests, which suits larger product teams. Your data volume and the plan you qualify for often decide it. We implement both.',
+        a: '**Both cover funnels, retention, cohorts and user paths well.** Mixpanel prices by events and is quick for teams to pick up. Amplitude prices by tracked users and adds products like Experiment for A/B tests, which suits larger product teams. Your data volume and the plan you qualify for often decide it. We implement both.',
       },
       {
         q: 'What is a tracking plan, and why do we need one?',
-        a: "A tracking plan lists every event and property you collect, what each one means, when it fires and where it comes from. It keeps names consistent across web, app and backend, so reports don't break when someone ships a feature. We write it with you before any code changes, and it becomes the spec for your developers and ours.",
+        a: "**A tracking plan lists every event and property you collect**, what each one means, when it fires and where it comes from. It keeps names consistent across web, app and backend, so reports don't break when someone ships a feature. We write it with you before any code changes, and it becomes the spec for your developers and ours.",
       },
       {
         q: 'Should we track events in the backend?',
-        a: "For anything tied to revenue, yes. Signups, purchases, subscription changes and refunds are more reliable from your server, where ad blockers and closed tabs can't drop them. Clicks and screen views still come from the browser or app SDK, and both land on the same user.",
+        a: "**For anything tied to revenue, yes.** Signups, purchases, subscription changes and refunds are more reliable from your server, where ad blockers and closed tabs can't drop them. Clicks and screen views still come from the browser or app SDK, and both land on the same user.",
       },
       {
         q: 'Can you integrate AppsFlyer or Adjust?',
-        a: 'Yes. We connect your mobile attribution tool so install and campaign data lands on the same user profiles in Mixpanel or Amplitude. Then you can see which campaigns bring users who stay and pay.',
+        a: '**Yes.** We connect your mobile attribution tool so install and campaign data lands on the same user profiles in Mixpanel or Amplitude. Then you can see which campaigns bring users who stay and pay.',
       },
       {
         q: "Why don't our analytics numbers match the warehouse?",
-        a: 'Usually because they count different things or lose different data. Browser events are lost to ad blockers and closed tabs, time zones and deduplication rules differ, bots are filtered in one place and not the other, and identity merges change counts. We trace each metric back to its source, fix what is broken and document what is expected to differ.',
+        a: '**Usually because they count different things or lose different data.** Browser events are lost to ad blockers and closed tabs, time zones and deduplication rules differ, bots are filtered in one place and not the other, and identity merges change counts. We trace each metric back to its source, fix what is broken and document what is expected to differ.',
       },
       {
         q: 'How do you validate events?',
-        a: "Every event is checked against the tracking plan before release, in the browser and app debuggers, in Mixpanel's or Amplitude's live event views, and with test users who run through the key funnels. After launch we compare counts with your backend, so drift is caught early.",
+        a: "**Every event is checked against the tracking plan before release**, in the browser and app debuggers, in Mixpanel's or Amplitude's live event views, and with test users who run through the key funnels. After launch we compare counts with your backend, so drift is caught early.",
       },
       {
         q: 'Can you show true campaign ROI?',
-        a: 'Yes. We import ad cost from Google Ads, Meta and other platforms and tie it to the users each campaign brought in, so you can compare spend with activation, retention and revenue by campaign.',
+        a: '**Yes.** We import ad cost from Google Ads, Meta and other platforms and tie it to the users each campaign brought in, so you can compare spend with activation, retention and revenue by campaign.',
       },
       {
         q: 'What does the free analytics audit cover?',
-        a: "It's a 30-minute call on your events, your reports and the questions you can't answer yet: where it hurts, the quick wins, and what to fix first, with a timeline and next steps. There's no obligation.",
+        a: "**It's a 30-minute call** on your events, your reports and the questions you can't answer yet: where it hurts, the quick wins, and what to fix first, with a timeline and next steps. There's no obligation.",
       },
     ],
   },
-  cta: { h2: 'Get a fixed-price quote for your Mixpanel or Amplitude setup' },
+  cta: { h2: '**Get a fixed-price quote** for your Mixpanel or Amplitude setup' },
 };
 
 export default page;

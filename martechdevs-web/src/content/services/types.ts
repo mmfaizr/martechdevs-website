@@ -13,11 +13,17 @@ export type ServicePageContent = {
   /** Start of the `source` on every quote the page opens, for reporting. */
   source: string;
   meta: { title: string; description: string };
+  /**
+   * Headings and paragraphs take **marks**: in a heading the marked words are
+   * the dark half and the rest is grey, in a paragraph they are bold.
+   */
   hero: {
     eyebrow: string;
     h1: string;
-    /** Problem first, then what we set up, with the tool names. */
-    intro: string;
+    /** The pain, said first. */
+    problem: string;
+    /** What we set up, with the tool names. */
+    solution: string;
     /** One extra line under the intro, with a link. */
     aside?: { text: string; link: string; href: string };
   };

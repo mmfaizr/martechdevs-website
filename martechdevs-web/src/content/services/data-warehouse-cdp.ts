@@ -11,9 +11,11 @@ const page: ServicePageContent = {
   },
   hero: {
     eyebrow: 'Data warehouse & CDP',
-    h1: 'Data warehouse and CDP implementation for one trusted customer view',
-    intro:
-      'Customer data is spread across your app, CRM, billing and support tools, every team pulls its own export, and nobody can say what a customer is worth. We set up Snowflake or Google BigQuery, Segment or RudderStack, Fivetran or Airbyte pipelines, dbt models and reverse ETL with Hightouch, so one trusted customer view feeds every tool your teams use.',
+    h1: '**Data warehouse and CDP implementation** for one trusted customer view',
+    problem:
+      'Customer data is spread across your app, CRM, billing and support tools, and **nobody can say what a customer is worth**.',
+    solution:
+      'We set up **Snowflake or Google BigQuery**, Segment or RudderStack, Fivetran or Airbyte pipelines, dbt models and reverse ETL with Hightouch, so **one trusted customer view feeds every tool**.',
   },
   auditName: 'stack audit',
   tools: [
@@ -28,13 +30,13 @@ const page: ServicePageContent = {
     { name: 'Census', icon: 'census' },
   ],
   setup: {
-    h2: 'Snowflake, BigQuery and Segment implementation',
-    lead: 'Data warehouse consulting from the people who build it. We design the warehouse, collect the data, model it and send it back out to your tools.',
+    h2: '**Snowflake, BigQuery and Segment** implementation',
+    lead: 'Data warehouse consulting from the people who build it. **We design the warehouse, collect the data, model it** and send it back out to your tools.',
     problems: [
-      'Every team pulls its own export and gets its own answer.',
-      'Product usage lives in one tool, revenue in another and support history in a third.',
-      "Your CRM and messaging tools can't see what customers actually do.",
-      'Pipelines break quietly, and someone finds out from a wrong report.',
+      'Every team pulls its own export and **gets its own answer**.',
+      'Product usage lives in one tool, revenue in another and **support history in a third**.',
+      "Your CRM and messaging tools **can't see what customers actually do**.",
+      'Pipelines break quietly, and **someone finds out from a wrong report**.',
     ],
     items: [
       {
@@ -70,7 +72,7 @@ const page: ServicePageContent = {
     ],
   },
   steps: {
-    h2: 'How a data warehouse implementation runs',
+    h2: '**Data warehouse implementation**, step by step',
     items: [
       { title: 'Free stack audit', body: 'We map your sources, your tools and the questions the data has to answer.' },
       { title: 'Fixed quote', body: 'Price, scope and timeline by email, usually within one business day.' },
@@ -80,45 +82,45 @@ const page: ServicePageContent = {
       { title: 'Hand over', body: 'Docs and a training session for your team, plus ongoing support if you want it.' },
     ],
   },
-  offer: { h2: 'Data warehouse consulting at a fixed price' },
+  offer: { h2: '**Data warehouse consulting** at a fixed price' },
   faq: {
-    h2: 'Data warehouse and CDP FAQs',
+    h2: '**Data warehouse and CDP** questions, answered',
     items: [
       {
         q: 'Snowflake or BigQuery?',
-        a: "Both work well for marketing data. BigQuery is a natural fit if you're on Google Cloud or rely on GA4, which exports straight into it. Snowflake suits teams on AWS or Azure, or anyone who wants to stay cloud-neutral and share data with partners. Cost depends mostly on how you query. We recommend one after looking at your sources, team and budget.",
+        a: "**Both work well for marketing data.** BigQuery is a natural fit if you're on Google Cloud or rely on GA4, which exports straight into it. Snowflake suits teams on AWS or Azure, or anyone who wants to stay cloud-neutral and share data with partners. Cost depends mostly on how you query. We recommend one after looking at your sources, team and budget.",
       },
       {
         q: 'Do we need Segment if we already have a warehouse?',
-        a: 'Not always. Segment or RudderStack collects events from your website, app and servers in one format and sends them to your tools in real time. If you only need data in the warehouse for reporting, Fivetran or Airbyte plus native exports may be enough. If you also want live events in Braze, HubSpot or your ad platforms, a CDP saves a lot of custom work. Some teams use the warehouse itself as the hub with reverse ETL, often called a composable CDP.',
+        a: '**Not always.** Segment or RudderStack collects events from your website, app and servers in one format and sends them to your tools in real time. If you only need data in the warehouse for reporting, Fivetran or Airbyte plus native exports may be enough. If you also want live events in Braze, HubSpot or your ad platforms, a CDP saves a lot of custom work. Some teams use the warehouse itself as the hub with reverse ETL, often called a composable CDP.',
       },
       {
         q: 'What is reverse ETL, and when do we need it?',
-        a: "Reverse ETL copies data from your warehouse back into the tools your teams use, like HubSpot, Salesforce, Braze or your ad platforms. You need it when the useful data, such as lifetime value, product usage or churn risk, lives in the warehouse and those tools can't see it. We set it up with Hightouch or Census, on Snowflake or BigQuery.",
+        a: "**Reverse ETL copies data from your warehouse back into the tools your teams use**, like HubSpot, Salesforce, Braze or your ad platforms. You need it when the useful data, such as lifetime value, product usage or churn risk, lives in the warehouse and those tools can't see it. We set it up with Hightouch or Census, on Snowflake or BigQuery.",
       },
       {
         q: 'Fivetran or Airbyte?',
-        a: 'Fivetran is fully managed, has a large set of maintained connectors and charges by monthly active rows. Airbyte is open source, runs on your own servers or as a cloud service, and is often cheaper at high volume, with more upkeep. We pick based on your sources, data volume and who will look after the pipelines.',
+        a: '**Fivetran is fully managed**, has a large set of maintained connectors and charges by monthly active rows. **Airbyte is open source**, runs on your own servers or as a cloud service, and is often cheaper at high volume, with more upkeep. We pick based on your sources, data volume and who will look after the pipelines.',
       },
       {
         q: 'How do you keep the data clean?',
-        a: "We agree a tracking plan and naming rules before anything is built, then transform the raw data with dbt into clean, modeled tables. Checks for freshness, duplicates and missing values catch problems early, and in Segment or RudderStack the tracking plan blocks or flags events that don't match it.",
+        a: "**We agree a tracking plan and naming rules before anything is built**, then transform the raw data with dbt into clean, modeled tables. Checks for freshness, duplicates and missing values catch problems early, and in Segment or RudderStack the tracking plan blocks or flags events that don't match it.",
       },
       {
         q: 'How long does a data warehouse implementation take?',
-        a: 'Most projects are live within a few weeks. A first version with your main sources loaded and modeled comes first, then more sources and the reverse ETL syncs. Your fixed quote gives the timeline.',
+        a: '**Most projects are live within a few weeks.** A first version with your main sources loaded and modeled comes first, then more sources and the reverse ETL syncs. Your fixed quote gives the timeline.',
       },
       {
         q: 'Can you build a single customer view?',
-        a: 'Yes. We join web, app, CRM, billing and support data on shared IDs such as email, user ID and device ID into one profile per customer, in the warehouse and in your CDP if you use one. That profile then drives audiences, scoring and reporting.',
+        a: '**Yes.** We join web, app, CRM, billing and support data on shared IDs such as email, user ID and device ID into one profile per customer, in the warehouse and in your CDP if you use one. That profile then drives audiences, scoring and reporting.',
       },
       {
         q: 'What does the free stack audit cover?',
-        a: "It's a 30-minute call on your data sources, tools and reporting: where it hurts, the quick wins, and what to build first, with a timeline and next steps. There's no obligation.",
+        a: "**It's a 30-minute call** on your data sources, tools and reporting: where it hurts, the quick wins, and what to build first, with a timeline and next steps. There's no obligation.",
       },
     ],
   },
-  cta: { h2: 'Get a fixed-price quote for your warehouse and CDP' },
+  cta: { h2: '**Get a fixed-price quote** for your warehouse and CDP' },
 };
 
 export default page;

@@ -550,7 +550,7 @@ export default function Footer({ home = false }: { home?: boolean }) {
 
             {/* The service pages, one line rather than a column of links. */}
             <nav aria-label="Service pages" className="mt-10 flex flex-wrap items-baseline gap-x-6 gap-y-2.5 text-[13px]">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 Services
               </span>
               {SERVICE_PAGES.map((page) => (
