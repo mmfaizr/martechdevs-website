@@ -83,6 +83,12 @@ function jsonLd(data: unknown) {
   return JSON.stringify(data).replace(/</g, '\\u003c');
 }
 
+/** Soft edges on the tools strip, in percent so a phone still shows most of it. */
+const STRIP_FADE = {
+  maskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+  WebkitMaskImage: 'linear-gradient(to right, transparent, #000 12%, #000 88%, transparent)',
+};
+
 /** Hero pieces rise in one after another. */
 const rise = (ms: number) => ({ animationDelay: `${ms}ms` });
 
@@ -156,7 +162,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
               <HeroIcons />
             </div>
             <h1
-              className="rise-in mx-auto max-w-3xl text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl md:text-5xl"
+              className="rise-in mx-auto max-w-[868px] text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl md:text-5xl"
               style={rise(80)}
             >
               <Rich text={c.hero.h1} strong="font-medium text-gray-900" muted={HEAD_MUTED} />
@@ -166,7 +172,7 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
           <p className="rise-in mx-auto max-w-2xl text-base font-medium text-gray-600 md:text-lg" style={rise(160)}>
             Truly DFY. This is our priority <span className="font-bold text-teal-600">#1</span>
           </p>
-          <p className="rise-in mx-auto mt-4 max-w-2xl text-pretty text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
+          <p className="rise-in mx-auto mt-4 max-w-[868px] text-balance text-base leading-relaxed text-gray-600 md:text-lg" style={rise(220)}>
             <Rich text={c.hero.solution} />
           </p>
           {c.hero.aside && (
@@ -216,28 +222,39 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
 
           <div className="rise-in" style={rise(420)}>
             <p className="mt-10 text-sm text-gray-500">Tools we set up and connect</p>
-            <ul className="mx-auto mt-3 flex max-w-3xl flex-wrap justify-center gap-2">
-              {c.tools.map((tool) => (
-                <li
-                  key={tool.name}
-                  className="flex items-center gap-2 rounded-full border bg-white py-1.5 pl-2 pr-3.5 text-sm font-medium text-gray-700 transition-transform hover:-translate-y-0.5"
-                  style={{ borderColor: BORDER }}
-                >
-                  {tool.icon ? (
-                    <Image
-                      src={`/assets/tool logos icons/${tool.icon} logo icon.svg`}
-                      alt=""
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 rounded"
-                    />
-                  ) : (
-                    <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-teal-600" />
-                  )}
-                  {tool.name}
-                </li>
-              ))}
-            </ul>
+            {/* One scrolling line, like the logo strip on growthandanalytics.com.
+                Three equal runs so the loop is seamless; each run is the list
+                twice over, wide enough to fill the strip on a big screen. The
+                first chip of each name is real text, the repeats draw theirs
+                from a data attribute, so the names are not in the page six
+                times over. */}
+            <div className="mx-auto mt-3 max-w-5xl overflow-hidden py-1" style={STRIP_FADE}>
+              <ul className="animate-marquee flex w-max gap-2" style={{ animationDuration: '45s' }}>
+                {[0, 1, 2, 3, 4, 5].flatMap((run) =>
+                  c.tools.map((tool) => (
+                    <li
+                      key={`${run}-${tool.name}`}
+                      aria-hidden={run > 0 || undefined}
+                      className="flex shrink-0 items-center gap-2 rounded-full border bg-white py-1.5 pl-2 pr-3.5 text-sm font-medium text-gray-700"
+                      style={{ borderColor: BORDER }}
+                    >
+                      {tool.icon ? (
+                        <Image
+                          src={`/assets/tool logos icons/${tool.icon} logo icon.svg`}
+                          alt=""
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 rounded"
+                        />
+                      ) : (
+                        <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-teal-600" />
+                      )}
+                      {run === 0 ? tool.name : <span data-name={tool.name} className="before:content-[attr(data-name)]" />}
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
           </div>
 
           <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-sm" style={rise(480)}>
