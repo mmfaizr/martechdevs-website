@@ -147,8 +147,11 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
           {/* The homepage hero's tagline slot. The asterisk is explained in the
               note at the foot of the hero. */}
           <p className="rise-in mx-auto max-w-2xl text-balance text-sm text-gray-600 md:text-base">
-            Experience hassle-free, blazing fast implementation, backed by{' '}
-            <span className="font-bold text-teal-600">74+</span> martech and growth stacks
+            <span className="font-semibold text-gray-900">Blazing fast</span>{' '}
+            <svg viewBox="0 0 24 24" className="inline-block h-4 w-4 align-[-2px]" aria-hidden="true">
+              <path d="M13.5 2 4.5 13.5h6.5L10 22l9.5-12H13z" fill="#F5B942" stroke="#D99A27" strokeWidth={1} strokeLinejoin="round" />
+            </svg>{' '}
+            implementation, backed by <span className="font-bold text-teal-600">74+</span> martech, data and growth stacks
             <a href="#implementations-note" aria-label="About the 74+ implementations" className="text-teal-600 no-underline">
               *
             </a>
@@ -253,8 +256,8 @@ export default function ServicePage({ content: c }: { content: ServicePageConten
             </div>
           </div>
 
-          <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-sm lg:max-w-none lg:whitespace-nowrap" style={rise(480)}>
-            * 74+ martech and growth stack implementations, delivered through{' '}
+          <p id="implementations-note" className="rise-in mx-auto mt-8 max-w-2xl text-balance text-xs text-gray-500 sm:text-[13px] lg:max-w-none lg:whitespace-nowrap" style={rise(480)}>
+            * 74+ martech, data and growth stack implementations, delivered through{' '}
             <a href={SITE_URL} className="font-medium text-teal-700 underline underline-offset-2 hover:text-teal-800">
               martechdevs
             </a>{' '}
